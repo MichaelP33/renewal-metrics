@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { 
   ModelCategory, 
-  ModelCategoryConfig, 
   CATEGORY_ORDER, 
   MODEL_COLORS 
 } from '@/types';
@@ -171,7 +170,7 @@ export function ModelSelector({
         {/* Summary */}
         <div className="text-xs text-gray-600 space-y-1">
           <p>
-            <strong>Note:</strong> Deselected categories will be grouped into "Other"
+            <strong>Note:</strong> Deselected categories will be grouped into &quot;Other&quot;
           </p>
           <p>
             Categories with no data will show as empty in charts

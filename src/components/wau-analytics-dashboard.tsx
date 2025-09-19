@@ -7,19 +7,14 @@ import { Separator } from '@/components/ui/separator';
 import { WAUMoMChart } from './wau-mom-chart';
 import { WAUWoWChart } from './wau-wow-chart';
 import { 
-  WAURawDataRow, 
-  WAUProcessedDataRow, 
-  WAUMoMData, 
-  WAUWoWData,
+  WAURawDataRow,
   WAUChartConfig, 
-  WAUFilterConfig,
-  DateRange
+  WAUFilterConfig
 } from '@/types';
 import { 
   processWAUData, 
   aggregateWAUMoM, 
-  aggregateWAUWoW,
-  getWAUDataDateRange
+  aggregateWAUWoW
 } from '@/lib/wau-data-processing';
 import { formatUserCount } from '@/lib/chart-utils';
 
@@ -35,7 +30,6 @@ export function WAUDashboard({
   rawData, 
   filterConfig, 
   chartConfig, 
-  onFilterConfigChange, 
   onChartConfigChange 
 }: WAUDashboardProps) {
   // Refs for export functionality
@@ -56,10 +50,6 @@ export function WAUDashboard({
     return aggregateWAUWoW(processedData);
   }, [processedData]);
 
-  // Get available date range from data
-  const availableDateRange = useMemo(() => {
-    return getWAUDataDateRange(rawData);
-  }, [rawData]);
 
   const hasData = rawData.length > 0;
   const hasProcessedData = processedData.length > 0;

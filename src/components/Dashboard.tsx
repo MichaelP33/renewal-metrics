@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useMemo } from 'react';
 import { AlertCircle, BarChart3, PieChart as PieChartIcon, Table, DollarSign, Users, TrendingUp } from 'lucide-react';
-import { FileUpload } from './FileUpload';
 import { DualFileUpload } from './dual-file-upload';
 import { DateRangePicker } from './DateRangePicker';
 import { ModelSelector } from './ModelSelector';
@@ -39,9 +38,6 @@ import {
 } from '@/lib/data-processing';
 import { 
   parseWAUCSVData, 
-  processWAUData, 
-  aggregateWAUMoM, 
-  aggregateWAUWoW,
   getWAUDataDateRange
 } from '@/lib/wau-data-processing';
 
@@ -118,9 +114,6 @@ export function Dashboard() {
     return getDataDateRange(rawData);
   }, [rawData]);
 
-  const wauAvailableDateRange = useMemo(() => {
-    return getWAUDataDateRange(wauRawData);
-  }, [wauRawData]);
 
   // Category counts for model selector
   const categoryCounts = useMemo(() => {

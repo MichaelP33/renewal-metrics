@@ -23,9 +23,7 @@ import {
 } from '@/types';
 import { 
   formatCurrency, 
-  createTooltipFormatter, 
   shouldShowLabels,
-  createDataLabelFormatter,
   yAxisTickFormatter
 } from '@/lib/chart-utils';
 
@@ -37,18 +35,29 @@ interface StackedBarChartProps {
   height?: number;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    dataKey: string;
+    color: string;
+    payload: Record<string, unknown>;
+  }>;
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
-    const total = payload.reduce((sum: number, entry: any) => sum + (entry.value || 0), 0);
+    const total = payload.reduce((sum: number, entry) => sum + (entry.value || 0), 0);
     
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-semibold text-gray-900 mb-2">{label}</p>
         <div className="space-y-1">
           {payload
-            .filter((entry: any) => entry.value > 0)
-            .sort((a: any, b: any) => b.value - a.value)
-            .map((entry: any, index: number) => (
+            .filter((entry) => entry.value > 0)
+            .sort((a, b) => b.value - a.value)
+            .map((entry, index: number) => (
               <div key={index} className="flex items-center justify-between min-w-[200px]">
                 <div className="flex items-center space-x-2">
                   <div
@@ -77,10 +86,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const CustomDataLabel = (props: any) => {
+interface DataLabelProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+}
+
+const CustomDataLabel = (props: DataLabelProps) => {
   const { x, y, width, height, value } = props;
   
-  if (!value || value < 50) return null; // Don't show labels for small values
+  if (!value || value < 50 || x === undefined || y === undefined || width === undefined || height === undefined) {
+    return null; // Do not show labels for small values or undefined positions
+  }
   
   return (
     <text

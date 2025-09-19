@@ -43,7 +43,7 @@ export function DualFileUpload({
 
   const [isDragOver, setIsDragOver] = useState<DataType | null>(null);
 
-  const processFile = async (file: File, dataType: DataType) => {
+  const processFile = useCallback(async (file: File, dataType: DataType) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
       if (dataType === 'MODEL_COSTS') {
         setModelCostsState(prev => ({ ...prev, validationStatus: 'invalid' }));
@@ -101,7 +101,7 @@ export function DualFileUpload({
         setWAUState(prev => ({ ...prev, validationStatus: 'invalid' }));
       }
     }
-  };
+  }, [onModelCostsUpload, onWAUUpload]);
 
   const handleDrop = useCallback(async (e: React.DragEvent, dataType: DataType) => {
     e.preventDefault();
@@ -113,7 +113,7 @@ export function DualFileUpload({
     if (file) {
       await processFile(file, dataType);
     }
-  }, []);
+  }, [processFile]);
 
   const handleDragOver = useCallback((e: React.DragEvent, dataType: DataType) => {
     e.preventDefault();
@@ -130,7 +130,7 @@ export function DualFileUpload({
     if (file) {
       await processFile(file, dataType);
     }
-  }, []);
+  }, [processFile]);
 
   const resetUpload = (dataType: DataType) => {
     if (dataType === 'MODEL_COSTS') {

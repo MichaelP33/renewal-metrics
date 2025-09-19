@@ -16,7 +16,6 @@ import { BarChart3 } from 'lucide-react';
 import { WAUMoMData, WAUChartConfig, WAU_COLORS } from '@/types';
 import { 
   formatUserCount, 
-  createWAUMoMTooltipFormatter, 
   wauYAxisTickFormatter,
   WAU_CHART_PRESETS
 } from '@/lib/chart-utils';
@@ -28,7 +27,15 @@ interface WAUMoMChartProps {
   height?: number;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: WAUMoMData;
+  }>;
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     
@@ -67,10 +74,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const CustomDataLabel = (props: any) => {
+interface DataLabelProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+}
+
+const CustomDataLabel = (props: DataLabelProps) => {
   const { x, y, width, height, value } = props;
   
-  if (!value || value < 10) return null; // Don't show labels for small values
+  if (!value || value < 10 || x === undefined || y === undefined || width === undefined || height === undefined) {
+    return null; // Do not show labels for small values or undefined positions
+  }
   
   return (
     <text

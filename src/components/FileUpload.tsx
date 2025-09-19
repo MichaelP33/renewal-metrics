@@ -17,36 +17,7 @@ export function FileUpload({ onFileUpload, isLoading = false, error }: FileUploa
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [validationStatus, setValidationStatus] = useState<'idle' | 'validating' | 'valid' | 'invalid'>('idle');
 
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    const file = files[0];
-    
-    if (file) {
-      await processFile(file);
-    }
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
-  const handleFileInput = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      await processFile(file);
-    }
-  }, []);
-
-  const processFile = async (file: File) => {
+  const processFile = useCallback(async (file: File) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
       setValidationStatus('invalid');
       return;
@@ -77,7 +48,36 @@ export function FileUpload({ onFileUpload, isLoading = false, error }: FileUploa
       console.error('File validation error:', err);
       setValidationStatus('invalid');
     }
-  };
+  }, [onFileUpload]);
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    const file = files[0];
+    
+    if (file) {
+      await processFile(file);
+    }
+  }, [processFile]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
+  const handleFileInput = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await processFile(file);
+    }
+  }, [processFile]);
 
   const resetUpload = () => {
     setUploadedFile(null);

@@ -35,19 +35,19 @@ export function getChartColors(categories: ModelCategory[]): string[] {
  * Custom tooltip formatter for Recharts
  */
 export function createTooltipFormatter(showPercentages = false) {
-  return (value: number, name: string, props: any) => {
+  return (value: number, _name: string, props: { payload?: Record<string, unknown> }) => {
     const formattedValue = formatCurrency(value);
     
     if (showPercentages && props.payload) {
       const total = Object.keys(props.payload)
-        .filter(key => key !== 'month' && typeof props.payload[key] === 'number')
-        .reduce((sum, key) => sum + (props.payload[key] || 0), 0);
+        .filter(key => key !== 'month' && typeof props.payload![key] === 'number')
+        .reduce((sum, key) => sum + (props.payload![key] as number || 0), 0);
       
       const percentage = total > 0 ? (value / total) * 100 : 0;
-      return [`${formattedValue} (${formatPercentage(percentage)})`, name];
+      return [`${formattedValue} (${formatPercentage(percentage)})`, _name];
     }
     
-    return [formattedValue, name];
+    return [formattedValue, _name];
   };
 }
 
@@ -226,7 +226,7 @@ export function getWAUChartColors(): string[] {
  * Custom tooltip formatter for WAU MoM charts
  */
 export function createWAUMoMTooltipFormatter() {
-  return (value: number, name: string, props: any) => {
+  return (value: number) => {
     const formattedValue = formatUserCount(value);
     return [formattedValue, 'Average WAU'];
   };
@@ -236,7 +236,7 @@ export function createWAUMoMTooltipFormatter() {
  * Custom tooltip formatter for WAU WoW charts
  */
 export function createWAUWoWTooltipFormatter() {
-  return (value: number, name: string, props: any) => {
+  return (value: number, name: string) => {
     if (name === 'wauCount') {
       return [formatUserCount(value), 'WAU Count'];
     } else if (name === 'weeklyUsage') {

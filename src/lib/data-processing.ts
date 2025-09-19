@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, isWithinInterval, parseISO, addMonths, addQuarters } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfQuarter, isWithinInterval, parseISO, addMonths, addQuarters } from 'date-fns';
 import { 
   RawDataRow, 
   ProcessedDataRow, 
@@ -53,7 +53,7 @@ export function parseCSVData(csvContent: string): Promise<RawDataRow[]> {
 
         resolve(validData);
       },
-      error: (error: any) => {
+      error: (error: Error) => {
         reject(new Error(`Failed to parse CSV: ${error.message}`));
       }
     });
@@ -81,7 +81,7 @@ export function processData(
           if (!isWithinInterval(rowDate, { start: filterConfig.dateRange.from, end: filterConfig.dateRange.to })) {
             return false;
           }
-        } catch (error: any) {
+        } catch {
           console.warn(`Invalid date format: ${row.month}`);
           return false;
         }
@@ -279,7 +279,7 @@ export function formatMonthDisplay(monthString: string): string {
   try {
     const date = parseISO(monthString);
     return format(date, 'MMM yyyy');
-  } catch (error) {
+  } catch {
     console.warn(`Invalid date format: ${monthString}`);
     return monthString;
   }
@@ -295,7 +295,7 @@ export function getDataDateRange(rawData: RawDataRow[]): DateRange | null {
     .map(row => {
       try {
         return parseISO(row.month);
-      } catch (error) {
+      } catch {
         return null;
       }
     })
@@ -372,7 +372,7 @@ export function validateCSVFormat(file: File): Promise<boolean> {
         );
 
         resolve(hasRequiredColumns);
-      } catch (error) {
+      } catch {
         resolve(false);
       }
     };

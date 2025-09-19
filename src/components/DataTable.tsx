@@ -56,8 +56,8 @@ export const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(({
     if (!sortColumn || !sortDirection) return data;
 
     return [...data].sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+      let aValue: number | Date;
+      let bValue: number | Date;
 
       if (sortColumn === 'month') {
         aValue = new Date(a.month);

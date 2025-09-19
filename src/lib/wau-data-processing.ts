@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { format, startOfMonth, endOfMonth, isWithinInterval, parseISO, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfMonth, isWithinInterval, parseISO, startOfWeek, endOfWeek } from 'date-fns';
 import { 
   WAURawDataRow, 
   WAUProcessedDataRow, 
@@ -52,7 +52,7 @@ export function parseWAUCSVData(csvContent: string): Promise<WAURawDataRow[]> {
 
         resolve(validData);
       },
-      error: (error: any) => {
+      error: (error: Error) => {
         reject(new Error(`Failed to parse CSV: ${error.message}`));
       }
     });
@@ -75,7 +75,7 @@ export function processWAUData(
           if (!isWithinInterval(rowDate, { start: filterConfig.dateRange.from, end: filterConfig.dateRange.to })) {
             return false;
           }
-        } catch (error: any) {
+        } catch {
           console.warn(`Invalid date format: ${row.week}`);
           return false;
         }
@@ -179,7 +179,7 @@ export function formatWeekDisplay(weekString: string): string {
   try {
     const date = parseISO(weekString);
     return format(date, 'MMM dd, yyyy');
-  } catch (error) {
+  } catch {
     console.warn(`Invalid date format: ${weekString}`);
     return weekString;
   }
@@ -195,7 +195,7 @@ export function getWAUDataDateRange(rawData: WAURawDataRow[]): DateRange | null 
     .map(row => {
       try {
         return parseISO(row.week);
-      } catch (error) {
+      } catch {
         return null;
       }
     })
@@ -236,7 +236,7 @@ export function validateWAUCSVFormat(file: File): Promise<boolean> {
         );
 
         resolve(hasRequiredColumns);
-      } catch (error) {
+      } catch {
         resolve(false);
       }
     };

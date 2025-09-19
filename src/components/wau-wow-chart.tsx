@@ -29,7 +29,15 @@ interface WAUWoWChartProps {
   height?: number;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: WAUWoWData;
+  }>;
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload }: TooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     
@@ -68,10 +76,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const CustomDataLabel = (props: any) => {
+interface DataLabelProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+}
+
+const CustomDataLabel = (props: DataLabelProps) => {
   const { x, y, width, height, value } = props;
   
-  if (!value || value < 10) return null; // Don't show labels for small values
+  if (!value || value < 10 || x === undefined || y === undefined || width === undefined || height === undefined) {
+    return null; // Do not show labels for small values or undefined positions
+  }
   
   return (
     <text
@@ -88,44 +106,6 @@ const CustomDataLabel = (props: any) => {
   );
 };
 
-// Custom X-axis component to show month labels
-const CustomXAxis = (props: any) => {
-  const { data, ...rest } = props;
-  
-  // Group data by month and create month labels
-  const monthGroups = data.reduce((acc: any, item: WAUWoWData, index: number) => {
-    if (!acc[item.monthLabel]) {
-      acc[item.monthLabel] = { startIndex: index, endIndex: index };
-    } else {
-      acc[item.monthLabel].endIndex = index;
-    }
-    return acc;
-  }, {});
-
-  const monthLabels = Object.entries(monthGroups).map(([month, group]: [string, any]) => ({
-    month,
-    position: (group.startIndex + group.endIndex) / 2
-  }));
-
-  return (
-    <g>
-      {/* Month labels */}
-      {monthLabels.map(({ month, position }, index) => (
-        <text
-          key={index}
-          x={props.width * (position / (data.length - 1))}
-          y={props.height - 10}
-          textAnchor="middle"
-          fontSize="12"
-          fill="#666"
-          fontWeight="500"
-        >
-          {month}
-        </text>
-      ))}
-    </g>
-  );
-};
 
 export const WAUWoWChart = forwardRef<HTMLDivElement, WAUWoWChartProps>(
   ({ data, config, title = "WAUs Week-over-Week", height = 400 }, ref) => {
@@ -166,7 +146,7 @@ export const WAUWoWChart = forwardRef<HTMLDivElement, WAUWoWChartProps>(
                   tick={{ fontSize: 10 }}
                   axisLine={{ stroke: '#e0e0e0' }}
                   tickLine={{ stroke: '#e0e0e0' }}
-                  hide={true} // Hide default labels, we'll show month labels instead
+                  hide={true} // Hide default labels, we will show month labels instead
                 />
                 <YAxis 
                   tickFormatter={wauYAxisTickFormatter}

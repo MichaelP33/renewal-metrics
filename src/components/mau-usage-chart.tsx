@@ -51,18 +51,33 @@ export const MAUUsageChart = forwardRef<HTMLDivElement, MAUUsageChartProps>(
     ];
 
     // Custom cell component that includes labels and background fill
-    const CustomCell = (props: any) => {
+    interface CustomCellProps {
+      payload?: {
+        value: number;
+        color: string;
+        name: string;
+        percentage: number;
+      };
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      [key: string]: unknown;
+    }
+    
+    const CustomCell = (props: CustomCellProps) => {
       const { payload, x, y, width, height } = props;
       
-      // Validate coordinates
+      // Validate coordinates and payload
       if (typeof x !== 'number' || isNaN(x) || 
           typeof y !== 'number' || isNaN(y) ||
           typeof width !== 'number' || isNaN(width) ||
-          typeof height !== 'number' || isNaN(height)) {
-        return <rect x={0} y={0} width={0} height={0} fill={payload?.color || MAU_COLORS.agent} />;
+          typeof height !== 'number' || isNaN(height) ||
+          !payload) {
+        return <rect x={0} y={0} width={0} height={0} fill={MAU_COLORS.agent} />;
       }
 
-      const labelText = `${payload.count} of ${payload.total} MAUs (${Math.round(payload.percentage)}%)`;
+      const labelText = `${payload.value} MAUs (${Math.round(payload.percentage)}%)`;
       const textColor = '#FFFFFF';
       
       // Calculate the orange bar width based on the actual percentage
