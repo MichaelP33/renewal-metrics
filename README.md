@@ -29,9 +29,9 @@ This application provides comprehensive analytics for AI model usage and costs, 
 
 ## Integration with Fieldsphere Portal
 
-This app is integrated into the Fieldsphere portal as a microfrontend:
+This app was previously integrated into the Fieldsphere portal as a microfrontend and now runs standalone:
 
-- **Route**: `/usage-spend`
+- **Previous Route**: `/usage-spend` (now runs on root `/`)
 - **Package Name**: `@usage-spend/app`
 - **Development URL**: `usage-spend.anyweb.dev`
 
@@ -55,7 +55,7 @@ This app is integrated into the Fieldsphere portal as a microfrontend:
 
 3. **Access the app**:
    - Standalone: `http://localhost:3000`
-   - Via Portal: `http://localhost:3000/usage-spend`
+   - Previously via Portal: `http://localhost:3000/usage-spend` (now runs on root)
 
 ### Available Scripts
 

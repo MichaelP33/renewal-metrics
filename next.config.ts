@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  basePath: '/usage-spend',
+  // basePath: '/usage-spend', // Removed to run on root path
   
   // Move turbo config to turbopack (fixing deprecation warning)
   turbopack: {
