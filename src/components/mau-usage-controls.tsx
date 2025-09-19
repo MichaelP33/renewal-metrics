@@ -23,38 +23,43 @@ export function MAUUsageControls({
 }: MAUUsageControlsProps) {
   // Local input state to allow blank fields
   const [activeUsersInput, setActiveUsersInput] = useState<string>('');
-  const [agentPctInput, setAgentPctInput] = useState<string>('');
-  const [tabPctInput, setTabPctInput] = useState<string>('');
+  const [agentUsersInput, setAgentUsersInput] = useState<string>('');
+  const [tabUsersInput, setTabUsersInput] = useState<string>('');
 
   // Sync local inputs if parent resets data
   useEffect(() => {
-    if (data.activeUsers === 0 && data.agentPercentage === 0 && data.tabPercentage === 0) {
+    if (data.activeUsers === 0 && data.agentUsers === 0 && data.tabUsers === 0) {
       setActiveUsersInput('');
-      setAgentPctInput('');
-      setTabPctInput('');
+      setAgentUsersInput('');
+      setTabUsersInput('');
     }
-  }, [data.activeUsers, data.agentPercentage, data.tabPercentage]);
+  }, [data.activeUsers, data.agentUsers, data.tabUsers]);
 
   const handleActiveUsersChange = (value: string) => {
     setActiveUsersInput(value);
     const activeUsers = Math.max(0, value === '' ? 0 : parseInt(value) || 0);
-    const agentUsers = Math.round((activeUsers * data.agentPercentage) / 100);
-    const tabUsers = Math.round((activeUsers * data.tabPercentage) / 100);
-    onDataChange({ ...data, activeUsers, agentUsers, tabUsers });
+    // Recalculate percentages based on current user counts
+    const agentPercentage = activeUsers > 0 ? (data.agentUsers / activeUsers) * 100 : 0;
+    const tabPercentage = activeUsers > 0 ? (data.tabUsers / activeUsers) * 100 : 0;
+    onDataChange({ ...data, activeUsers, agentPercentage, tabPercentage });
   };
 
-  const handleAgentPercentageChange = (value: string) => {
-    setAgentPctInput(value);
-    const percentage = value === '' ? 0 : Math.max(0, Math.min(100, parseFloat(value) || 0));
-    const agentUsers = Math.round((data.activeUsers * percentage) / 100);
-    onDataChange({ ...data, agentPercentage: percentage, agentUsers });
+  const handleAgentUsersChange = (value: string) => {
+    setAgentUsersInput(value);
+    const agentUsers = Math.max(0, value === '' ? 0 : parseInt(value) || 0);
+    // Cap agent users at total active users
+    const cappedAgentUsers = Math.min(agentUsers, data.activeUsers);
+    const agentPercentage = data.activeUsers > 0 ? (cappedAgentUsers / data.activeUsers) * 100 : 0;
+    onDataChange({ ...data, agentUsers: cappedAgentUsers, agentPercentage });
   };
 
-  const handleTabPercentageChange = (value: string) => {
-    setTabPctInput(value);
-    const percentage = value === '' ? 0 : Math.max(0, Math.min(100, parseFloat(value) || 0));
-    const tabUsers = Math.round((data.activeUsers * percentage) / 100);
-    onDataChange({ ...data, tabPercentage: percentage, tabUsers });
+  const handleTabUsersChange = (value: string) => {
+    setTabUsersInput(value);
+    const tabUsers = Math.max(0, value === '' ? 0 : parseInt(value) || 0);
+    // Cap tab users at total active users
+    const cappedTabUsers = Math.min(tabUsers, data.activeUsers);
+    const tabPercentage = data.activeUsers > 0 ? (cappedTabUsers / data.activeUsers) * 100 : 0;
+    onDataChange({ ...data, tabUsers: cappedTabUsers, tabPercentage });
   };
 
   const handleShowLabelsChange = (checked: boolean) => {
@@ -90,39 +95,29 @@ export function MAUUsageControls({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="agentPercentage">% that use agent</Label>
-              <div className="relative">
-                <Input
-                  id="agentPercentage"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value={agentPctInput}
-                  onChange={(e) => handleAgentPercentageChange(e.target.value)}
-                  placeholder="0-100"
-                  className="pr-8"
-                />
-                <span className="absolute right-3 top-2 text-sm text-gray-500">%</span>
-              </div>
+              <Label htmlFor="agentUsers">Users that use agent</Label>
+              <Input
+                id="agentUsers"
+                type="number"
+                min="0"
+                value={agentUsersInput}
+                onChange={(e) => handleAgentUsersChange(e.target.value)}
+                placeholder="Enter agent users"
+                className="w-full"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tabPercentage">% that use tab</Label>
-              <div className="relative">
-                <Input
-                  id="tabPercentage"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value={tabPctInput}
-                  onChange={(e) => handleTabPercentageChange(e.target.value)}
-                  placeholder="0-100"
-                  className="pr-8"
-                />
-                <span className="absolute right-3 top-2 text-sm text-gray-500">%</span>
-              </div>
+              <Label htmlFor="tabUsers">Users that use tab</Label>
+              <Input
+                id="tabUsers"
+                type="number"
+                min="0"
+                value={tabUsersInput}
+                onChange={(e) => handleTabUsersChange(e.target.value)}
+                placeholder="Enter tab users"
+                className="w-full"
+              />
             </div>
           </div>
         </CardContent>
@@ -151,11 +146,11 @@ export function MAUUsageControls({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Agent users:</span>
-                <span className="font-medium">{data.agentUsers.toLocaleString()}</span>
+                <span className="font-medium">{data.agentUsers.toLocaleString()} ({data.agentPercentage.toFixed(1)}%)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Tab users:</span>
-                <span className="font-medium">{data.tabUsers.toLocaleString()}</span>
+                <span className="font-medium">{data.tabUsers.toLocaleString()} ({data.tabPercentage.toFixed(1)}%)</span>
               </div>
             </div>
             {data.activeUsers > 0 && (

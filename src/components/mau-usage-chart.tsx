@@ -57,6 +57,8 @@ export const MAUUsageChart = forwardRef<HTMLDivElement, MAUUsageChartProps>(
         color: string;
         name: string;
         percentage: number;
+        count: number;
+        total: number;
       };
       x?: number;
       y?: number;
@@ -77,7 +79,7 @@ export const MAUUsageChart = forwardRef<HTMLDivElement, MAUUsageChartProps>(
         return <rect x={0} y={0} width={0} height={0} fill={MAU_COLORS.agent} />;
       }
 
-      const labelText = `${payload.value} MAUs (${Math.round(payload.percentage)}%)`;
+      const labelText = `${payload.count} of ${payload.total} MAUs (${Math.round(payload.percentage)}%)`;
       const textColor = '#FFFFFF';
       
       // Calculate the orange bar width based on the actual percentage
