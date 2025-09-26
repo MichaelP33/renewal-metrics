@@ -140,8 +140,8 @@ export interface PredefinedDateRange {
 
 // Color configuration for consistency
 export const MODEL_COLORS: Record<ModelCategory, string> = {
-  'Opus': '#CD7F32',           // Brown/terracotta
-  'Sonnet': '#E5E5DC',         // Beige
+  'Opus': '#CC785C',           // Brown/terracotta
+  'Sonnet': '#D4A27F',         // Beige
   'Anthropic (other)': '#D1D5DB', // Light gray
   'GPT-5': '#1E3A8A',          // Dark blue
   'OpenAI (other)': '#3B82F6', // Light blue
