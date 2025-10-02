@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useMemo } from 'react';
-import { AlertCircle, BarChart3, PieChart as PieChartIcon, Table, DollarSign, Users, TrendingUp } from 'lucide-react';
-import { DualFileUpload } from './dual-file-upload';
+import { AlertCircle, BarChart3, PieChart as PieChartIcon, Table, DollarSign, Users, TrendingUp, Code } from 'lucide-react';
+import { TripleFileUpload } from './TripleFileUpload';
 import { DateRangePicker } from './DateRangePicker';
 import { ModelSelector } from './ModelSelector';
 import { ChartControls } from './ChartControls';
@@ -11,14 +11,17 @@ import { StackedBarChart } from './StackedBarChart';
 import { PieChart } from './PieChart';
 import { WAUDashboard } from './wau-analytics-dashboard';
 import { MAUUsageDashboard } from './mau-usage-dashboard';
+import { AICodeMetricsDashboard } from './AICodeMetricsDashboard';
 import { ExportControls } from './ExportControls';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { 
   RawDataRow,
   WAURawDataRow,
+  AICodeMetricsRow,
   FilterConfig,
   WAUFilterConfig,
+  AICodeMetricsConfig,
   ChartConfig,
   WAUChartConfig,
   MAUUsageData,
@@ -40,11 +43,16 @@ import {
   parseWAUCSVData, 
   getWAUDataDateRange
 } from '@/lib/wau-data-processing';
+import {
+  parseAICodeCSV,
+  processAICodeData
+} from '@/lib/ai-code-data-processing';
 
 export function Dashboard() {
   // Data state
   const [rawData, setRawData] = useState<RawDataRow[]>([]);
   const [wauRawData, setWAURawData] = useState<WAURawDataRow[]>([]);
+  const [aiCodeRawData, setAICodeRawData] = useState<AICodeMetricsRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DataType>('MODEL_COSTS');
@@ -85,6 +93,12 @@ export function Dashboard() {
     showLabels: true
   });
 
+  // AI Code Metrics state
+  const [aiCodeConfig, setAICodeConfig] = useState<AICodeMetricsConfig>({
+    showDataLabels: true,
+    maxSelectedUsers: 15
+  });
+
   // Refs for export functionality
   const dashboardRef = useRef<HTMLDivElement>(null);
   const barChartRef = useRef<HTMLDivElement>(null);
@@ -113,6 +127,12 @@ export function Dashboard() {
   const availableDateRange = useMemo(() => {
     return getDataDateRange(rawData);
   }, [rawData]);
+
+  // Process AI Code Metrics data
+  const processedAICodeData = useMemo(() => {
+    if (aiCodeRawData.length === 0) return [];
+    return processAICodeData(aiCodeRawData);
+  }, [aiCodeRawData]);
 
 
   // Category counts for model selector
@@ -180,6 +200,26 @@ export function Dashboard() {
     }
   };
 
+  const handleAICodeUpload = async (file: File, content: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const parsed = await parseAICodeCSV(content);
+      setAICodeRawData(parsed);
+
+      // Switch to AI Code Metrics tab if not already there
+      setActiveTab('AI_CODE_METRICS');
+
+    } catch (err) {
+      console.error('AI Code file processing error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to process AI Code Metrics file');
+      setAICodeRawData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDateRangeChange = (dateRange: DateRange | null) => {
     setFilterConfig(prev => ({
       ...prev,
@@ -214,9 +254,14 @@ export function Dashboard() {
     setMAUUsageConfig(config);
   };
 
+  const handleAICodeConfigChange = (config: AICodeMetricsConfig) => {
+    setAICodeConfig(config);
+  };
+
   const hasModelCostsData = rawData.length > 0;
   const hasWAUData = wauRawData.length > 0;
-  const hasData = hasModelCostsData || hasWAUData;
+  const hasAICodeData = aiCodeRawData.length > 0;
+  const hasData = hasModelCostsData || hasWAUData || hasAICodeData;
   const hasProcessedData = aggregatedData.length > 0;
 
   return (
@@ -228,20 +273,22 @@ export function Dashboard() {
             Model Cost & Usage Analytics Dashboard
           </h1>
           <p className="text-gray-600">
-            Upload your model usage data and WAU analytics to analyze spending patterns, or use the MAU Usage tool to visualize user adoption rates
+            Upload your model usage data, WAU analytics, and AI code metrics to analyze spending patterns, user engagement, and AI code adoption rates
           </p>
         </div>
 
         {/* File Upload Section or MAU Usage Access */}
         {!hasData && activeTab !== 'MAU_USAGE' && (
           <div className="mb-8">
-            <DualFileUpload
+            <TripleFileUpload
               onModelCostsUpload={handleModelCostsUpload}
               onWAUUpload={handleWAUUpload}
+              onAICodeUpload={handleAICodeUpload}
               isLoading={isLoading}
               error={error}
               hasModelCostsData={hasModelCostsData}
               hasWAUData={hasWAUData}
+              hasAICodeData={hasAICodeData}
             />
             {/* Quick access to MAU Usage tool */}
             <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
@@ -321,6 +368,24 @@ export function Dashboard() {
                       <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
                         Interactive
                       </span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('AI_CODE_METRICS')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'AI_CODE_METRICS'
+                        ? 'border-orange-500 text-orange-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Code className="h-4 w-4" />
+                      <span>AI Code Metrics</span>
+                      {hasAICodeData && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          Loaded
+                        </span>
+                      )}
                     </div>
                   </button>
                 </nav>
@@ -485,9 +550,19 @@ export function Dashboard() {
               />
             )}
 
+            {/* AI Code Metrics Tab */}
+            {activeTab === 'AI_CODE_METRICS' && hasAICodeData && (
+              <AICodeMetricsDashboard
+                rawData={processedAICodeData}
+                config={aiCodeConfig}
+                onConfigChange={handleAICodeConfigChange}
+              />
+            )}
+
             {/* Show message if no data for active tab */}
             {((activeTab === 'MODEL_COSTS' && !hasModelCostsData) || 
-              (activeTab === 'WAU_ANALYTICS' && !hasWAUData)) && (
+              (activeTab === 'WAU_ANALYTICS' && !hasWAUData) ||
+              (activeTab === 'AI_CODE_METRICS' && !hasAICodeData)) && (
               <Card>
                 <CardContent className="p-8 text-center">
                   <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -497,7 +572,9 @@ export function Dashboard() {
                   <p className="text-gray-600 mb-4">
                     {activeTab === 'MODEL_COSTS' 
                       ? 'Upload a model costs CSV file to view cost analytics.'
-                      : 'Upload a WAU analytics CSV file to view user engagement analytics.'
+                      : activeTab === 'WAU_ANALYTICS'
+                      ? 'Upload a WAU analytics CSV file to view user engagement analytics.'
+                      : 'Upload an AI code metrics CSV file to view user AI code statistics.'
                     }
                   </p>
                 </CardContent>
@@ -512,13 +589,15 @@ export function Dashboard() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Upload New Data
                 </h3>
-                <DualFileUpload
+                <TripleFileUpload
                   onModelCostsUpload={handleModelCostsUpload}
                   onWAUUpload={handleWAUUpload}
+                  onAICodeUpload={handleAICodeUpload}
                   isLoading={isLoading}
                   error={error}
                   hasModelCostsData={hasModelCostsData}
                   hasWAUData={hasWAUData}
+                  hasAICodeData={hasAICodeData}
                 />
               </CardContent>
             </Card>

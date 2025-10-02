@@ -90,7 +90,7 @@ export interface DateRange {
 }
 
 export type TimePeriod = 'MoM' | 'QoQ';
-export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE';
+export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE' | 'AI_CODE_METRICS';
 export type WAUViewType = 'MoM' | 'WoW';
 
 export interface ChartConfig {
@@ -126,6 +126,25 @@ export interface MAUUsageConfig {
   showLabels: boolean;
 }
 
+export interface AICodeMetricsRow {
+  team_id: number;
+  team_name: string;
+  user_id: number;
+  email: string;
+  person_linkedin_url: string;
+  total_lines_changed: number;
+  ai_lines_changed: number;
+  non_ai_lines_changed: number;
+  pct_ai_lines_changed: number;
+  pct_non_ai_lines_changed: number;
+  commit_count: number;
+}
+
+export interface AICodeMetricsConfig {
+  showDataLabels: boolean;
+  maxSelectedUsers: number;
+}
+
 export interface ExportOptions {
   format: 'png' | 'csv';
   chartType?: 'table' | 'bar' | 'pie' | 'all';
@@ -157,6 +176,12 @@ export const WAU_COLORS = {
   secondary: '#ED5F2E',        // Same color for consistency
   accent: '#ED5F2E',           // Same color for consistency
   background: '#FEF3C7'        // Orange-100 background
+};
+
+// AI Code Metrics colors
+export const AI_CODE_COLORS = {
+  aiCode: '#ED5F2E',           // Orange for AI code percentage
+  background: '#F3F4F6'        // Light gray background
 };
 
 // Default category order for consistent display
