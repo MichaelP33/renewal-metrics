@@ -13,12 +13,13 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3 } from 'lucide-react';
-import { AICodeMetricsRow, AICodeMetricsConfig, AI_CODE_COLORS } from '@/types';
+import { AICodeMetricsRow, AICodeMetricsConfig, AI_CODE_COLORS, UserNameData } from '@/types';
 import { formatNumber, formatPercentage } from '@/lib/ai-code-data-processing';
 
 interface AICodeHorizontalBarChartProps {
   data: AICodeMetricsRow[];
   config: AICodeMetricsConfig;
+  userNames: Map<string, UserNameData>;
   title?: string;
   height?: number;
 }
@@ -26,10 +27,13 @@ interface AICodeHorizontalBarChartProps {
 interface ChartDataPoint {
   email: string;
   emailShort: string;
+  firstName: string;
+  lastName: string;
   totalLines: number;
   aiLines: number;
   aiPercentage: number;
   value: number; // For full-width bars
+  userKey: string;
 }
 
 interface TooltipProps {
@@ -74,6 +78,54 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
     );
   }
   return null;
+};
+
+interface CustomYAxisTickProps {
+  x?: number;
+  y?: number;
+  payload?: {
+    value: string;
+    index: number;
+  };
+  chartData: ChartDataPoint[];
+  useLabelNames: boolean;
+}
+
+const CustomYAxisTick = ({ x, y, payload, chartData, useLabelNames }: CustomYAxisTickProps) => {
+  if (typeof x !== 'number' || typeof y !== 'number' || !payload) {
+    return null;
+  }
+
+  const dataPoint = chartData.find(d => d.emailShort === payload.value);
+  
+  if (!dataPoint) {
+    return (
+      <text x={x} y={y} dy={4} textAnchor="end" fill="#374151" fontSize={11}>
+        {payload.value}
+      </text>
+    );
+  }
+
+  // If using names and both are available, show stacked names with larger font
+  if (useLabelNames && dataPoint.firstName && dataPoint.lastName) {
+    return (
+      <g>
+        <text x={x} y={y - 6} textAnchor="end" fill="#374151" fontSize={14} fontWeight="400">
+          {dataPoint.firstName}
+        </text>
+        <text x={x} y={y + 10} textAnchor="end" fill="#374151" fontSize={14} fontWeight="400">
+          {dataPoint.lastName}
+        </text>
+      </g>
+    );
+  }
+
+  // Otherwise show email (smaller font)
+  return (
+    <text x={x} y={y} dy={4} textAnchor="end" fill="#374151" fontSize={11}>
+      {dataPoint.emailShort}
+    </text>
+  );
 };
 
 interface CustomCellProps {
@@ -143,11 +195,14 @@ const CustomCell = (props: CustomCellProps) => {
 };
 
 export const AICodeHorizontalBarChart = forwardRef<HTMLDivElement, AICodeHorizontalBarChartProps>(
-  ({ data, config, title = "AI Code Usage by User", height = 400 }, ref) => {
+  ({ data, config, userNames, title = "AI Code Usage by User", height = 400 }, ref) => {
     
     // Prepare chart data
     const chartData = useMemo((): ChartDataPoint[] => {
       return data.map(user => {
+        const userKey = `${user.user_id}-${user.email}`;
+        const nameData = userNames.get(userKey);
+        
         // Truncate email for Y-axis display
         const emailParts = user.email.split('@');
         const emailShort = emailParts[0].length > 12 
@@ -157,13 +212,16 @@ export const AICodeHorizontalBarChart = forwardRef<HTMLDivElement, AICodeHorizon
         return {
           email: user.email,
           emailShort,
+          firstName: nameData?.first_name || '',
+          lastName: nameData?.last_name || '',
           totalLines: user.total_lines_changed,
           aiLines: user.ai_lines_changed,
           aiPercentage: user.pct_ai_lines_changed,
-          value: user.total_lines_changed // For full-width bars
+          value: user.total_lines_changed, // For full-width bars
+          userKey
         };
       }).reverse(); // Reverse to show highest values at top
-    }, [data]);
+    }, [data, userNames]);
 
     // Calculate max value for X-axis
     const maxTotalLines = useMemo(() => {
@@ -200,8 +258,8 @@ export const AICodeHorizontalBarChart = forwardRef<HTMLDivElement, AICodeHorizon
               <BarChart
                 data={chartData}
                 layout="vertical"
-                margin={{ top: 20, right: 30, left: 120, bottom: 5 }}
-                barCategoryGap="15%"
+                margin={{ top: 20, right: 30, left: config.useLabelNames ? 130 : 120, bottom: 5 }}
+                barCategoryGap="25%"
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 
@@ -217,10 +275,16 @@ export const AICodeHorizontalBarChart = forwardRef<HTMLDivElement, AICodeHorizon
                 <YAxis 
                   type="category"
                   dataKey="emailShort"
-                  tick={{ fontSize: 11 }}
+                  tick={(props) => (
+                    <CustomYAxisTick 
+                      {...props} 
+                      chartData={chartData} 
+                      useLabelNames={config.useLabelNames}
+                    />
+                  )}
                   axisLine={{ stroke: '#e0e0e0' }}
                   tickLine={{ stroke: '#e0e0e0' }}
-                  width={110}
+                  width={config.useLabelNames ? 120 : 110}
                 />
                 
                 <Tooltip content={<CustomTooltip />} />

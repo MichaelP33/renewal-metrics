@@ -96,7 +96,8 @@ export function Dashboard() {
   // AI Code Metrics state
   const [aiCodeConfig, setAICodeConfig] = useState<AICodeMetricsConfig>({
     showDataLabels: true,
-    maxSelectedUsers: 15
+    maxSelectedUsers: 15,
+    useLabelNames: false
   });
 
   // Refs for export functionality

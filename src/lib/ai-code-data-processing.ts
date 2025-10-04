@@ -194,12 +194,17 @@ export function validateAICodeCSVFormat(file: File): Promise<boolean> {
 /**
  * Exports AI code metrics data to CSV format
  */
-export function exportAICodeMetricsToCSV(data: AICodeMetricsRow[]): string {
+export function exportAICodeMetricsToCSV(
+  data: AICodeMetricsRow[], 
+  userNames?: Map<string, { first_name: string; last_name: string }>
+): string {
   if (data.length === 0) return '';
 
   // Create header
   const headers = [
     'Email',
+    'First Name',
+    'Last Name',
     'LinkedIn URL', 
     'Total Lines Changed',
     'AI Lines Changed',
@@ -208,14 +213,21 @@ export function exportAICodeMetricsToCSV(data: AICodeMetricsRow[]): string {
   ];
   
   // Create rows
-  const rows = data.map(row => [
-    row.email,
-    row.person_linkedin_url || 'N/A',
-    row.total_lines_changed.toString(),
-    row.ai_lines_changed.toString(),
-    `${row.pct_ai_lines_changed.toFixed(2)}%`,
-    row.commit_count.toString()
-  ]);
+  const rows = data.map(row => {
+    const userKey = `${row.user_id}-${row.email}`;
+    const nameData = userNames?.get(userKey);
+    
+    return [
+      row.email,
+      nameData?.first_name || '',
+      nameData?.last_name || '',
+      row.person_linkedin_url || 'N/A',
+      row.total_lines_changed.toString(),
+      row.ai_lines_changed.toString(),
+      `${row.pct_ai_lines_changed.toFixed(2)}%`,
+      row.commit_count.toString()
+    ];
+  });
 
   // Convert to CSV
   const csvContent = [headers, ...rows]
@@ -224,3 +236,5 @@ export function exportAICodeMetricsToCSV(data: AICodeMetricsRow[]): string {
 
   return csvContent;
 }
+
+

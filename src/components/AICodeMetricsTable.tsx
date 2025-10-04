@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { AICodeMetricsRow } from '@/types';
+import { AICodeMetricsRow, UserNameData } from '@/types';
 import { formatNumber, formatPercentage, formatLinkedInUrl } from '@/lib/ai-code-data-processing';
 
 interface AICodeMetricsTableProps {
@@ -22,17 +22,21 @@ interface AICodeMetricsTableProps {
   onSelectionChange: (selectedUsers: Set<string>) => void;
   maxSelection?: number;
   title?: string;
+  userNames: Map<string, UserNameData>;
+  onNameChange: (userKey: string, nameData: UserNameData) => void;
 }
 
 type SortDirection = 'asc' | 'desc' | null;
-type SortColumn = 'email' | 'total_lines_changed' | 'ai_lines_changed' | 'pct_ai_lines_changed' | 'commit_count';
+type SortColumn = 'email' | 'first_name' | 'last_name' | 'total_lines_changed' | 'ai_lines_changed' | 'pct_ai_lines_changed' | 'commit_count';
 
 export const AICodeMetricsTable = React.forwardRef<HTMLDivElement, AICodeMetricsTableProps>(({ 
   data, 
   selectedUsers,
   onSelectionChange,
   maxSelection = 15,
-  title = "AI Code Metrics" 
+  title = "AI Code Metrics",
+  userNames,
+  onNameChange
 }, ref) => {
   const [sortColumn, setSortColumn] = useState<SortColumn>('total_lines_changed');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -45,10 +49,21 @@ export const AICodeMetricsTable = React.forwardRef<HTMLDivElement, AICodeMetrics
       let aValue: number | string;
       let bValue: number | string;
 
+      const aKey = `${a.user_id}-${a.email}`;
+      const bKey = `${b.user_id}-${b.email}`;
+
       switch (sortColumn) {
         case 'email':
           aValue = a.email.toLowerCase();
           bValue = b.email.toLowerCase();
+          break;
+        case 'first_name':
+          aValue = (userNames.get(aKey)?.first_name || '').toLowerCase();
+          bValue = (userNames.get(bKey)?.first_name || '').toLowerCase();
+          break;
+        case 'last_name':
+          aValue = (userNames.get(aKey)?.last_name || '').toLowerCase();
+          bValue = (userNames.get(bKey)?.last_name || '').toLowerCase();
           break;
         case 'total_lines_changed':
           aValue = a.total_lines_changed;
@@ -74,7 +89,7 @@ export const AICodeMetricsTable = React.forwardRef<HTMLDivElement, AICodeMetrics
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, sortColumn, sortDirection]);
+  }, [data, sortColumn, sortDirection, userNames]);
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -196,6 +211,32 @@ export const AICodeMetricsTable = React.forwardRef<HTMLDivElement, AICodeMetrics
                     </Button>
                   </TableHead>
                   
+                  {/* First Name column */}
+                  <TableHead className="min-w-[120px]">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-1 font-semibold hover:bg-gray-100"
+                      onClick={() => handleSort('first_name')}
+                    >
+                      <span>First Name</span>
+                      {getSortIcon('first_name')}
+                    </Button>
+                  </TableHead>
+                  
+                  {/* Last Name column */}
+                  <TableHead className="min-w-[120px]">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-1 font-semibold hover:bg-gray-100"
+                      onClick={() => handleSort('last_name')}
+                    >
+                      <span>Last Name</span>
+                      {getSortIcon('last_name')}
+                    </Button>
+                  </TableHead>
+                  
                   {/* LinkedIn URL column */}
                   <TableHead className="min-w-[150px]">
                     <span className="font-semibold">LinkedIn</span>
@@ -261,6 +302,7 @@ export const AICodeMetricsTable = React.forwardRef<HTMLDivElement, AICodeMetrics
                   const isSelected = selectedUsers.has(userKey);
                   const canSelect = !isSelected && selectedUsers.size < maxSelection;
                   const linkedInInfo = formatLinkedInUrl(user.person_linkedin_url);
+                  const nameData = userNames.get(userKey) || { first_name: '', last_name: '' };
                   
                   return (
                     <TableRow 
@@ -278,6 +320,26 @@ export const AICodeMetricsTable = React.forwardRef<HTMLDivElement, AICodeMetrics
                       
                       <TableCell className="font-medium">
                         {user.email}
+                      </TableCell>
+                      
+                      <TableCell>
+                        <input
+                          type="text"
+                          value={nameData.first_name}
+                          onChange={(e) => onNameChange(userKey, { ...nameData, first_name: e.target.value })}
+                          placeholder="First name"
+                          className="w-full px-2 py-1 text-sm border-0 border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none bg-transparent"
+                        />
+                      </TableCell>
+                      
+                      <TableCell>
+                        <input
+                          type="text"
+                          value={nameData.last_name}
+                          onChange={(e) => onNameChange(userKey, { ...nameData, last_name: e.target.value })}
+                          placeholder="Last name"
+                          className="w-full px-2 py-1 text-sm border-0 border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none bg-transparent"
+                        />
                       </TableCell>
                       
                       <TableCell>

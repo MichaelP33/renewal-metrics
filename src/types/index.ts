@@ -143,6 +143,12 @@ export interface AICodeMetricsRow {
 export interface AICodeMetricsConfig {
   showDataLabels: boolean;
   maxSelectedUsers: number;
+  useLabelNames: boolean;
+}
+
+export interface UserNameData {
+  first_name: string;
+  last_name: string;
 }
 
 export interface ExportOptions {

@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AICodeMetricsTable } from './AICodeMetricsTable';
 import { AICodeHorizontalBarChart } from './AICodeHorizontalBarChart';
-import { AICodeMetricsRow, AICodeMetricsConfig } from '@/types';
+import { AICodeMetricsRow, AICodeMetricsConfig, UserNameData } from '@/types';
 import { exportAICodeMetricsToCSV, getTopUsers } from '@/lib/ai-code-data-processing';
 import { exportCSV } from '@/lib/export-utils';
 
@@ -27,6 +27,9 @@ export function AICodeMetricsDashboard({
     const topUsers = getTopUsers(rawData, 5);
     return new Set(topUsers.map(user => `${user.user_id}-${user.email}`));
   });
+
+  // State for user names (manually entered)
+  const [userNames, setUserNames] = useState<Map<string, UserNameData>>(new Map());
 
   // Refs for export functionality
   const chartRef = useRef<HTMLDivElement>(null);
@@ -57,11 +60,19 @@ export function AICodeMetricsDashboard({
     onConfigChange({ ...config, ...newConfig });
   };
 
+  const handleNameChange = (userKey: string, nameData: UserNameData) => {
+    setUserNames(prev => {
+      const newMap = new Map(prev);
+      newMap.set(userKey, nameData);
+      return newMap;
+    });
+  };
+
   const handleExportTableCSV = () => {
     if (rawData.length === 0) return;
 
     try {
-      const csvContent = exportAICodeMetricsToCSV(rawData);
+      const csvContent = exportAICodeMetricsToCSV(rawData, userNames);
       const filename = `ai-code-metrics-${new Date().toISOString().split('T')[0]}`;
       exportCSV(csvContent, filename);
     } catch (error) {
@@ -73,7 +84,7 @@ export function AICodeMetricsDashboard({
     if (selectedUsersData.length === 0) return;
 
     try {
-      const csvContent = exportAICodeMetricsToCSV(selectedUsersData);
+      const csvContent = exportAICodeMetricsToCSV(selectedUsersData, userNames);
       const filename = `ai-code-metrics-selected-${new Date().toISOString().split('T')[0]}`;
       exportCSV(csvContent, filename);
     } catch (error) {
@@ -184,6 +195,16 @@ export function AICodeMetricsDashboard({
             />
             <span className="text-sm text-gray-700">Show data labels on chart</span>
           </label>
+          
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={config.useLabelNames}
+              onChange={(e) => handleConfigChange({ useLabelNames: e.target.checked })}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">Use names as chart labels</span>
+          </label>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -217,6 +238,8 @@ export function AICodeMetricsDashboard({
         onSelectionChange={handleSelectionChange}
         maxSelection={config.maxSelectedUsers}
         title="User AI Code Metrics"
+        userNames={userNames}
+        onNameChange={handleNameChange}
       />
 
       {/* Horizontal Bar Chart */}
@@ -224,6 +247,7 @@ export function AICodeMetricsDashboard({
         ref={chartRef}
         data={selectedUsersData}
         config={config}
+        userNames={userNames}
         title="AI Code Usage Visualization"
         height={Math.max(300, selectedUsersData.length * 40 + 100)} // Dynamic height based on number of users
       />
