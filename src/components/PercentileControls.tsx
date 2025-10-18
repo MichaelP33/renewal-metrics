@@ -22,6 +22,13 @@ export function PercentileControls({
     });
   };
 
+  const handleExclude100thPercentileChange = (exclude100thPercentile: boolean) => {
+    onConfigChange({
+      ...config,
+      exclude100thPercentile
+    });
+  };
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -36,6 +43,17 @@ export function PercentileControls({
           />
           <Label htmlFor="show-data-labels" className="text-sm font-medium cursor-pointer">
             Show data labels
+          </Label>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="exclude-100th-percentile"
+            checked={config.exclude100thPercentile}
+            onCheckedChange={handleExclude100thPercentileChange}
+          />
+          <Label htmlFor="exclude-100th-percentile" className="text-sm font-medium cursor-pointer">
+            Exclude 100th percentile (outlier removal)
           </Label>
         </div>
       </CardContent>

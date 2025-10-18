@@ -125,7 +125,8 @@ export function Dashboard() {
 
   // Percentile Distribution state
   const [percentileConfig, setPercentileConfig] = useState<PercentileConfig>({
-    showDataLabels: true
+    showDataLabels: true,
+    exclude100thPercentile: false
   });
 
   // Refs for export functionality

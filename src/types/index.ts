@@ -174,6 +174,7 @@ export interface PercentileDataRow {
 
 export interface PercentileConfig {
   showDataLabels: boolean;
+  exclude100thPercentile: boolean;
 }
 
 export interface UserNameData {

@@ -22,30 +22,39 @@ export function PercentileDashboard({
 
   const hasData = data.length > 0;
 
-  // Calculate summary stats
+  // Filter data based on config
+  const filteredData = useMemo(() => {
+    if (!hasData) return [];
+    if (config.exclude100thPercentile) {
+      return data.filter(d => d.percentile < 100);
+    }
+    return data;
+  }, [data, hasData, config.exclude100thPercentile]);
+
+  // Calculate summary stats based on filtered data
   const maxInteractions = useMemo(() => {
-    if (!hasData) return 0;
-    return Math.max(...data.map(d => d.interactions));
-  }, [data, hasData]);
+    if (filteredData.length === 0) return 0;
+    return Math.max(...filteredData.map(d => d.interactions));
+  }, [filteredData]);
 
   const minInteractions = useMemo(() => {
-    if (!hasData) return 0;
-    return Math.min(...data.map(d => d.interactions));
-  }, [data, hasData]);
+    if (filteredData.length === 0) return 0;
+    return Math.min(...filteredData.map(d => d.interactions));
+  }, [filteredData]);
 
   const medianInteractions = useMemo(() => {
-    if (!hasData) return 0;
-    const sorted = [...data].sort((a, b) => a.interactions - b.interactions);
+    if (filteredData.length === 0) return 0;
+    const sorted = [...filteredData].sort((a, b) => a.interactions - b.interactions);
     const mid = Math.floor(sorted.length / 2);
     return sorted[mid]?.interactions || 0;
-  }, [data, hasData]);
+  }, [filteredData]);
 
   const medianPercentile = useMemo(() => {
-    if (!hasData) return 0;
-    const sorted = [...data].sort((a, b) => a.percentile - b.percentile);
+    if (filteredData.length === 0) return 0;
+    const sorted = [...filteredData].sort((a, b) => a.percentile - b.percentile);
     const mid = Math.floor(sorted.length / 2);
     return sorted[mid]?.percentile || 0;
-  }, [data, hasData]);
+  }, [filteredData]);
 
   if (!hasData) {
     return (
@@ -71,10 +80,10 @@ export function PercentileDashboard({
           <CardContent className="p-4 text-center">
             <BarChart3 className="h-8 w-8 text-orange-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-gray-900">
-              {data.length}
+              {filteredData.length}
             </div>
             <div className="text-sm text-gray-600">
-              Data Points
+              Data Points {config.exclude100thPercentile && '(excl. 100th)'}
             </div>
           </CardContent>
         </Card>
@@ -123,12 +132,12 @@ export function PercentileDashboard({
       />
 
       {/* Chart Section */}
-      {hasData && (
+      {filteredData.length > 0 && (
         <PercentileChart
           ref={chartRef}
-          data={data}
+          data={filteredData}
           config={config}
-          title="Percentile Distribution Chart"
+          title={config.exclude100thPercentile ? "Percentile Distribution Chart (excl. 100th percentile)" : "Percentile Distribution Chart"}
           height={400}
         />
       )}
@@ -166,10 +175,10 @@ export function PercentileDashboard({
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-gray-700">Data Coverage</h4>
                 <div className="text-2xl font-bold text-orange-600">
-                  {data[data.length - 1]?.percentile || 0}%
+                  {filteredData[filteredData.length - 1]?.percentile || 0}%
                 </div>
                 <p className="text-sm text-gray-600">
-                  Highest percentile value in dataset
+                  Highest percentile value {config.exclude100thPercentile ? '(100th excluded)' : 'in dataset'}
                 </p>
               </div>
             </div>
