@@ -8,8 +8,7 @@ import { ActiveUserGrowthChart } from './ActiveUserGrowthChart';
 import { ActiveUserGrowthControls } from './ActiveUserGrowthControls';
 import { 
   ActiveUserGrowthRawRow,
-  ActiveUserGrowthConfig, 
-  ActiveUserGrowthProcessedRow
+  ActiveUserGrowthConfig
 } from '@/types';
 import { 
   processActiveUserGrowthData, 

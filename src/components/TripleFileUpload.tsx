@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { Upload, FileText, AlertCircle, CheckCircle, DollarSign, Users, Code, TrendingUp } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, DollarSign, Users, Code, TrendingUp, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { validateCSVFormat } from '@/lib/data-processing';
 import { validateWAUCSVFormat } from '@/lib/wau-data-processing';
 import { validateAICodeCSVFormat } from '@/lib/ai-code-data-processing';
 import { validateActiveUserGrowthCSVFormat } from '@/lib/active-user-growth-processing';
+import { validatePercentileCSVFormat } from '@/lib/percentile-data-processing';
 import { DataType } from '@/types';
 
 interface TripleFileUploadProps {
@@ -15,12 +16,14 @@ interface TripleFileUploadProps {
   onWAUUpload: (file: File, content: string) => void;
   onAICodeUpload: (file: File, content: string) => void;
   onActiveUserGrowthUpload: (file: File, content: string) => void;
+  onPercentileUpload: (file: File, content: string) => void;
   isLoading?: boolean;
   error?: string | null;
   hasModelCostsData?: boolean;
   hasWAUData?: boolean;
   hasAICodeData?: boolean;
   hasActiveUserGrowthData?: boolean;
+  hasPercentileData?: boolean;
 }
 
 interface UploadState {
@@ -33,12 +36,14 @@ export function TripleFileUpload({
   onWAUUpload, 
   onAICodeUpload,
   onActiveUserGrowthUpload,
+  onPercentileUpload,
   isLoading = false, 
   error,
   hasModelCostsData = false,
   hasWAUData = false,
   hasAICodeData = false,
-  hasActiveUserGrowthData = false
+  hasActiveUserGrowthData = false,
+  hasPercentileData = false
 }: TripleFileUploadProps) {
   const [modelCostsState, setModelCostsState] = useState<UploadState>({
     file: null,
@@ -60,6 +65,11 @@ export function TripleFileUpload({
     validationStatus: 'idle'
   });
 
+  const [percentileState, setPercentileState] = useState<UploadState>({
+    file: null,
+    validationStatus: 'idle'
+  });
+
   const [isDragOver, setIsDragOver] = useState<DataType | null>(null);
 
   const processFile = useCallback(async (file: File, dataType: DataType) => {
@@ -72,6 +82,8 @@ export function TripleFileUpload({
         setAICodeState(prev => ({ ...prev, validationStatus: 'invalid' }));
       } else if (dataType === 'ACTIVE_USER_GROWTH') {
         setActiveUserGrowthState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'PERCENTILE_DATA') {
+        setPercentileState(prev => ({ ...prev, validationStatus: 'invalid' }));
       }
       return;
     }
@@ -85,6 +97,8 @@ export function TripleFileUpload({
       setAICodeState(prev => ({ ...prev, file, validationStatus: 'validating' }));
     } else if (dataType === 'ACTIVE_USER_GROWTH') {
       setActiveUserGrowthState(prev => ({ ...prev, file, validationStatus: 'validating' }));
+    } else if (dataType === 'PERCENTILE_DATA') {
+      setPercentileState(prev => ({ ...prev, file, validationStatus: 'validating' }));
     }
 
     try {
@@ -98,6 +112,8 @@ export function TripleFileUpload({
         isValid = await validateAICodeCSVFormat(file);
       } else if (dataType === 'ACTIVE_USER_GROWTH') {
         isValid = await validateActiveUserGrowthCSVFormat(file);
+      } else if (dataType === 'PERCENTILE_DATA') {
+        isValid = await validatePercentileCSVFormat(file);
       }
 
       if (dataType === 'MODEL_COSTS') {
@@ -120,6 +136,11 @@ export function TripleFileUpload({
           ...prev, 
           validationStatus: isValid ? 'valid' : 'invalid' 
         }));
+      } else if (dataType === 'PERCENTILE_DATA') {
+        setPercentileState(prev => ({ 
+          ...prev, 
+          validationStatus: isValid ? 'valid' : 'invalid' 
+        }));
       }
     } catch (error) {
       console.error('Validation error:', error);
@@ -131,6 +152,8 @@ export function TripleFileUpload({
         setAICodeState(prev => ({ ...prev, validationStatus: 'invalid' }));
       } else if (dataType === 'ACTIVE_USER_GROWTH') {
         setActiveUserGrowthState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'PERCENTILE_DATA') {
+        setPercentileState(prev => ({ ...prev, validationStatus: 'invalid' }));
       }
     }
   }, []);
@@ -175,6 +198,9 @@ export function TripleFileUpload({
     } else if (dataType === 'ACTIVE_USER_GROWTH') {
       state = activeUserGrowthState;
       uploadHandler = onActiveUserGrowthUpload;
+    } else if (dataType === 'PERCENTILE_DATA') {
+      state = percentileState;
+      uploadHandler = onPercentileUpload;
     } else {
       return;
     }
@@ -187,7 +213,7 @@ export function TripleFileUpload({
     } catch (error) {
       console.error('File reading error:', error);
     }
-  }, [modelCostsState, wauState, aiCodeState, activeUserGrowthState, onModelCostsUpload, onWAUUpload, onAICodeUpload, onActiveUserGrowthUpload]);
+  }, [modelCostsState, wauState, aiCodeState, activeUserGrowthState, percentileState, onModelCostsUpload, onWAUUpload, onAICodeUpload, onActiveUserGrowthUpload, onPercentileUpload]);
 
   const getStatusIcon = (status: UploadState['validationStatus']) => {
     switch (status) {
@@ -331,7 +357,7 @@ export function TripleFileUpload({
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-5 gap-6">
           <FileUploadSection
             dataType="MODEL_COSTS"
             state={modelCostsState}
@@ -372,6 +398,17 @@ export function TripleFileUpload({
             description="Upload CSV with agent WAU, L4, and power user data"
             icon={TrendingUp}
             hasData={hasActiveUserGrowthData}
+            borderColor="border-orange-400"
+            iconColor="text-orange-600"
+          />
+
+          <FileUploadSection
+            dataType="PERCENTILE_DATA"
+            state={percentileState}
+            title="Percentile Distribution"
+            description="Upload CSV with percentile and interactions data"
+            icon={BarChart3}
+            hasData={hasPercentileData}
             borderColor="border-orange-400"
             iconColor="text-orange-600"
           />

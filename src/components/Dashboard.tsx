@@ -13,6 +13,7 @@ import { WAUDashboard } from './wau-analytics-dashboard';
 import { MAUUsageDashboard } from './mau-usage-dashboard';
 import { AICodeMetricsDashboard } from './AICodeMetricsDashboard';
 import { ActiveUserGrowthDashboard } from './ActiveUserGrowthDashboard';
+import { PercentileDashboard } from './PercentileDashboard';
 import { ExportControls } from './ExportControls';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -21,10 +22,12 @@ import {
   WAURawDataRow,
   AICodeMetricsRow,
   ActiveUserGrowthRawRow,
+  PercentileDataRow,
   FilterConfig,
   WAUFilterConfig,
   AICodeMetricsConfig,
   ActiveUserGrowthConfig,
+  PercentileConfig,
   ChartConfig,
   WAUChartConfig,
   MAUUsageData,
@@ -54,6 +57,10 @@ import {
   parseActiveUserGrowthCSV,
   getActiveUserGrowthDateRange
 } from '@/lib/active-user-growth-processing';
+import {
+  parsePercentileCSV,
+  processPercentileData
+} from '@/lib/percentile-data-processing';
 
 export function Dashboard() {
   // Data state
@@ -61,6 +68,7 @@ export function Dashboard() {
   const [wauRawData, setWAURawData] = useState<WAURawDataRow[]>([]);
   const [aiCodeRawData, setAICodeRawData] = useState<AICodeMetricsRow[]>([]);
   const [activeUserGrowthRawData, setActiveUserGrowthRawData] = useState<ActiveUserGrowthRawRow[]>([]);
+  const [percentileRawData, setPercentileRawData] = useState<PercentileDataRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DataType>('MODEL_COSTS');
@@ -115,6 +123,11 @@ export function Dashboard() {
     dateRange: null
   });
 
+  // Percentile Distribution state
+  const [percentileConfig, setPercentileConfig] = useState<PercentileConfig>({
+    showDataLabels: true
+  });
+
   // Refs for export functionality
   const dashboardRef = useRef<HTMLDivElement>(null);
   const barChartRef = useRef<HTMLDivElement>(null);
@@ -149,6 +162,12 @@ export function Dashboard() {
     if (aiCodeRawData.length === 0) return [];
     return processAICodeData(aiCodeRawData);
   }, [aiCodeRawData]);
+
+  // Process Percentile Distribution data
+  const processedPercentileData = useMemo(() => {
+    if (percentileRawData.length === 0) return [];
+    return processPercentileData(percentileRawData);
+  }, [percentileRawData]);
 
 
   // Category counts for model selector
@@ -263,6 +282,26 @@ export function Dashboard() {
     }
   };
 
+  const handlePercentileUpload = async (file: File, content: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const parsed = await parsePercentileCSV(content);
+      setPercentileRawData(parsed);
+
+      // Switch to Percentile Data tab if not already there
+      setActiveTab('PERCENTILE_DATA');
+
+    } catch (err) {
+      console.error('Percentile file processing error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to process Percentile file');
+      setPercentileRawData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDateRangeChange = (dateRange: DateRange | null) => {
     setFilterConfig(prev => ({
       ...prev,
@@ -305,11 +344,16 @@ export function Dashboard() {
     setActiveUserGrowthConfig(config);
   };
 
+  const handlePercentileConfigChange = (config: PercentileConfig) => {
+    setPercentileConfig(config);
+  };
+
   const hasModelCostsData = rawData.length > 0;
   const hasWAUData = wauRawData.length > 0;
   const hasAICodeData = aiCodeRawData.length > 0;
   const hasActiveUserGrowthData = activeUserGrowthRawData.length > 0;
-  const hasData = hasModelCostsData || hasWAUData || hasAICodeData || hasActiveUserGrowthData;
+  const hasPercentileData = percentileRawData.length > 0;
+  const hasData = hasModelCostsData || hasWAUData || hasAICodeData || hasActiveUserGrowthData || hasPercentileData;
   const hasProcessedData = aggregatedData.length > 0;
 
   return (
@@ -333,12 +377,14 @@ export function Dashboard() {
               onWAUUpload={handleWAUUpload}
               onAICodeUpload={handleAICodeUpload}
               onActiveUserGrowthUpload={handleActiveUserGrowthUpload}
+              onPercentileUpload={handlePercentileUpload}
               isLoading={isLoading}
               error={error}
               hasModelCostsData={hasModelCostsData}
               hasWAUData={hasWAUData}
               hasAICodeData={hasAICodeData}
               hasActiveUserGrowthData={hasActiveUserGrowthData}
+              hasPercentileData={hasPercentileData}
             />
             {/* Quick access to MAU Usage tool */}
             <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
@@ -450,6 +496,24 @@ export function Dashboard() {
                       <Code className="h-4 w-4" />
                       <span>AI Code Metrics</span>
                       {hasAICodeData && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          Loaded
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('PERCENTILE_DATA')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'PERCENTILE_DATA'
+                        ? 'border-orange-500 text-orange-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <BarChart3 className="h-4 w-4" />
+                      <span>Percentile Distribution</span>
+                      {hasPercentileData && (
                         <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                           Loaded
                         </span>
@@ -636,11 +700,21 @@ export function Dashboard() {
               />
             )}
 
+            {/* Percentile Distribution Tab */}
+            {activeTab === 'PERCENTILE_DATA' && hasPercentileData && (
+              <PercentileDashboard
+                data={processedPercentileData}
+                config={percentileConfig}
+                onConfigChange={handlePercentileConfigChange}
+              />
+            )}
+
             {/* Show message if no data for active tab */}
             {((activeTab === 'MODEL_COSTS' && !hasModelCostsData) || 
               (activeTab === 'WAU_ANALYTICS' && !hasWAUData) ||
               (activeTab === 'ACTIVE_USER_GROWTH' && !hasActiveUserGrowthData) ||
-              (activeTab === 'AI_CODE_METRICS' && !hasAICodeData)) && (
+              (activeTab === 'AI_CODE_METRICS' && !hasAICodeData) ||
+              (activeTab === 'PERCENTILE_DATA' && !hasPercentileData)) && (
               <Card>
                 <CardContent className="p-8 text-center">
                   <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -654,7 +728,9 @@ export function Dashboard() {
                       ? 'Upload a WAU analytics CSV file to view user engagement analytics.'
                       : activeTab === 'ACTIVE_USER_GROWTH'
                       ? 'Upload an active user growth CSV file to view agent WAU analytics.'
-                      : 'Upload an AI code metrics CSV file to view user AI code statistics.'
+                      : activeTab === 'AI_CODE_METRICS'
+                      ? 'Upload an AI code metrics CSV file to view user AI code statistics.'
+                      : 'Upload a percentile distribution CSV file to view percentile analytics.'
                     }
                   </p>
                 </CardContent>
@@ -674,12 +750,14 @@ export function Dashboard() {
                   onWAUUpload={handleWAUUpload}
                   onAICodeUpload={handleAICodeUpload}
                   onActiveUserGrowthUpload={handleActiveUserGrowthUpload}
+                  onPercentileUpload={handlePercentileUpload}
                   isLoading={isLoading}
                   error={error}
                   hasModelCostsData={hasModelCostsData}
                   hasWAUData={hasWAUData}
                   hasAICodeData={hasAICodeData}
                   hasActiveUserGrowthData={hasActiveUserGrowthData}
+                  hasPercentileData={hasPercentileData}
                 />
               </CardContent>
         </Card>
