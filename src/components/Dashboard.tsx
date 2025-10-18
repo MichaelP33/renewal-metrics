@@ -12,6 +12,7 @@ import { PieChart } from './PieChart';
 import { WAUDashboard } from './wau-analytics-dashboard';
 import { MAUUsageDashboard } from './mau-usage-dashboard';
 import { AICodeMetricsDashboard } from './AICodeMetricsDashboard';
+import { ActiveUserGrowthDashboard } from './ActiveUserGrowthDashboard';
 import { ExportControls } from './ExportControls';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -19,9 +20,11 @@ import {
   RawDataRow,
   WAURawDataRow,
   AICodeMetricsRow,
+  ActiveUserGrowthRawRow,
   FilterConfig,
   WAUFilterConfig,
   AICodeMetricsConfig,
+  ActiveUserGrowthConfig,
   ChartConfig,
   WAUChartConfig,
   MAUUsageData,
@@ -47,12 +50,17 @@ import {
   parseAICodeCSV,
   processAICodeData
 } from '@/lib/ai-code-data-processing';
+import {
+  parseActiveUserGrowthCSV,
+  getActiveUserGrowthDateRange
+} from '@/lib/active-user-growth-processing';
 
 export function Dashboard() {
   // Data state
   const [rawData, setRawData] = useState<RawDataRow[]>([]);
   const [wauRawData, setWAURawData] = useState<WAURawDataRow[]>([]);
   const [aiCodeRawData, setAICodeRawData] = useState<AICodeMetricsRow[]>([]);
+  const [activeUserGrowthRawData, setActiveUserGrowthRawData] = useState<ActiveUserGrowthRawRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DataType>('MODEL_COSTS');
@@ -98,6 +106,13 @@ export function Dashboard() {
     showDataLabels: true,
     maxSelectedUsers: 15,
     useLabelNames: false
+  });
+
+  // Active User Growth state
+  const [activeUserGrowthConfig, setActiveUserGrowthConfig] = useState<ActiveUserGrowthConfig>({
+    showDataLabels: true,
+    visibleLines: new Set(['agent_wau', 'agent_l4', 'agent_power_user']),
+    dateRange: null
   });
 
   // Refs for export functionality
@@ -221,6 +236,33 @@ export function Dashboard() {
     }
   };
 
+  const handleActiveUserGrowthUpload = async (file: File, content: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const parsed = await parseActiveUserGrowthCSV(content);
+      setActiveUserGrowthRawData(parsed);
+
+      // Set initial date range to all available data
+      const dateRange = getActiveUserGrowthDateRange(parsed);
+      setActiveUserGrowthConfig(prev => ({
+        ...prev,
+        dateRange
+      }));
+
+      // Switch to Active User Growth tab if not already there
+      setActiveTab('ACTIVE_USER_GROWTH');
+
+    } catch (err) {
+      console.error('Active User Growth file processing error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to process Active User Growth file');
+      setActiveUserGrowthRawData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDateRangeChange = (dateRange: DateRange | null) => {
     setFilterConfig(prev => ({
       ...prev,
@@ -259,10 +301,15 @@ export function Dashboard() {
     setAICodeConfig(config);
   };
 
+  const handleActiveUserGrowthConfigChange = (config: ActiveUserGrowthConfig) => {
+    setActiveUserGrowthConfig(config);
+  };
+
   const hasModelCostsData = rawData.length > 0;
   const hasWAUData = wauRawData.length > 0;
   const hasAICodeData = aiCodeRawData.length > 0;
-  const hasData = hasModelCostsData || hasWAUData || hasAICodeData;
+  const hasActiveUserGrowthData = activeUserGrowthRawData.length > 0;
+  const hasData = hasModelCostsData || hasWAUData || hasAICodeData || hasActiveUserGrowthData;
   const hasProcessedData = aggregatedData.length > 0;
 
   return (
@@ -285,11 +332,13 @@ export function Dashboard() {
               onModelCostsUpload={handleModelCostsUpload}
               onWAUUpload={handleWAUUpload}
               onAICodeUpload={handleAICodeUpload}
+              onActiveUserGrowthUpload={handleActiveUserGrowthUpload}
               isLoading={isLoading}
               error={error}
               hasModelCostsData={hasModelCostsData}
               hasWAUData={hasWAUData}
               hasAICodeData={hasAICodeData}
+              hasActiveUserGrowthData={hasActiveUserGrowthData}
             />
             {/* Quick access to MAU Usage tool */}
             <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
@@ -349,6 +398,24 @@ export function Dashboard() {
                       <Users className="h-4 w-4" />
                       <span>WAU Analytics</span>
                       {hasWAUData && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          Loaded
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('ACTIVE_USER_GROWTH')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'ACTIVE_USER_GROWTH'
+                        ? 'border-orange-500 text-orange-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>Agent WAU Analytics</span>
+                      {hasActiveUserGrowthData && (
                         <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                           Loaded
                         </span>
@@ -541,6 +608,15 @@ export function Dashboard() {
               />
             )}
 
+            {/* Active User Growth Tab */}
+            {activeTab === 'ACTIVE_USER_GROWTH' && hasActiveUserGrowthData && (
+              <ActiveUserGrowthDashboard
+                rawData={activeUserGrowthRawData}
+                config={activeUserGrowthConfig}
+                onConfigChange={handleActiveUserGrowthConfigChange}
+              />
+            )}
+
             {/* MAU Usage Tab */}
             {activeTab === 'MAU_USAGE' && (
               <MAUUsageDashboard
@@ -563,6 +639,7 @@ export function Dashboard() {
             {/* Show message if no data for active tab */}
             {((activeTab === 'MODEL_COSTS' && !hasModelCostsData) || 
               (activeTab === 'WAU_ANALYTICS' && !hasWAUData) ||
+              (activeTab === 'ACTIVE_USER_GROWTH' && !hasActiveUserGrowthData) ||
               (activeTab === 'AI_CODE_METRICS' && !hasAICodeData)) && (
               <Card>
                 <CardContent className="p-8 text-center">
@@ -575,6 +652,8 @@ export function Dashboard() {
                       ? 'Upload a model costs CSV file to view cost analytics.'
                       : activeTab === 'WAU_ANALYTICS'
                       ? 'Upload a WAU analytics CSV file to view user engagement analytics.'
+                      : activeTab === 'ACTIVE_USER_GROWTH'
+                      ? 'Upload an active user growth CSV file to view agent WAU analytics.'
                       : 'Upload an AI code metrics CSV file to view user AI code statistics.'
                     }
                   </p>
@@ -594,14 +673,16 @@ export function Dashboard() {
                   onModelCostsUpload={handleModelCostsUpload}
                   onWAUUpload={handleWAUUpload}
                   onAICodeUpload={handleAICodeUpload}
+                  onActiveUserGrowthUpload={handleActiveUserGrowthUpload}
                   isLoading={isLoading}
                   error={error}
                   hasModelCostsData={hasModelCostsData}
                   hasWAUData={hasWAUData}
                   hasAICodeData={hasAICodeData}
+                  hasActiveUserGrowthData={hasActiveUserGrowthData}
                 />
               </CardContent>
-            </Card>
+        </Card>
           </>
         )}
       </div>

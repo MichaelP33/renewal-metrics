@@ -1,23 +1,26 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { Upload, FileText, AlertCircle, CheckCircle, DollarSign, Users, Code } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, DollarSign, Users, Code, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { validateCSVFormat } from '@/lib/data-processing';
 import { validateWAUCSVFormat } from '@/lib/wau-data-processing';
 import { validateAICodeCSVFormat } from '@/lib/ai-code-data-processing';
+import { validateActiveUserGrowthCSVFormat } from '@/lib/active-user-growth-processing';
 import { DataType } from '@/types';
 
 interface TripleFileUploadProps {
   onModelCostsUpload: (file: File, content: string) => void;
   onWAUUpload: (file: File, content: string) => void;
   onAICodeUpload: (file: File, content: string) => void;
+  onActiveUserGrowthUpload: (file: File, content: string) => void;
   isLoading?: boolean;
   error?: string | null;
   hasModelCostsData?: boolean;
   hasWAUData?: boolean;
   hasAICodeData?: boolean;
+  hasActiveUserGrowthData?: boolean;
 }
 
 interface UploadState {
@@ -29,11 +32,13 @@ export function TripleFileUpload({
   onModelCostsUpload, 
   onWAUUpload, 
   onAICodeUpload,
+  onActiveUserGrowthUpload,
   isLoading = false, 
   error,
   hasModelCostsData = false,
   hasWAUData = false,
-  hasAICodeData = false
+  hasAICodeData = false,
+  hasActiveUserGrowthData = false
 }: TripleFileUploadProps) {
   const [modelCostsState, setModelCostsState] = useState<UploadState>({
     file: null,
@@ -50,6 +55,11 @@ export function TripleFileUpload({
     validationStatus: 'idle'
   });
 
+  const [activeUserGrowthState, setActiveUserGrowthState] = useState<UploadState>({
+    file: null,
+    validationStatus: 'idle'
+  });
+
   const [isDragOver, setIsDragOver] = useState<DataType | null>(null);
 
   const processFile = useCallback(async (file: File, dataType: DataType) => {
@@ -60,6 +70,8 @@ export function TripleFileUpload({
         setWAUState(prev => ({ ...prev, validationStatus: 'invalid' }));
       } else if (dataType === 'AI_CODE_METRICS') {
         setAICodeState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'ACTIVE_USER_GROWTH') {
+        setActiveUserGrowthState(prev => ({ ...prev, validationStatus: 'invalid' }));
       }
       return;
     }
@@ -71,6 +83,8 @@ export function TripleFileUpload({
       setWAUState(prev => ({ ...prev, file, validationStatus: 'validating' }));
     } else if (dataType === 'AI_CODE_METRICS') {
       setAICodeState(prev => ({ ...prev, file, validationStatus: 'validating' }));
+    } else if (dataType === 'ACTIVE_USER_GROWTH') {
+      setActiveUserGrowthState(prev => ({ ...prev, file, validationStatus: 'validating' }));
     }
 
     try {
@@ -82,6 +96,8 @@ export function TripleFileUpload({
         isValid = await validateWAUCSVFormat(file);
       } else if (dataType === 'AI_CODE_METRICS') {
         isValid = await validateAICodeCSVFormat(file);
+      } else if (dataType === 'ACTIVE_USER_GROWTH') {
+        isValid = await validateActiveUserGrowthCSVFormat(file);
       }
 
       if (dataType === 'MODEL_COSTS') {
@@ -99,6 +115,11 @@ export function TripleFileUpload({
           ...prev, 
           validationStatus: isValid ? 'valid' : 'invalid' 
         }));
+      } else if (dataType === 'ACTIVE_USER_GROWTH') {
+        setActiveUserGrowthState(prev => ({ 
+          ...prev, 
+          validationStatus: isValid ? 'valid' : 'invalid' 
+        }));
       }
     } catch (error) {
       console.error('Validation error:', error);
@@ -108,6 +129,8 @@ export function TripleFileUpload({
         setWAUState(prev => ({ ...prev, validationStatus: 'invalid' }));
       } else if (dataType === 'AI_CODE_METRICS') {
         setAICodeState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'ACTIVE_USER_GROWTH') {
+        setActiveUserGrowthState(prev => ({ ...prev, validationStatus: 'invalid' }));
       }
     }
   }, []);
@@ -149,6 +172,9 @@ export function TripleFileUpload({
     } else if (dataType === 'AI_CODE_METRICS') {
       state = aiCodeState;
       uploadHandler = onAICodeUpload;
+    } else if (dataType === 'ACTIVE_USER_GROWTH') {
+      state = activeUserGrowthState;
+      uploadHandler = onActiveUserGrowthUpload;
     } else {
       return;
     }
@@ -161,7 +187,7 @@ export function TripleFileUpload({
     } catch (error) {
       console.error('File reading error:', error);
     }
-  }, [modelCostsState, wauState, aiCodeState, onModelCostsUpload, onWAUUpload, onAICodeUpload]);
+  }, [modelCostsState, wauState, aiCodeState, activeUserGrowthState, onModelCostsUpload, onWAUUpload, onAICodeUpload, onActiveUserGrowthUpload]);
 
   const getStatusIcon = (status: UploadState['validationStatus']) => {
     switch (status) {
@@ -305,7 +331,7 @@ export function TripleFileUpload({
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
           <FileUploadSection
             dataType="MODEL_COSTS"
             state={modelCostsState}
@@ -335,6 +361,17 @@ export function TripleFileUpload({
             description="Upload CSV with user AI code generation statistics"
             icon={Code}
             hasData={hasAICodeData}
+            borderColor="border-orange-400"
+            iconColor="text-orange-600"
+          />
+
+          <FileUploadSection
+            dataType="ACTIVE_USER_GROWTH"
+            state={activeUserGrowthState}
+            title="Agent WAU Analytics"
+            description="Upload CSV with agent WAU, L4, and power user data"
+            icon={TrendingUp}
+            hasData={hasActiveUserGrowthData}
             borderColor="border-orange-400"
             iconColor="text-orange-600"
           />

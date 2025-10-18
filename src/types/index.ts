@@ -90,7 +90,7 @@ export interface DateRange {
 }
 
 export type TimePeriod = 'MoM' | 'QoQ';
-export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE' | 'AI_CODE_METRICS';
+export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE' | 'AI_CODE_METRICS' | 'ACTIVE_USER_GROWTH';
 export type WAUViewType = 'MoM' | 'WoW';
 
 export interface ChartConfig {
@@ -146,6 +146,27 @@ export interface AICodeMetricsConfig {
   useLabelNames: boolean;
 }
 
+export interface ActiveUserGrowthRawRow {
+  week: string;
+  agent_l4: number;
+  agent_power_user: number;
+  agent_wau: number;
+}
+
+export interface ActiveUserGrowthProcessedRow {
+  week: string;
+  weekDisplay: string;
+  agent_l4: number;
+  agent_power_user: number;
+  agent_wau: number;
+}
+
+export interface ActiveUserGrowthConfig {
+  showDataLabels: boolean;
+  visibleLines: Set<'agent_wau' | 'agent_l4' | 'agent_power_user'>;
+  dateRange: DateRange | null;
+}
+
 export interface UserNameData {
   first_name: string;
   last_name: string;
@@ -188,6 +209,13 @@ export const WAU_COLORS = {
 export const AI_CODE_COLORS = {
   aiCode: '#ED5F2E',           // Orange for AI code percentage
   background: '#F3F4F6'        // Light gray background
+};
+
+// Active User Growth colors
+export const ACTIVE_USER_GROWTH_COLORS = {
+  agent_wau: '#ED5F2E',       // Main orange
+  agent_l4: '#D4A27F',        // Golden/beige tone
+  agent_power_user: '#8B9A7A' // Muted green tone
 };
 
 // Default category order for consistent display
