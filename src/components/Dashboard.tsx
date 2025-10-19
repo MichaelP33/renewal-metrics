@@ -14,6 +14,8 @@ import { MAUUsageDashboard } from './mau-usage-dashboard';
 import { AICodeMetricsDashboard } from './AICodeMetricsDashboard';
 import { ActiveUserGrowthDashboard } from './ActiveUserGrowthDashboard';
 import { PercentileDashboard } from './PercentileDashboard';
+import { MCPUsageDashboard } from './mcp-usage-dashboard';
+import { RuleUsageDashboard } from './rule-usage-dashboard';
 import { ExportControls } from './ExportControls';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -23,11 +25,15 @@ import {
   AICodeMetricsRow,
   ActiveUserGrowthRawRow,
   PercentileDataRow,
+  MCPUsageRawRow,
+  RuleUsageRawRow,
   FilterConfig,
   WAUFilterConfig,
   AICodeMetricsConfig,
   ActiveUserGrowthConfig,
   PercentileConfig,
+  MCPUsageConfig,
+  RuleUsageConfig,
   ChartConfig,
   WAUChartConfig,
   MAUUsageData,
@@ -61,6 +67,14 @@ import {
   parsePercentileCSV,
   processPercentileData
 } from '@/lib/percentile-data-processing';
+import {
+  parseMCPUsageCSV,
+  getMCPUsageDateRange
+} from '@/lib/mcp-usage-processing';
+import {
+  parseRuleUsageCSV,
+  getRuleUsageDateRange
+} from '@/lib/rule-usage-processing';
 
 export function Dashboard() {
   // Data state
@@ -69,6 +83,8 @@ export function Dashboard() {
   const [aiCodeRawData, setAICodeRawData] = useState<AICodeMetricsRow[]>([]);
   const [activeUserGrowthRawData, setActiveUserGrowthRawData] = useState<ActiveUserGrowthRawRow[]>([]);
   const [percentileRawData, setPercentileRawData] = useState<PercentileDataRow[]>([]);
+  const [mcpUsageRawData, setMCPUsageRawData] = useState<MCPUsageRawRow[]>([]);
+  const [ruleUsageRawData, setRuleUsageRawData] = useState<RuleUsageRawRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DataType>('MODEL_COSTS');
@@ -127,6 +143,20 @@ export function Dashboard() {
   const [percentileConfig, setPercentileConfig] = useState<PercentileConfig>({
     showDataLabels: true,
     exclude100thPercentile: false
+  });
+
+  // MCP Usage state
+  const [mcpUsageConfig, setMCPUsageConfig] = useState<MCPUsageConfig>({
+    showDataLabels: true,
+    dateRange: null,
+    visibleLines: new Set(['mcp_usage_wau', 'agent_l4'])
+  });
+
+  // Rule Usage state
+  const [ruleUsageConfig, setRuleUsageConfig] = useState<RuleUsageConfig>({
+    showDataLabels: true,
+    dateRange: null,
+    visibleLines: new Set(['rule_usage_wau', 'agent_l4'])
   });
 
   // Refs for export functionality
@@ -303,6 +333,60 @@ export function Dashboard() {
     }
   };
 
+  const handleMCPUsageUpload = async (file: File, content: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const parsed = await parseMCPUsageCSV(content);
+      setMCPUsageRawData(parsed);
+
+      // Set initial date range to all available data
+      const dateRange = getMCPUsageDateRange(parsed);
+      setMCPUsageConfig(prev => ({
+        ...prev,
+        dateRange
+      }));
+
+      // Switch to MCP Usage tab if not already there
+      setActiveTab('MCP_USAGE');
+
+    } catch (err) {
+      console.error('MCP Usage file processing error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to process MCP Usage file');
+      setMCPUsageRawData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRuleUsageUpload = async (file: File, content: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const parsed = await parseRuleUsageCSV(content);
+      setRuleUsageRawData(parsed);
+
+      // Set initial date range to all available data
+      const dateRange = getRuleUsageDateRange(parsed);
+      setRuleUsageConfig(prev => ({
+        ...prev,
+        dateRange
+      }));
+
+      // Switch to Rule Usage tab if not already there
+      setActiveTab('RULE_USAGE');
+
+    } catch (err) {
+      console.error('Rule Usage file processing error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to process Rule Usage file');
+      setRuleUsageRawData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDateRangeChange = (dateRange: DateRange | null) => {
     setFilterConfig(prev => ({
       ...prev,
@@ -349,12 +433,22 @@ export function Dashboard() {
     setPercentileConfig(config);
   };
 
+  const handleMCPUsageConfigChange = (config: MCPUsageConfig) => {
+    setMCPUsageConfig(config);
+  };
+
+  const handleRuleUsageConfigChange = (config: RuleUsageConfig) => {
+    setRuleUsageConfig(config);
+  };
+
   const hasModelCostsData = rawData.length > 0;
   const hasWAUData = wauRawData.length > 0;
   const hasAICodeData = aiCodeRawData.length > 0;
   const hasActiveUserGrowthData = activeUserGrowthRawData.length > 0;
   const hasPercentileData = percentileRawData.length > 0;
-  const hasData = hasModelCostsData || hasWAUData || hasAICodeData || hasActiveUserGrowthData || hasPercentileData;
+  const hasMCPUsageData = mcpUsageRawData.length > 0;
+  const hasRuleUsageData = ruleUsageRawData.length > 0;
+  const hasData = hasModelCostsData || hasWAUData || hasAICodeData || hasActiveUserGrowthData || hasPercentileData || hasMCPUsageData || hasRuleUsageData;
   const hasProcessedData = aggregatedData.length > 0;
 
   return (
@@ -379,6 +473,8 @@ export function Dashboard() {
               onAICodeUpload={handleAICodeUpload}
               onActiveUserGrowthUpload={handleActiveUserGrowthUpload}
               onPercentileUpload={handlePercentileUpload}
+              onMCPUsageUpload={handleMCPUsageUpload}
+              onRuleUsageUpload={handleRuleUsageUpload}
               isLoading={isLoading}
               error={error}
               hasModelCostsData={hasModelCostsData}
@@ -386,6 +482,8 @@ export function Dashboard() {
               hasAICodeData={hasAICodeData}
               hasActiveUserGrowthData={hasActiveUserGrowthData}
               hasPercentileData={hasPercentileData}
+              hasMCPUsageData={hasMCPUsageData}
+              hasRuleUsageData={hasRuleUsageData}
             />
             {/* Quick access to MAU Usage tool */}
             <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
@@ -515,6 +613,42 @@ export function Dashboard() {
                       <BarChart3 className="h-4 w-4" />
                       <span>Percentile Distribution</span>
                       {hasPercentileData && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          Loaded
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('MCP_USAGE')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'MCP_USAGE'
+                        ? 'border-orange-500 text-orange-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>Weekly MCP Usage</span>
+                      {hasMCPUsageData && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          Loaded
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('RULE_USAGE')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'RULE_USAGE'
+                        ? 'border-orange-500 text-orange-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <TrendingUp className="h-4 w-4" />
+                      <span>Weekly Rule Usage</span>
+                      {hasRuleUsageData && (
                         <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                           Loaded
                         </span>
@@ -710,12 +844,32 @@ export function Dashboard() {
               />
             )}
 
+            {/* MCP Usage Tab */}
+            {activeTab === 'MCP_USAGE' && hasMCPUsageData && (
+              <MCPUsageDashboard
+                rawData={mcpUsageRawData}
+                config={mcpUsageConfig}
+                onConfigChange={handleMCPUsageConfigChange}
+              />
+            )}
+
+            {/* Rule Usage Tab */}
+            {activeTab === 'RULE_USAGE' && hasRuleUsageData && (
+              <RuleUsageDashboard
+                rawData={ruleUsageRawData}
+                config={ruleUsageConfig}
+                onConfigChange={handleRuleUsageConfigChange}
+              />
+            )}
+
             {/* Show message if no data for active tab */}
             {((activeTab === 'MODEL_COSTS' && !hasModelCostsData) || 
               (activeTab === 'WAU_ANALYTICS' && !hasWAUData) ||
               (activeTab === 'ACTIVE_USER_GROWTH' && !hasActiveUserGrowthData) ||
               (activeTab === 'AI_CODE_METRICS' && !hasAICodeData) ||
-              (activeTab === 'PERCENTILE_DATA' && !hasPercentileData)) && (
+              (activeTab === 'PERCENTILE_DATA' && !hasPercentileData) ||
+              (activeTab === 'MCP_USAGE' && !hasMCPUsageData) ||
+              (activeTab === 'RULE_USAGE' && !hasRuleUsageData)) && (
               <Card>
                 <CardContent className="p-8 text-center">
                   <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -731,7 +885,11 @@ export function Dashboard() {
                       ? 'Upload an active user growth CSV file to view agent WAU analytics.'
                       : activeTab === 'AI_CODE_METRICS'
                       ? 'Upload an AI code metrics CSV file to view user AI code statistics.'
-                      : 'Upload a percentile distribution CSV file to view percentile analytics.'
+                      : activeTab === 'PERCENTILE_DATA'
+                      ? 'Upload a percentile distribution CSV file to view percentile analytics.'
+                      : activeTab === 'MCP_USAGE'
+                      ? 'Upload a weekly MCP usage CSV file to view MCP usage analytics.'
+                      : 'Upload a weekly rule usage CSV file to view rule usage analytics.'
                     }
                   </p>
                 </CardContent>
@@ -752,6 +910,8 @@ export function Dashboard() {
                   onAICodeUpload={handleAICodeUpload}
                   onActiveUserGrowthUpload={handleActiveUserGrowthUpload}
                   onPercentileUpload={handlePercentileUpload}
+                  onMCPUsageUpload={handleMCPUsageUpload}
+                  onRuleUsageUpload={handleRuleUsageUpload}
                   isLoading={isLoading}
                   error={error}
                   hasModelCostsData={hasModelCostsData}
@@ -759,6 +919,8 @@ export function Dashboard() {
                   hasAICodeData={hasAICodeData}
                   hasActiveUserGrowthData={hasActiveUserGrowthData}
                   hasPercentileData={hasPercentileData}
+                  hasMCPUsageData={hasMCPUsageData}
+                  hasRuleUsageData={hasRuleUsageData}
                 />
               </CardContent>
         </Card>

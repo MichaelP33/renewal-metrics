@@ -9,6 +9,8 @@ import { validateWAUCSVFormat } from '@/lib/wau-data-processing';
 import { validateAICodeCSVFormat } from '@/lib/ai-code-data-processing';
 import { validateActiveUserGrowthCSVFormat } from '@/lib/active-user-growth-processing';
 import { validatePercentileCSVFormat } from '@/lib/percentile-data-processing';
+import { validateMCPUsageCSVFormat } from '@/lib/mcp-usage-processing';
+import { validateRuleUsageCSVFormat } from '@/lib/rule-usage-processing';
 import { DataType } from '@/types';
 
 interface TripleFileUploadProps {
@@ -17,6 +19,8 @@ interface TripleFileUploadProps {
   onAICodeUpload: (file: File, content: string) => void;
   onActiveUserGrowthUpload: (file: File, content: string) => void;
   onPercentileUpload: (file: File, content: string) => void;
+  onMCPUsageUpload: (file: File, content: string) => void;
+  onRuleUsageUpload: (file: File, content: string) => void;
   isLoading?: boolean;
   error?: string | null;
   hasModelCostsData?: boolean;
@@ -24,6 +28,8 @@ interface TripleFileUploadProps {
   hasAICodeData?: boolean;
   hasActiveUserGrowthData?: boolean;
   hasPercentileData?: boolean;
+  hasMCPUsageData?: boolean;
+  hasRuleUsageData?: boolean;
 }
 
 interface UploadState {
@@ -37,13 +43,17 @@ export function TripleFileUpload({
   onAICodeUpload,
   onActiveUserGrowthUpload,
   onPercentileUpload,
+  onMCPUsageUpload,
+  onRuleUsageUpload,
   isLoading = false, 
   error,
   hasModelCostsData = false,
   hasWAUData = false,
   hasAICodeData = false,
   hasActiveUserGrowthData = false,
-  hasPercentileData = false
+  hasPercentileData = false,
+  hasMCPUsageData = false,
+  hasRuleUsageData = false
 }: TripleFileUploadProps) {
   const [modelCostsState, setModelCostsState] = useState<UploadState>({
     file: null,
@@ -70,6 +80,16 @@ export function TripleFileUpload({
     validationStatus: 'idle'
   });
 
+  const [mcpUsageState, setMCPUsageState] = useState<UploadState>({
+    file: null,
+    validationStatus: 'idle'
+  });
+
+  const [ruleUsageState, setRuleUsageState] = useState<UploadState>({
+    file: null,
+    validationStatus: 'idle'
+  });
+
   const [isDragOver, setIsDragOver] = useState<DataType | null>(null);
 
   const processFile = useCallback(async (file: File, dataType: DataType) => {
@@ -84,6 +104,10 @@ export function TripleFileUpload({
         setActiveUserGrowthState(prev => ({ ...prev, validationStatus: 'invalid' }));
       } else if (dataType === 'PERCENTILE_DATA') {
         setPercentileState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'MCP_USAGE') {
+        setMCPUsageState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'RULE_USAGE') {
+        setRuleUsageState(prev => ({ ...prev, validationStatus: 'invalid' }));
       }
       return;
     }
@@ -99,6 +123,10 @@ export function TripleFileUpload({
       setActiveUserGrowthState(prev => ({ ...prev, file, validationStatus: 'validating' }));
     } else if (dataType === 'PERCENTILE_DATA') {
       setPercentileState(prev => ({ ...prev, file, validationStatus: 'validating' }));
+    } else if (dataType === 'MCP_USAGE') {
+      setMCPUsageState(prev => ({ ...prev, file, validationStatus: 'validating' }));
+    } else if (dataType === 'RULE_USAGE') {
+      setRuleUsageState(prev => ({ ...prev, file, validationStatus: 'validating' }));
     }
 
     try {
@@ -114,6 +142,10 @@ export function TripleFileUpload({
         isValid = await validateActiveUserGrowthCSVFormat(file);
       } else if (dataType === 'PERCENTILE_DATA') {
         isValid = await validatePercentileCSVFormat(file);
+      } else if (dataType === 'MCP_USAGE') {
+        isValid = await validateMCPUsageCSVFormat(file);
+      } else if (dataType === 'RULE_USAGE') {
+        isValid = await validateRuleUsageCSVFormat(file);
       }
 
       if (dataType === 'MODEL_COSTS') {
@@ -141,6 +173,16 @@ export function TripleFileUpload({
           ...prev, 
           validationStatus: isValid ? 'valid' : 'invalid' 
         }));
+      } else if (dataType === 'MCP_USAGE') {
+        setMCPUsageState(prev => ({ 
+          ...prev, 
+          validationStatus: isValid ? 'valid' : 'invalid' 
+        }));
+      } else if (dataType === 'RULE_USAGE') {
+        setRuleUsageState(prev => ({ 
+          ...prev, 
+          validationStatus: isValid ? 'valid' : 'invalid' 
+        }));
       }
     } catch (error) {
       console.error('Validation error:', error);
@@ -154,6 +196,10 @@ export function TripleFileUpload({
         setActiveUserGrowthState(prev => ({ ...prev, validationStatus: 'invalid' }));
       } else if (dataType === 'PERCENTILE_DATA') {
         setPercentileState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'MCP_USAGE') {
+        setMCPUsageState(prev => ({ ...prev, validationStatus: 'invalid' }));
+      } else if (dataType === 'RULE_USAGE') {
+        setRuleUsageState(prev => ({ ...prev, validationStatus: 'invalid' }));
       }
     }
   }, []);
@@ -201,6 +247,12 @@ export function TripleFileUpload({
     } else if (dataType === 'PERCENTILE_DATA') {
       state = percentileState;
       uploadHandler = onPercentileUpload;
+    } else if (dataType === 'MCP_USAGE') {
+      state = mcpUsageState;
+      uploadHandler = onMCPUsageUpload;
+    } else if (dataType === 'RULE_USAGE') {
+      state = ruleUsageState;
+      uploadHandler = onRuleUsageUpload;
     } else {
       return;
     }
@@ -213,7 +265,7 @@ export function TripleFileUpload({
     } catch (error) {
       console.error('File reading error:', error);
     }
-  }, [modelCostsState, wauState, aiCodeState, activeUserGrowthState, percentileState, onModelCostsUpload, onWAUUpload, onAICodeUpload, onActiveUserGrowthUpload, onPercentileUpload]);
+  }, [modelCostsState, wauState, aiCodeState, activeUserGrowthState, percentileState, mcpUsageState, ruleUsageState, onModelCostsUpload, onWAUUpload, onAICodeUpload, onActiveUserGrowthUpload, onPercentileUpload, onMCPUsageUpload, onRuleUsageUpload]);
 
   const getStatusIcon = (status: UploadState['validationStatus']) => {
     switch (status) {
@@ -357,7 +409,7 @@ export function TripleFileUpload({
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
           <FileUploadSection
             dataType="MODEL_COSTS"
             state={modelCostsState}
@@ -409,6 +461,28 @@ export function TripleFileUpload({
             description="Upload CSV with percentile and interactions data"
             icon={BarChart3}
             hasData={hasPercentileData}
+            borderColor="border-orange-400"
+            iconColor="text-orange-600"
+          />
+
+          <FileUploadSection
+            dataType="MCP_USAGE"
+            state={mcpUsageState}
+            title="Weekly MCP Usage"
+            description="Upload CSV with weekly MCP usage data"
+            icon={TrendingUp}
+            hasData={hasMCPUsageData}
+            borderColor="border-orange-400"
+            iconColor="text-orange-600"
+          />
+
+          <FileUploadSection
+            dataType="RULE_USAGE"
+            state={ruleUsageState}
+            title="Weekly Rule Usage"
+            description="Upload CSV with weekly rule usage data"
+            icon={TrendingUp}
+            hasData={hasRuleUsageData}
             borderColor="border-orange-400"
             iconColor="text-orange-600"
           />

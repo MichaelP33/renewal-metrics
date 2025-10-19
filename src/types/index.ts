@@ -90,7 +90,7 @@ export interface DateRange {
 }
 
 export type TimePeriod = 'MoM' | 'QoQ';
-export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE' | 'AI_CODE_METRICS' | 'ACTIVE_USER_GROWTH' | 'PERCENTILE_DATA';
+export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE' | 'AI_CODE_METRICS' | 'ACTIVE_USER_GROWTH' | 'PERCENTILE_DATA' | 'MCP_USAGE' | 'RULE_USAGE';
 export type WAUViewType = 'MoM' | 'WoW';
 
 export interface ChartConfig {
@@ -177,6 +177,44 @@ export interface PercentileConfig {
   exclude100thPercentile: boolean;
 }
 
+export interface MCPUsageRawRow {
+  week: string;
+  agent_l4: number;
+  mcp_usage_wau: number;
+}
+
+export interface MCPUsageProcessedRow {
+  week: string;
+  weekDisplay: string;
+  agent_l4: number;
+  mcp_usage_wau: number;
+}
+
+export interface MCPUsageConfig {
+  showDataLabels: boolean;
+  dateRange: DateRange | null;
+  visibleLines: Set<'mcp_usage_wau' | 'agent_l4'>;
+}
+
+export interface RuleUsageRawRow {
+  week: string;
+  agent_l4: number;
+  rule_usage_wau: number;
+}
+
+export interface RuleUsageProcessedRow {
+  week: string;
+  weekDisplay: string;
+  agent_l4: number;
+  rule_usage_wau: number;
+}
+
+export interface RuleUsageConfig {
+  showDataLabels: boolean;
+  dateRange: DateRange | null;
+  visibleLines: Set<'rule_usage_wau' | 'agent_l4'>;
+}
+
 export interface UserNameData {
   first_name: string;
   last_name: string;
@@ -232,6 +270,18 @@ export const ACTIVE_USER_GROWTH_COLORS = {
 export const PERCENTILE_COLORS = {
   bar: '#EA580C',             // Orange-600
   background: '#FFF7ED'       // Orange-50
+};
+
+// MCP Usage colors
+export const MCP_USAGE_COLORS = {
+  mcp_usage_wau: '#ED5F2E',   // Main orange
+  agent_l4: '#D4A27F'         // Golden/beige tone
+};
+
+// Rule Usage colors
+export const RULE_USAGE_COLORS = {
+  rule_usage_wau: '#ED5F2E',  // Main orange
+  agent_l4: '#D4A27F'         // Golden/beige tone (consistent with MCP and percentile theme)
 };
 
 // Default category order for consistent display
