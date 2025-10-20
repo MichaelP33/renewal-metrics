@@ -108,7 +108,12 @@ export function AICodeDistributionChart({ data }: AICodeDistributionChartProps) 
     exportCSV(csvContent, filename);
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{ payload: ChartDataPoint }>;
+  }
+
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -140,7 +145,15 @@ export function AICodeDistributionChart({ data }: AICodeDistributionChartProps) 
     return null;
   };
 
-  const CustomCell = (props: any) => {
+  interface CustomCellProps {
+    payload?: ChartDataPoint;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+  }
+
+  const CustomCell = (props: CustomCellProps) => {
     const { payload, x, y, width, height } = props;
     
     if (typeof x !== 'number' || typeof y !== 'number' ||

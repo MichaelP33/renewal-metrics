@@ -65,7 +65,9 @@ export function UserSegmentation({ data, onSegmentClick }: UserSegmentationProps
 
   const total = segmentData.reduce((sum, item) => sum + item.value, 0);
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface TooltipDatum { payload: SegmentData }
+  interface CustomTooltipProps { active?: boolean; payload?: TooltipDatum[] }
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : '0';
@@ -95,7 +97,10 @@ export function UserSegmentation({ data, onSegmentClick }: UserSegmentationProps
     return null;
   };
 
-  const CustomLabel = (entry: any) => {
+  interface CustomLabelEntry {
+    cx?: number; cy?: number; midAngle?: number; outerRadius?: number; percent?: number; name?: string;
+  }
+  const CustomLabel = (entry: CustomLabelEntry) => {
     const { cx, cy, midAngle, outerRadius, percent, name } = entry;
     
     if (!cx || !cy || !outerRadius || !midAngle || !name) return null;
@@ -142,12 +147,14 @@ export function UserSegmentation({ data, onSegmentClick }: UserSegmentationProps
     );
   };
 
-  const CustomLegend = (props: any) => {
+  interface LegendEntry { color: string; value: string; payload: SegmentData }
+  interface CustomLegendProps { payload?: LegendEntry[] }
+  const CustomLegend = (props: CustomLegendProps) => {
     const { payload } = props;
     
     return (
       <div className="flex flex-wrap justify-center gap-4 mt-4">
-        {payload?.map((entry: any, index: number) => {
+        {payload?.map((entry, index: number) => {
           const data = entry.payload;
           const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : '0';
           

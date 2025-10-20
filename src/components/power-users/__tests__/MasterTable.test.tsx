@@ -5,7 +5,7 @@ import { MasterUserRecord } from '@/types/power-users';
 
 // Mock the UserDetailDrawer component
 jest.mock('../UserDetailDrawer', () => ({
-  UserDetailDrawer: ({ isOpen, user }: { isOpen: boolean; user: any }) => 
+  UserDetailDrawer: ({ isOpen, user }: { isOpen: boolean; user: { email?: string } | null }) => 
     isOpen ? <div data-testid="user-detail-drawer">Drawer Open: {user?.email}</div> : null
 }));
 
@@ -154,7 +154,7 @@ describe('MasterTable', () => {
   });
 
   it('exports CSV when export button is clicked', () => {
-    const { exportCSV } = require('@/lib/export-utils');
+    const { exportCSV } = jest.requireActual('@/lib/export-utils');
     
     render(<MasterTable rows={mockUsers} />);
     
