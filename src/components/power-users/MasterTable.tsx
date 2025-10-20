@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Table,
@@ -106,6 +106,17 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
     engagementPercentile: false,
     segment: false,
   });
+
+  // Reset pagination when data changes to ensure fresh render
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [rows]);
+
+  // Force remount when data reference changes to avoid stale memoized paths
+  const [dataVersion, setDataVersion] = useState(0);
+  useEffect(() => {
+    setDataVersion((v) => v + 1);
+  }, [rows]);
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -558,7 +569,7 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       <CardContent>
         <div className="rounded-md border overflow-hidden">
           <div className="overflow-x-auto">
-            <Table>
+              <Table key={dataVersion}>
               <TableHeader>
                 <TableRow className="bg-gray-50">
                   {columnVisibility.email && (
@@ -836,9 +847,9 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
               </TableHeader>
               
               <TableBody>
-                {paginatedData.map((row, index) => (
+                {paginatedData.map((row) => (
                     <TableRow 
-                      key={`${row.email}-${index}`} 
+                      key={row.email} 
                       className="hover:bg-gray-50 cursor-pointer"
                       onClick={() => {
                         setSelectedUser(row);
