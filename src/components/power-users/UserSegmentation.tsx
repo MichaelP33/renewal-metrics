@@ -23,6 +23,7 @@ interface SegmentData {
   value: number;
   color: string;
   segment: UserSegment;
+  [key: string]: string | number | UserSegment;
 }
 
 const SEGMENT_COLORS: Record<UserSegment, string> = {
