@@ -1,0 +1,456 @@
+[
+  {
+    "email": "cristi.lezau@nutanix.com",
+    "firstName": "Cristi",
+    "lastName": "Lezau",
+    "totalSessions": 1176,
+    "totalAgentRequests": 4891,
+    "isMcpUser": true,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 123,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "basundhara.c@nutanix.com",
+    "firstName": "Basundhara",
+    "lastName": "Chakrabarty",
+    "totalSessions": 1164,
+    "totalAgentRequests": 4589,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 2,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "hardik.menger@nutanix.com",
+    "firstName": "Hardik",
+    "lastName": "Menger",
+    "totalSessions": 753,
+    "totalAgentRequests": 2632,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 8,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "dipak.das@nutanix.com",
+    "firstName": "Dipak",
+    "lastName": "Das",
+    "totalSessions": 708,
+    "totalAgentRequests": 2179,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 129,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "nitish.kumar@nutanix.com",
+    "firstName": "Nitish",
+    "lastName": "Kumar",
+    "totalSessions": 690,
+    "totalAgentRequests": 2100,
+    "isMcpUser": true,
+    "isRuleCreator": false,
+    "isRuleUser": true,
+    "isCommandCreator": true,
+    "isCommandUser": false,
+    "numProductsUsed": 3,
+    "membershipDays": 127,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "rahul.choudhory@nutanix.com",
+    "firstName": "Rahul",
+    "lastName": "Choudhory",
+    "totalSessions": 646,
+    "totalAgentRequests": 2078,
+    "isMcpUser": true,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 124,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "marc.swingler@nutanix.com",
+    "firstName": "Marc",
+    "lastName": "Swingler",
+    "totalSessions": 642,
+    "totalAgentRequests": 2575,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 92,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "tejas.sangol@nutanix.com",
+    "firstName": "Tejas",
+    "lastName": "Sangol",
+    "totalSessions": 637,
+    "totalAgentRequests": 1965,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 130,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "sailesh.duddupudi@nutanix.com",
+    "firstName": "Sailesh",
+    "lastName": "Duddupudi",
+    "totalSessions": 601,
+    "totalAgentRequests": 2523,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": true,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 110,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "harsha.dirisala@nutanix.com",
+    "firstName": "Harsha Rohith",
+    "lastName": "Dirisala",
+    "totalSessions": 579,
+    "totalAgentRequests": 2231,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 130,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "vamsikrishna.velaga@nutanix.com",
+    "firstName": "Vamsi Krishna",
+    "lastName": "Velaga",
+    "totalSessions": 558,
+    "totalAgentRequests": 2476,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": true,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 2,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "vaishnavi.bhargava@nutanix.com",
+    "firstName": "Vaishnavi",
+    "lastName": "Bhargava",
+    "totalSessions": 556,
+    "totalAgentRequests": 2623,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 124,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "puspak.sahu@nutanix.com",
+    "firstName": "Puspak",
+    "lastName": "Sahu",
+    "totalSessions": 549,
+    "totalAgentRequests": 1562,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": true,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 130,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "faizan.shaikh@nutanix.com",
+    "firstName": "Faizan Mustafa",
+    "lastName": "Shaikh",
+    "totalSessions": 538,
+    "totalAgentRequests": 1139,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": true,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 10,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "rohan.kumar1@nutanix.com",
+    "firstName": "Rohan",
+    "lastName": "Kumar",
+    "totalSessions": 536,
+    "totalAgentRequests": 1997,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 130,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "modita.behl@nutanix.com",
+    "firstName": "Modita",
+    "lastName": "Behl",
+    "totalSessions": 536,
+    "totalAgentRequests": 1867,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": false,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "pankaj.bedse@nutanix.com",
+    "firstName": "Pankaj",
+    "lastName": "Bedse",
+    "totalSessions": 519,
+    "totalAgentRequests": 2146,
+    "isMcpUser": true,
+    "isRuleCreator": true,
+    "isRuleUser": true,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 3,
+    "membershipDays": 126,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "shubham.kumar@nutanix.com",
+    "firstName": "Shubham",
+    "lastName": "Kumar",
+    "totalSessions": 501,
+    "totalAgentRequests": 1998,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": true,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 128,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "abhishek.pokala@nutanix.com",
+    "firstName": "Abhishek",
+    "lastName": "Pokala",
+    "totalSessions": 488,
+    "totalAgentRequests": 1546,
+    "isMcpUser": true,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 1,
+    "membershipDays": 130,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "saharsh.goenka@nutanix.com",
+    "firstName": "Saharsh",
+    "lastName": "Goenka",
+    "totalSessions": 478,
+    "totalAgentRequests": 2174,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": false,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "henry.wong@nutanix.com",
+    "firstName": "Henry",
+    "lastName": "Wong",
+    "totalSessions": 477,
+    "totalAgentRequests": 1084,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 100,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "helen.xie@nutanix.com",
+    "firstName": "Helen",
+    "lastName": "Xie",
+    "totalSessions": 473,
+    "totalAgentRequests": 1693,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": false,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "eric.wang@nutanix.com",
+    "firstName": "Eric",
+    "lastName": "Wang",
+    "totalSessions": 470,
+    "totalAgentRequests": 1353,
+    "isMcpUser": true,
+    "isRuleCreator": false,
+    "isRuleUser": true,
+    "isCommandCreator": false,
+    "isCommandUser": true,
+    "numProductsUsed": 3,
+    "membershipDays": 128,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "tingting.li@nutanix.com",
+    "firstName": "Tingting",
+    "lastName": "Li",
+    "totalSessions": 470,
+    "totalAgentRequests": 1903,
+    "isMcpUser": true,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": true,
+    "numProductsUsed": 2,
+    "membershipDays": 131,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  },
+  {
+    "email": "pavankumar.dodda@nutanix.com",
+    "firstName": "Pavan Kumar",
+    "lastName": "Dodda",
+    "totalSessions": 461,
+    "totalAgentRequests": 1068,
+    "isMcpUser": false,
+    "isRuleCreator": false,
+    "isRuleUser": false,
+    "isCommandCreator": false,
+    "isCommandUser": false,
+    "numProductsUsed": 0,
+    "membershipDays": 129,
+    "sourceFlags": {
+      "aiCode": false,
+      "features": true,
+      "agentRequests": true
+    }
+  }
+]

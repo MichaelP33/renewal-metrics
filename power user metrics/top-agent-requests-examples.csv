@@ -1,0 +1,51 @@
+email,first_name,last_name,auth_id,total_requests,total_sessions,combined_score
+cristi.lezau@nutanix.com,Cristi,Lezau,github|user_01JY02BQQ1C585J932AYXQ49H2,4891,1176,1.0
+basundhara.c@nutanix.com,Basundhara,Chakrabarty,auth0|user_01JXBANAJZ9AMJ6BWAMTJ46V6Q,4589,1164,0.9640000000000001
+hardik.menger@nutanix.com,Hardik,Menger,auth0|user_01JXCJ2KNQGP1092KRN5XC740N,2632,753,0.5892000000000001
+marc.swingler@nutanix.com,Marc,Swingler,auth0|user_01K0F6E73K7FXJD7WSGTB9JZB9,2575,642,0.5362
+dipak.das@nutanix.com,Dipak,Das,auth0|user_01JXEXACZK8M4B0C9MGVVD3DS5,2179,708,0.5237999999999999
+sailesh.duddupudi@nutanix.com,Sailesh,Duddupudi,google-oauth2|user_01JZ13QD6C7HEKEFFBB1QBXVM7,2523,601,0.5134
+nitish.kumar@nutanix.com,Nitish,Kumar,auth0|user_01JXMV6PGR38KV42Y539VZZD10,2100,690,0.508
+vaishnavi.bhargava@nutanix.com,Vaishnavi,Bhargava,auth0|user_01JXXBE6R3SYPJK84B0K7GKYZM,2623,556,0.5045
+vamsikrishna.velaga@nutanix.com,Vamsi Krishna,Velaga,auth0|user_01JXDN68B3S6Q38QWWFYC0HD6D,2476,558,0.4904
+rahul.choudhory@nutanix.com,Rahul,Choudhory,auth0|user_01JXX47V87EQ6VEDVR6V4H3VHA,2078,646,0.48710000000000003
+harsha.dirisala@nutanix.com,Harsha Rohith,Dirisala,auth0|user_01JXDE9FFF5VTHKR6J5XTV48W9,2231,579,0.4742
+tejas.sangol@nutanix.com,Tejas,Sangol,auth0|user_01JXD99XH151H7YQAZ58ZFGX0D,1965,637,0.47170000000000006
+pankaj.bedse@nutanix.com,Pankaj,Bedse,auth0|user_01JXRBKQ31EY3WSMS39G0M4NJD,2146,519,0.44000000000000006
+rohan.kumar1@nutanix.com,Rohan,Kumar,auth0|user_01JXDEGPW2N6415T5FV31EVP6T,1997,536,0.43200000000000005
+saharsh.goenka@nutanix.com,Saharsh,Goenka,auth0|user_01JY07M13WVD7Q823S86E1AH6T,2174,478,0.4255
+modita.behl@nutanix.com,Modita,Behl,auth0|user_01JXDBSJT7BBDGEZ8JWKV9PKF8,1867,536,0.41880000000000006
+shubham.kumar@nutanix.com,Shubham,Kumar,auth0|user_01JXH4P9M6P1VGJNZ9H3X7VPYF,1998,501,0.4173
+abhya.ambati@nutanix.com,Abhya,Ambati [C],auth0|user_01JX17CXKH0W1G7GZQ76B2K45A,2488,358,0.4066000000000001
+tingting.li@nutanix.com,Tingting,Li,auth0|user_01JXBEW28S37SVRNX5Q5XHH6BK,1903,470,0.3944
+puspak.sahu@nutanix.com,Puspak,Sahu,google-oauth2|user_01JXBZV6CVM41VYV2EWT4JGR1G,1562,549,0.3931
+helen.xie@nutanix.com,Helen,Xie,auth0|user_01JY21NWS87DDT93M8H3K6SR11,1693,473,0.3742
+arshika.lalan@nutanix.com,Arshika,Lalan,google-oauth2|user_01JXDYA4FCQN8KWRNP4VA4KRQ9,1764,453,0.3729
+abhishek.pokala@nutanix.com,Abhishek,Pokala,auth0|user_01JXDWBD7X04ENVEQNCHWFPA49,1546,488,0.3655
+sangana.abhiram@nutanix.com,Abhiram,Sangana,google-oauth2|user_01JZQGZNRHKN0VDT2SR35BT7BW,1848,402,0.3598
+faizan.shaikh@nutanix.com,Faizan Mustafa,Shaikh,auth0|user_01JYQ0HFX7DFMWWZJ4WTBEVZH1,1139,538,0.34519999999999995
+samhitha.vadlamani@nutanix.com,Samhitha,Vadlamani,auth0|user_01JZKXNE0Q9AZR8A1V1YQA29A8,1597,427,0.34480000000000005
+eric.wang@nutanix.com,Eric,Wang,auth0|user_01JXK7R6GWHWXPED5AV799PVZD,1353,470,0.3381
+prince.keshari@nutanix.com,Prince,Keshari,auth0|user_01JXN2EV9ZTQYB2ZKF3WVC983K,1674,387,0.3357
+ashish.kumar@nutanix.com,Ashish,Kumar,auth0|user_01JYQZBCN2YAP29M64K54A45MA,1862,327,0.32939999999999997
+dheeraj.akula@nutanix.com,Dheeraj,Akula,github|user_01K081BFB73WEE5QFKTVZAZKHV,1644,378,0.32880000000000004
+kristen.pereira@nutanix.com,Kristen,Pereira,auth0|user_01JYHYGPCWZC5TVJAGJ6E0QB7P,1423,415,0.32189999999999996
+neelabh.sinha@nutanix.com,Neelabh,Sinha,auth0|user_01JYFP6HRXBHGXVZFJQ1VV7Y4V,1537,378,0.31779999999999997
+henry.wong@nutanix.com,Henry,Wong,auth0|user_01JZSK0WDNAYWGKK68FVN9WZGN,1084,477,0.3136
+arpit.mittal@nutanix.com,Arpit,Mittal,auth0|user_01JXBAAQPTPWXXD70VZ0T67D5E,1488,373,0.31070000000000003
+rahul.bhooteshwar@nutanix.com,Rahul,Bhooteshwar,github|user_01JZHZW60C0MHCRWRH36Q6HSM3,1318,406,0.3074
+pavankumar.dodda@nutanix.com,Pavan Kumar,Dodda,auth0|user_01JXEJW9H3ZC4BYAXJWN0BG46B,1068,461,0.3052
+mohit.gurnani@nutanix.com,Mohit,Gurnani,google-oauth2|user_01JYS5K0VFG9X4NSNBPSCD6HEV,1141,438,0.3029
+tanuja.singh@nutanix.com,Tanuja,Singh,google-oauth2|user_01K1ZBYF2JG8536GHK2YQ8FPB8,1540,331,0.2982
+eshwar.rn@nutanix.com,Eshwar,Naidu,auth0|user_01K2Z3BSTPKPAJV85QAYPQJ2RC,1095,431,0.2952
+naveen.yugenthar@nutanix.com,Naveen,Yugenthar,google-oauth2|user_01K0RSV930NVA890SM9VWGTT4P,1251,386,0.292
+maheshreddy.bapatu@nutanix.com,Mahesh Reddy,Bapatu,auth0|user_01JYQDE66B3VQX14PF7ZG9ED34,1479,327,0.2902
+rajashekarreddy.a@nutanix.com,Rajashekar Reddy,Aluka,auth0|user_01JXDSYR14J4HMHF47T23NWP3D,1350,349,0.2864
+ajay.singh@nutanix.com,Ajay,Singh,auth0|user_01JYPXC57CTQPCYM5SXSNTBFDP,1193,384,0.2852
+manish.lokur@nutanix.com,Manish,Lokur,auth0|user_01JXN05VPBMA1VPN7C4DF7DQ91,995,404,0.2735
+sakthivel.subburaja@nutanix.com,Sakthivel,Subburaja,github|user_01JXYPHCK7KR41VAVPTNRJTFR6,1365,313,0.2726
+kiran.kumarp@nutanix.com,Kiran,Puligorla,auth0|user_01JXBX87A8Y9C3M16W5W9B79TH,1140,365,0.27169999999999994
+utsav.kaushal@nutanix.com,Utsav,Kaushal,google-oauth2|user_01JYK2Q4V79Q636FR123DBD7F4,1137,355,0.2672
+abhinav.veldanda@nutanix.com,Abhinav,Veldanda,auth0|user_01K30A49CBAN7XF2FC5PXG8QGZ,1251,323,0.2652
+pradhap.devarajan@nutanix.com,Pradhap,Devarajan,auth0|user_01JZ4WSGW21S7KYS9PGRA8T7H5,736,439,0.26189999999999997
+videet.singhai@nutanix.com,Videet,Singhai,auth0|user_01JYSJHC5WDZJYY7M9RXJ29RT7,895,398,0.26070000000000004
