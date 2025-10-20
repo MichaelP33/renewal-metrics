@@ -68,7 +68,7 @@ export function PowerUsersUpload() {
     description: string;
     icon: React.ComponentType<{ className?: string }>;
     iconColor: string;
-    inputRef: React.RefObject<HTMLInputElement>;
+    inputRef: React.RefObject<HTMLInputElement | null>;
   }) => {
     const status = uploadStatus[kind];
     const isSuccess = status === 'success';
