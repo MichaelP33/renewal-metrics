@@ -99,12 +99,12 @@ export function UserSegmentation({ data, onSegmentClick }: UserSegmentationProps
   };
 
   interface CustomLabelEntry {
-    cx?: number; cy?: number; midAngle?: number; outerRadius?: number; percent?: number; name?: string;
+    cx?: string | number; cy?: string | number; midAngle?: string | number; outerRadius?: string | number; percent?: number; name?: string;
   }
   const CustomLabel = (entry: CustomLabelEntry) => {
     const { cx, cy, midAngle, outerRadius, percent, name } = entry;
     
-    if (!cx || !cy || !outerRadius || !midAngle || !name) return null;
+    if (cx == null || cy == null || outerRadius == null || midAngle == null || !name) return null;
     
     const percentage = (percent || 0) * 100;
     if (percentage < 5) return null;
