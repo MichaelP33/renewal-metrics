@@ -163,5 +163,34 @@ describe('MasterTable', () => {
     
     expect(exportCSV).toHaveBeenCalled();
   });
+
+  it('updates agent requests values when rows prop updates without toggling columns', async () => {
+    // Start with rows that have undefined agent requests
+    const initialRows: MasterUserRecord[] = [
+      { ...mockUsers[0], totalAgentRequests: undefined, totalSessions: undefined },
+      { ...mockUsers[1], totalAgentRequests: undefined, totalSessions: undefined },
+    ];
+
+    const { rerender } = render(<MasterTable rows={initialRows} />);
+
+    // Values should display as em-dash initially
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+
+    // Rerender with updated rows containing values
+    const updatedRows: MasterUserRecord[] = [
+      { ...mockUsers[0], totalAgentRequests: 500, totalSessions: 100 },
+      { ...mockUsers[1], totalAgentRequests: 1000, totalSessions: 200 },
+    ];
+
+    rerender(<MasterTable rows={updatedRows} />);
+
+    // Wait for the numbers to appear without any user interaction
+    await waitFor(() => {
+      expect(screen.getAllByText('500').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('1,000').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('100').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('200').length).toBeGreaterThan(0);
+    });
+  });
 });
 
