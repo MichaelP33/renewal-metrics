@@ -60,7 +60,6 @@ export function PowerUsersUpload() {
     description,
     icon: Icon,
     iconColor,
-    borderColor,
     inputRef,
   }: {
     kind: 'ai' | 'features' | 'agent';
@@ -69,7 +68,6 @@ export function PowerUsersUpload() {
     description: string;
     icon: React.ComponentType<{ className?: string }>;
     iconColor: string;
-    borderColor: string;
     inputRef: React.RefObject<HTMLInputElement>;
   }) => {
     const status = uploadStatus[kind];
@@ -221,7 +219,6 @@ export function PowerUsersUpload() {
             description="Upload CSV with user AI code generation statistics"
             icon={Code}
             iconColor="text-blue-600"
-            borderColor="border-blue-400"
             inputRef={aiInputRef}
           />
           
@@ -232,7 +229,6 @@ export function PowerUsersUpload() {
             description="Upload CSV with power user feature usage data"
             icon={Users}
             iconColor="text-green-600"
-            borderColor="border-green-400"
             inputRef={featuresInputRef}
           />
 
@@ -243,7 +239,6 @@ export function PowerUsersUpload() {
             description="Upload CSV with agent request and session data"
             icon={Bot}
             iconColor="text-purple-600"
-            borderColor="border-purple-400"
             inputRef={agentInputRef}
           />
         </CardContent>

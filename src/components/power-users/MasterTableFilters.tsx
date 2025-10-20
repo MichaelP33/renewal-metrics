@@ -26,7 +26,7 @@ export interface FilterState {
 
 interface MasterTableFiltersProps {
   onFilterChange: (filters: FilterState) => void;
-  searchInputRef?: React.RefObject<HTMLInputElement>;
+  searchInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 const DEBOUNCE_MS = 300;
