@@ -99,7 +99,9 @@ export function SessionsByUserChart({ data }: SessionsByUserChartProps) {
     exportCSV(csvContent, filename);
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface CustomTooltipPayload { payload: { email: string; sessions: number } }
+  interface CustomTooltipProps { active?: boolean; payload?: CustomTooltipPayload[] }
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

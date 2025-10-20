@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test CSV Upload</title>
+</head>
+<body>
+  <h1>CSV Upload Test</h1>
+  <p>Open browser console and check for errors</p>
+  <input type="file" id="fileInput" accept=".csv">
+  <div id="output"></div>
+  
+  <script type="module">
+    // Simulate the upload flow
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      console.log('File selected:', file.name);
+      
+      try {
+        const text = await file.text();
+        console.log('File read successfully, length:', text.length);
+        console.log('First 200 chars:', text.substring(0, 200));
+        
+        document.getElementById('output').innerHTML = `
+          <p style="color: green;">✓ File read successfully</p>
+          <p>Size: ${text.length} bytes</p>
+          <p>First line: ${text.split('\n')[0]}</p>
+        `;
+      } catch (error) {
+        console.error('Error reading file:', error);
+        document.getElementById('output').innerHTML = `
+          <p style="color: red;">✗ Error: ${error.message}</p>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
+
