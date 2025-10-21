@@ -11,8 +11,8 @@ import { validateWAUCSVFormat } from '@/lib/wau-data-processing';
 import { DataType } from '@/types';
 
 interface GeneralAdoptionUploadProps {
-  onModelCostsUpload: (file: File, content: string) => void;
-  onWAUUpload: (file: File, content: string) => void;
+  onModelCostsUpload: (file: File, content: string) => Promise<void>;
+  onWAUUpload: (file: File, content: string) => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
   hasModelCostsData?: boolean;

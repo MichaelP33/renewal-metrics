@@ -13,10 +13,10 @@ import { validateRuleUsageCSVFormat } from '@/lib/rule-usage-processing';
 import { DataType } from '@/types';
 
 interface TeamTrendsUploadProps {
-  onActiveUserGrowthUpload: (file: File, content: string) => void;
-  onPercentileUpload: (file: File, content: string) => void;
-  onMCPUsageUpload: (file: File, content: string) => void;
-  onRuleUsageUpload: (file: File, content: string) => void;
+  onActiveUserGrowthUpload: (file: File, content: string) => Promise<void>;
+  onPercentileUpload: (file: File, content: string) => Promise<void>;
+  onMCPUsageUpload: (file: File, content: string) => Promise<void>;
+  onRuleUsageUpload: (file: File, content: string) => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
   hasActiveUserGrowthData?: boolean;
