@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
+import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Model Cost Analyzer",
-  description: "Upload your model usage data and analyze spending patterns across different AI providers",
+  title: "Renewal Metrics Dashboard",
+  description: "Analyze model costs, user engagement, and adoption metrics across your organization",
 };
 
 export default function RootLayout({
@@ -29,8 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <Navigation />
-        {children}
+        <DashboardDataProvider>
+          <Navigation />
+          {children}
+        </DashboardDataProvider>
       </body>
     </html>
   );

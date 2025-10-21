@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users } from 'lucide-react';
+import { Home, TrendingUp, Target, Users } from 'lucide-react';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -20,7 +20,29 @@ export function Navigation() {
             }`}
           >
             <Home className="h-4 w-4" />
-            <span>Dashboard</span>
+            <span>Overview</span>
+          </Link>
+          <Link
+            href="/general-adoption"
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              pathname === '/general-adoption'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            <TrendingUp className="h-4 w-4" />
+            <span>General Adoption</span>
+          </Link>
+          <Link
+            href="/team-trends"
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              pathname === '/team-trends'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            <Target className="h-4 w-4" />
+            <span>Team Trends</span>
           </Link>
           <Link
             href="/power-users"
