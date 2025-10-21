@@ -16,7 +16,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DollarSign, Users, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Table } from 'lucide-react';
 import { 
   ModelCategory, 
-  CATEGORY_ORDER 
+  CATEGORY_ORDER,
+  DateRange,
+  ChartConfig,
+  MAUUsageData,
+  MAUUsageConfig
 } from '@/types';
 import { 
   processData, 
@@ -90,7 +94,7 @@ export default function GeneralAdoptionPage() {
     return counts;
   }, [processedData]);
 
-  const handleDateRangeChange = (dateRange: any) => {
+  const handleDateRangeChange = (dateRange: DateRange | null) => {
     setFilterConfig(prev => ({
       ...prev,
       dateRange
@@ -104,15 +108,15 @@ export default function GeneralAdoptionPage() {
     }));
   };
 
-  const handleChartConfigChange = (config: any) => {
+  const handleChartConfigChange = (config: ChartConfig) => {
     setChartConfig(config);
   };
 
-  const handleMAUUsageDataChange = (data: any) => {
+  const handleMAUUsageDataChange = (data: MAUUsageData) => {
     setMAUUsageData(data);
   };
 
-  const handleMAUUsageConfigChange = (config: any) => {
+  const handleMAUUsageConfigChange = (config: MAUUsageConfig) => {
     setMAUUsageConfig(config);
   };
 

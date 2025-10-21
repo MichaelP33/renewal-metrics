@@ -10,6 +10,12 @@ import { RuleUsageDashboard } from '@/components/rule-usage-dashboard';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, BarChart3, AlertCircle } from 'lucide-react';
 import { processPercentileData } from '@/lib/percentile-data-processing';
+import { 
+  ActiveUserGrowthConfig, 
+  PercentileConfig, 
+  MCPUsageConfig, 
+  RuleUsageConfig 
+} from '@/types';
 
 export default function TeamTrendsPage() {
   const { 
@@ -35,19 +41,19 @@ export default function TeamTrendsPage() {
 
   const [activeTab, setActiveTab] = useState<'ACTIVE_USER_GROWTH' | 'PERCENTILE_DATA' | 'MCP_USAGE' | 'RULE_USAGE'>('ACTIVE_USER_GROWTH');
 
-  const handleActiveUserGrowthConfigChange = (config: any) => {
+  const handleActiveUserGrowthConfigChange = (config: ActiveUserGrowthConfig) => {
     setActiveUserGrowthConfig(config);
   };
 
-  const handlePercentileConfigChange = (config: any) => {
+  const handlePercentileConfigChange = (config: PercentileConfig) => {
     setPercentileConfig(config);
   };
 
-  const handleMCPUsageConfigChange = (config: any) => {
+  const handleMCPUsageConfigChange = (config: MCPUsageConfig) => {
     setMCPUsageConfig(config);
   };
 
-  const handleRuleUsageConfigChange = (config: any) => {
+  const handleRuleUsageConfigChange = (config: RuleUsageConfig) => {
     setRuleUsageConfig(config);
   };
 
