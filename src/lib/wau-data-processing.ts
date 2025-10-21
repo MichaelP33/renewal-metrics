@@ -8,29 +8,40 @@ import {
   WAUFilterConfig, 
   DateRange
 } from '@/types';
+import { createFlexibleColumnMapping } from './csv-utils';
 
 /**
  * Parses WAU CSV data and returns structured data
  */
 export function parseWAUCSVData(csvContent: string): Promise<WAURawDataRow[]> {
   return new Promise((resolve, reject) => {
+    // First, get the header to create column mapping
+    const lines = csvContent.split('\n');
+    if (lines.length < 2) {
+      reject(new Error('CSV file is empty or invalid'));
+      return;
+    }
+
+    const requiredColumns = ['week', 'weekly_usage', 'weekly_tabs', 'wau_count', 'requestsper'];
+    const actualColumns = lines[0].split(',').map(col => col.trim());
+    const { mapping, missingColumns } = createFlexibleColumnMapping(requiredColumns, actualColumns);
+
+    if (missingColumns.length > 0) {
+      reject(new Error(`CSV must contain columns: ${missingColumns.join(', ')}`));
+      return;
+    }
+
     Papa.parse<WAURawDataRow>(csvContent, {
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
+      transformHeader: (header: string) => {
+        // Map actual column names to expected names
+        return mapping[header] || header;
+      },
       complete: (results) => {
         if (results.errors.length > 0) {
           reject(new Error(`CSV parsing errors: ${results.errors.map(e => e.message).join(', ')}`));
-          return;
-        }
-
-        // Validate required columns
-        const requiredColumns = ['week', 'weekly_usage', 'weekly_tabs', 'wau_count', 'requestsper'];
-        const hasRequiredColumns = results.data.length > 0 && 
-          requiredColumns.every(col => col in results.data[0]);
-
-        if (!hasRequiredColumns) {
-          reject(new Error(`CSV must contain columns: ${requiredColumns.join(', ')}`));
           return;
         }
 
@@ -225,23 +236,34 @@ export function validateWAUCSVFormat(file: File): Promise<boolean> {
         const lines = content.split('\n');
         
         if (lines.length < 2) {
+          console.warn('[WAU Validation] File has less than 2 lines');
           resolve(false);
           return;
         }
 
-        const header = lines[0].toLowerCase();
         const requiredColumns = ['week', 'weekly_usage', 'weekly_tabs', 'wau_count', 'requestsper'];
-        const hasRequiredColumns = requiredColumns.every(col => 
-          header.includes(col.replace('_', '')) || header.includes(col)
-        );
+        const actualColumns = lines[0].split(',').map(col => col.trim());
+        const { mapping, missingColumns } = createFlexibleColumnMapping(requiredColumns, actualColumns);
 
-        resolve(hasRequiredColumns);
-      } catch {
+        console.log('[WAU Validation] Required columns:', requiredColumns);
+        console.log('[WAU Validation] Actual columns:', actualColumns);
+        console.log('[WAU Validation] Column mapping:', mapping);
+        console.log('[WAU Validation] Missing columns:', missingColumns);
+
+        const isValid = missingColumns.length === 0;
+        console.log('[WAU Validation] Is valid:', isValid);
+        
+        resolve(isValid);
+      } catch (error) {
+        console.error('[WAU Validation] Error during validation:', error);
         resolve(false);
       }
     };
 
-    reader.onerror = () => resolve(false);
+    reader.onerror = () => {
+      console.error('[WAU Validation] FileReader error');
+      resolve(false);
+    };
     reader.readAsText(file.slice(0, 1000)); // Read first 1KB to check format
   });
 }

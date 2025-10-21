@@ -100,7 +100,8 @@ export interface ChartConfig {
 }
 
 export interface WAUChartConfig {
-  showDataLabels: boolean;
+  showDataLabels: boolean;      // User counts on/in bars
+  showXAxisLabels: boolean;      // X-axis date labels
   viewType: WAUViewType;
 }
 

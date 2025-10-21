@@ -1,28 +1,40 @@
 import Papa from 'papaparse';
 import { PercentileDataRow } from '@/types';
+import { createFlexibleColumnMapping } from './csv-utils';
 
 /**
  * Parses Percentile CSV data and returns structured data
  */
 export function parsePercentileCSV(csvContent: string): Promise<PercentileDataRow[]> {
   return new Promise((resolve, reject) => {
+    // First, get the header to create column mapping
+    const lines = csvContent.split('\n');
+    if (lines.length < 2) {
+      reject(new Error('CSV file is empty or invalid'));
+      return;
+    }
+
+    // Try to match columns ending with 'interactions' and 'percentile'
+    const requiredColumns = ['interactions', 'percentile'];
+    const actualColumns = lines[0].split(',').map(col => col.trim());
+    const { mapping, missingColumns } = createFlexibleColumnMapping(requiredColumns, actualColumns);
+
+    if (missingColumns.length > 0) {
+      reject(new Error(`CSV must contain columns ending with: ${missingColumns.join(', ')}`));
+      return;
+    }
+
     Papa.parse(csvContent, {
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
+      transformHeader: (header: string) => {
+        // Map actual column names to expected names
+        return mapping[header] || header;
+      },
       complete: (results) => {
         if (results.errors.length > 0) {
           reject(new Error(`CSV parsing errors: ${results.errors.map(e => e.message).join(', ')}`));
-          return;
-        }
-
-        // Validate required columns (support both original column names and simplified names)
-        const requiredColumns = ['csrv90q_number_interactions', 'cszi4l6_number_percentile'];
-        const hasRequiredColumns = results.data.length > 0 && 
-          requiredColumns.every(col => col in (results.data[0] as Record<string, unknown>));
-
-        if (!hasRequiredColumns) {
-          reject(new Error(`CSV must contain columns: ${requiredColumns.join(', ')}`));
           return;
         }
 
@@ -31,15 +43,15 @@ export function parsePercentileCSV(csvContent: string): Promise<PercentileDataRo
           .filter((row): row is Record<string, unknown> => {
             return Boolean(
               row &&
-              typeof (row as Record<string, unknown>).csrv90q_number_interactions === 'number' &&
-              typeof (row as Record<string, unknown>).cszi4l6_number_percentile === 'number' &&
-              !isNaN((row as Record<string, unknown>).csrv90q_number_interactions as number) &&
-              !isNaN((row as Record<string, unknown>).cszi4l6_number_percentile as number)
+              typeof (row as Record<string, unknown>).interactions === 'number' &&
+              typeof (row as Record<string, unknown>).percentile === 'number' &&
+              !isNaN((row as Record<string, unknown>).interactions as number) &&
+              !isNaN((row as Record<string, unknown>).percentile as number)
             );
           })
           .map(row => ({
-            percentile: row.cszi4l6_number_percentile as number,
-            interactions: row.csrv90q_number_interactions as number
+            percentile: row.percentile as number,
+            interactions: row.interactions as number
           }))
           .sort((a, b) => a.percentile - b.percentile);
 
@@ -89,13 +101,11 @@ export function validatePercentileCSVFormat(file: File): Promise<boolean> {
           return;
         }
 
-        const header = lines[0].toLowerCase();
-        const requiredColumns = ['csrv90q_number_interactions', 'cszi4l6_number_percentile'];
-        const hasRequiredColumns = requiredColumns.every(col => 
-          header.includes(col.replace('_', '')) || header.includes(col)
-        );
+        const requiredColumns = ['interactions', 'percentile'];
+        const actualColumns = lines[0].split(',').map(col => col.trim());
+        const { missingColumns } = createFlexibleColumnMapping(requiredColumns, actualColumns);
 
-        resolve(hasRequiredColumns);
+        resolve(missingColumns.length === 0);
       } catch {
         resolve(false);
       }

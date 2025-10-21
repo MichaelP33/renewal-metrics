@@ -111,6 +111,7 @@ export function Dashboard() {
 
   const [wauChartConfig, setWAUChartConfig] = useState<WAUChartConfig>({
     showDataLabels: true,
+    showXAxisLabels: false,
     viewType: 'MoM'
   });
 

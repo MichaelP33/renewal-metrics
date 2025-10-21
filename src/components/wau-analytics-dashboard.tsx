@@ -5,6 +5,7 @@ import { Users, BarChart3, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { DataSourceLink } from './DataSourceLink';
+import { DateRangePicker } from './DateRangePicker';
 import { WAU_ANALYTICS_HEX_URL } from '@/lib/data-source-links';
 import { WAUMoMChart } from './wau-mom-chart';
 import { WAUWoWChart } from './wau-wow-chart';
@@ -16,7 +17,8 @@ import {
 import { 
   processWAUData, 
   aggregateWAUMoM, 
-  aggregateWAUWoW
+  aggregateWAUWoW,
+  getWAUDataDateRange
 } from '@/lib/wau-data-processing';
 import { formatUserCount } from '@/lib/chart-utils';
 
@@ -32,11 +34,17 @@ export function WAUDashboard({
   rawData, 
   filterConfig, 
   chartConfig, 
+  onFilterConfigChange,
   onChartConfigChange 
 }: WAUDashboardProps) {
   // Refs for export functionality
   const momChartRef = useRef<HTMLDivElement>(null);
   const wowChartRef = useRef<HTMLDivElement>(null);
+
+  // Calculate available date range from raw data
+  const availableDateRange = useMemo(() => {
+    return getWAUDataDateRange(rawData);
+  }, [rawData]);
 
   // Process data based on current filters
   const processedData = useMemo(() => {
@@ -81,6 +89,13 @@ export function WAUDashboard({
       <div className="flex justify-end">
         <DataSourceLink href={WAU_ANALYTICS_HEX_URL} />
       </div>
+
+      {/* Date Range Controls */}
+      <DateRangePicker
+        dateRange={filterConfig.dateRange}
+        onDateRangeChange={(range) => onFilterConfigChange({ ...filterConfig, dateRange: range })}
+        availableRange={availableDateRange}
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -182,6 +197,18 @@ export function WAUDashboard({
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
+                      checked={chartConfig.showXAxisLabels}
+                      onChange={(e) => onChartConfigChange({ 
+                        ...chartConfig, 
+                        showXAxisLabels: e.target.checked 
+                      })}
+                      className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                    />
+                    <span className="text-sm text-gray-700">Show X-axis labels</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
                       checked={chartConfig.showDataLabels}
                       onChange={(e) => onChartConfigChange({ 
                         ...chartConfig, 
@@ -189,7 +216,7 @@ export function WAUDashboard({
                       })}
                       className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                     />
-                    <span className="text-sm text-gray-700">Show data labels</span>
+                    <span className="text-sm text-gray-700">Show user counts</span>
                   </label>
                 </div>
               </div>

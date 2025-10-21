@@ -1,41 +1,51 @@
 import Papa from 'papaparse';
 import { AICodeMetricsRow } from '@/types';
+import { createFlexibleColumnMapping } from './csv-utils';
 
 /**
  * Parses AI Code Metrics CSV data and returns structured data
  */
 export function parseAICodeCSV(csvContent: string): Promise<AICodeMetricsRow[]> {
   return new Promise((resolve, reject) => {
+    // First, get the header to create column mapping
+    const lines = csvContent.split('\n');
+    if (lines.length < 2) {
+      reject(new Error('CSV file is empty or invalid'));
+      return;
+    }
+
+    const requiredColumns = [
+      'team_id',
+      'team_name', 
+      'user_id',
+      'email',
+      'person_linkedin_url',
+      'total_lines_changed',
+      'ai_lines_changed',
+      'non_ai_lines_changed',
+      'pct_ai_lines_changed',
+      'pct_non_ai_lines_changed',
+      'commit_count'
+    ];
+    const actualColumns = lines[0].split(',').map(col => col.trim());
+    const { mapping, missingColumns } = createFlexibleColumnMapping(requiredColumns, actualColumns);
+
+    if (missingColumns.length > 0) {
+      reject(new Error(`CSV must contain columns: ${missingColumns.join(', ')}`));
+      return;
+    }
+
     Papa.parse<AICodeMetricsRow>(csvContent, {
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
+      transformHeader: (header: string) => {
+        // Map actual column names to expected names
+        return mapping[header] || header;
+      },
       complete: (results) => {
         if (results.errors.length > 0) {
           reject(new Error(`CSV parsing errors: ${results.errors.map(e => e.message).join(', ')}`));
-          return;
-        }
-
-        // Validate required columns
-        const requiredColumns = [
-          'team_id',
-          'team_name', 
-          'user_id',
-          'email',
-          'person_linkedin_url',
-          'total_lines_changed',
-          'ai_lines_changed',
-          'non_ai_lines_changed',
-          'pct_ai_lines_changed',
-          'pct_non_ai_lines_changed',
-          'commit_count'
-        ];
-        
-        const hasRequiredColumns = results.data.length > 0 && 
-          requiredColumns.every(col => col in results.data[0]);
-
-        if (!hasRequiredColumns) {
-          reject(new Error(`CSV must contain columns: ${requiredColumns.join(', ')}`));
           return;
         }
 
@@ -167,7 +177,6 @@ export function validateAICodeCSVFormat(file: File): Promise<boolean> {
           return;
         }
 
-        const header = lines[0].toLowerCase();
         const requiredColumns = [
           'team_id',
           'email', 
@@ -175,12 +184,10 @@ export function validateAICodeCSVFormat(file: File): Promise<boolean> {
           'ai_lines_changed',
           'pct_ai_lines_changed'
         ];
-        
-        const hasRequiredColumns = requiredColumns.every(col => 
-          header.includes(col.replace('_', '')) || header.includes(col)
-        );
+        const actualColumns = lines[0].split(',').map(col => col.trim());
+        const { missingColumns } = createFlexibleColumnMapping(requiredColumns, actualColumns);
 
-        resolve(hasRequiredColumns);
+        resolve(missingColumns.length === 0);
       } catch {
         resolve(false);
       }

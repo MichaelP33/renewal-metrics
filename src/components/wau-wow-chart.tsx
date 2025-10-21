@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -21,6 +21,7 @@ import {
   wauYAxisTickFormatter,
   WAU_CHART_PRESETS
 } from '@/lib/chart-utils';
+import { format, parseISO } from 'date-fns';
 
 interface WAUWoWChartProps {
   data: WAUWoWData[];
@@ -106,9 +107,65 @@ const CustomDataLabel = (props: DataLabelProps) => {
   );
 };
 
+// Helper to group data by month and calculate center positions
+function getMonthlyTicks(data: WAUWoWData[]): Array<{ value: string; index: number }> {
+  const monthGroups = new Map<string, number[]>();
+  
+  data.forEach((item, index) => {
+    const monthLabel = item.monthLabel;
+    if (!monthGroups.has(monthLabel)) {
+      monthGroups.set(monthLabel, []);
+    }
+    monthGroups.get(monthLabel)!.push(index);
+  });
+  
+  const ticks: Array<{ value: string; index: number }> = [];
+  monthGroups.forEach((indices, monthLabel) => {
+    // Calculate center index for this month
+    const centerIndex = indices[Math.floor(indices.length / 2)];
+    ticks.push({ value: monthLabel, index: centerIndex });
+  });
+  
+  return ticks;
+}
+
 
 export const WAUWoWChart = forwardRef<HTMLDivElement, WAUWoWChartProps>(
   ({ data, config, title = "WAUs Week-over-Week", height = 400 }, ref) => {
+    // Determine labeling strategy based on number of weeks
+    const labelConfig = useMemo(() => {
+      const weekCount = data.length;
+      const useMonthlyLabels = weekCount > 16;
+      
+      if (useMonthlyLabels) {
+        // Get monthly tick positions
+        const monthlyTicks = getMonthlyTicks(data);
+        return {
+          mode: 'monthly' as const,
+          ticks: monthlyTicks.map(t => data[t.index].weekDisplay),
+          tickFormatter: (value: string) => {
+            const dataPoint = data.find(d => d.weekDisplay === value);
+            if (!dataPoint) return '';
+            const tick = monthlyTicks.find(t => data[t.index].weekDisplay === value);
+            return tick ? tick.value : '';
+          }
+        };
+      } else {
+        // Show all weeks in MM/DD format
+        return {
+          mode: 'all' as const,
+          tickFormatter: (value: string) => {
+            try {
+              const date = parseISO(data.find(d => d.weekDisplay === value)?.week || value);
+              return format(date, 'M/d');
+            } catch {
+              return value;
+            }
+          }
+        };
+      }
+    }, [data]);
+
     if (data.length === 0) {
       return (
         <Card ref={ref}>
@@ -146,7 +203,10 @@ export const WAUWoWChart = forwardRef<HTMLDivElement, WAUWoWChartProps>(
                   tick={{ fontSize: 10 }}
                   axisLine={{ stroke: '#e0e0e0' }}
                   tickLine={{ stroke: '#e0e0e0' }}
-                  hide={true} // Hide default labels, we will show month labels instead
+                  hide={!config.showXAxisLabels}
+                  tickFormatter={labelConfig.tickFormatter}
+                  ticks={labelConfig.mode === 'monthly' ? labelConfig.ticks : undefined}
+                  interval={labelConfig.mode === 'all' ? 0 : undefined}
                 />
                 <YAxis 
                   tickFormatter={wauYAxisTickFormatter}

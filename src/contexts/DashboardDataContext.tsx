@@ -142,6 +142,7 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
 
   const [wauChartConfig, setWAUChartConfig] = useState<WAUChartConfig>({
     showDataLabels: true,
+    showXAxisLabels: false,
     viewType: 'MoM'
   });
 
