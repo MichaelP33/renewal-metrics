@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { exportCSV } from '@/lib/export-utils';
 import { MasterTable } from '../MasterTable';
 import { MasterUserRecord } from '@/types/power-users';
 
@@ -154,7 +155,6 @@ describe('MasterTable', () => {
   });
 
   it('exports CSV when export button is clicked', () => {
-    const { exportCSV } = jest.requireActual('@/lib/export-utils');
     
     render(<MasterTable rows={mockUsers} />);
     

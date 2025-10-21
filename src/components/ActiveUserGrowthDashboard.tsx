@@ -4,6 +4,8 @@ import React, { useMemo } from 'react';
 import { TrendingUp, Users, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { DataSourceLink } from './DataSourceLink';
+import { TAM_MISSION_CONTROL_HEX_URL } from '@/lib/data-source-links';
 import { ActiveUserGrowthChart } from './ActiveUserGrowthChart';
 import { ActiveUserGrowthControls } from './ActiveUserGrowthControls';
 import { 
@@ -52,6 +54,9 @@ export function ActiveUserGrowthDashboard({
           <p className="text-gray-600">
             Upload an Active User Growth CSV file to view analytics and visualizations.
           </p>
+          <div className="mt-3">
+            <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
+          </div>
         </CardContent>
       </Card>
     );
@@ -70,6 +75,11 @@ export function ActiveUserGrowthDashboard({
 
   return (
     <div className="space-y-6">
+      {/* Header with data source link */}
+      <div className="flex justify-end">
+        <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
+      </div>
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>

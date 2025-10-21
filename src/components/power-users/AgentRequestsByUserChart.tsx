@@ -15,6 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DataSourceLink } from '../DataSourceLink';
+import { TAM_MISSION_CONTROL_HEX_URL } from '@/lib/data-source-links';
 import {
   Select,
   SelectContent,
@@ -145,15 +147,18 @@ export function AgentRequestsByUserChart({ data }: AgentRequestsByUserChartProps
             <BarChart3 className="h-4 w-4" />
             <span>Agent Requests by User</span>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportCSV}
-            className="flex items-center space-x-2"
-          >
-            <Download className="h-3 w-3" />
-            <span>Export CSV</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportCSV}
+              className="flex items-center space-x-2"
+            >
+              <Download className="h-3 w-3" />
+              <span>Export CSV</span>
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       

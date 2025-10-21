@@ -4,6 +4,8 @@ import React, { useMemo } from 'react';
 import { TrendingUp, Users, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { DataSourceLink } from './DataSourceLink';
+import { TAM_MISSION_CONTROL_HEX_URL } from '@/lib/data-source-links';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RuleUsageChart } from './rule-usage-chart';
@@ -55,6 +57,9 @@ export function RuleUsageDashboard({
           <p className="text-gray-600">
             Upload a Weekly Rule Usage CSV file to view analytics and visualizations.
           </p>
+          <div className="mt-3">
+            <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
+          </div>
         </CardContent>
       </Card>
     );
@@ -99,6 +104,11 @@ export function RuleUsageDashboard({
 
   return (
     <div className="space-y-6">
+      {/* Header with data source link */}
+      <div className="flex justify-end">
+        <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
+      </div>
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>

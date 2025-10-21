@@ -17,6 +17,7 @@ import { PercentileDashboard } from './PercentileDashboard';
 import { MCPUsageDashboard } from './mcp-usage-dashboard';
 import { RuleUsageDashboard } from './rule-usage-dashboard';
 import { ExportControls } from './ExportControls';
+import { DataSourceLink } from './DataSourceLink';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { 
@@ -75,6 +76,7 @@ import {
   parseRuleUsageCSV,
   getRuleUsageDateRange
 } from '@/lib/rule-usage-processing';
+import { MODEL_COSTS_HEX_URL } from '@/lib/data-source-links';
 
 export function Dashboard() {
   // Data state
@@ -456,12 +458,19 @@ export function Dashboard() {
       <div className="container mx-auto p-6" ref={dashboardRef}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Model Cost & Usage Analytics Dashboard
-          </h1>
-          <p className="text-gray-600">
-            Upload your model usage data, WAU analytics, and AI code metrics to analyze spending patterns, user engagement, and AI code adoption rates
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Model Cost & Usage Analytics Dashboard
+              </h1>
+              <p className="text-gray-600">
+                Upload your model usage data, WAU analytics, and AI code metrics to analyze spending patterns, user engagement, and AI code adoption rates
+              </p>
+            </div>
+            {activeTab === 'MODEL_COSTS' && (
+              <DataSourceLink href={MODEL_COSTS_HEX_URL} />
+            )}
+          </div>
         </div>
 
         {/* File Upload Section or MAU Usage Access */}
@@ -789,6 +798,9 @@ export function Dashboard() {
                             Minimum cost: ${filterConfig.minCostThreshold}
                           </li>
                         </ul>
+                      </div>
+                      <div className="mt-3">
+                        <DataSourceLink href={MODEL_COSTS_HEX_URL} />
                       </div>
                     </CardContent>
                   </Card>

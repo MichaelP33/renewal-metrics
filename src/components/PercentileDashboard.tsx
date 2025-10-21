@@ -3,6 +3,8 @@
 import React, { useMemo, useRef } from 'react';
 import { BarChart3, TrendingUp, Percent } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { DataSourceLink } from './DataSourceLink';
+import { TAM_MISSION_CONTROL_HEX_URL } from '@/lib/data-source-links';
 import { PercentileChart } from './PercentileChart';
 import { PercentileControls } from './PercentileControls';
 import { PercentileDataRow, PercentileConfig } from '@/types';
@@ -67,6 +69,9 @@ export function PercentileDashboard({
           <p className="text-gray-600">
             Upload a percentile distribution CSV file to view analytics and visualizations.
           </p>
+          <div className="mt-3">
+            <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
+          </div>
         </CardContent>
       </Card>
     );
@@ -74,6 +79,11 @@ export function PercentileDashboard({
 
   return (
     <div className="space-y-6">
+      {/* Header with data source link */}
+      <div className="flex justify-end">
+        <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
+      </div>
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>

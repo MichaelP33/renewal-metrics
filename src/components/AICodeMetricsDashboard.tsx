@@ -4,6 +4,8 @@ import React, { useState, useMemo, useRef } from 'react';
 import { Code, Download, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DataSourceLink } from './DataSourceLink';
+import { AI_CODE_METRICS_HEX_URL } from '@/lib/data-source-links';
 import { AICodeMetricsTable } from './AICodeMetricsTable';
 import { AICodeHorizontalBarChart } from './AICodeHorizontalBarChart';
 import { AICodeMetricsRow, AICodeMetricsConfig, UserNameData } from '@/types';
@@ -123,6 +125,9 @@ export function AICodeMetricsDashboard({
           <p className="text-gray-600">
             Upload an AI code metrics CSV file to view user statistics and visualizations.
           </p>
+          <div className="mt-3">
+            <DataSourceLink href={AI_CODE_METRICS_HEX_URL} />
+          </div>
         </CardContent>
       </Card>
     );
@@ -130,6 +135,11 @@ export function AICodeMetricsDashboard({
 
   return (
     <div className="space-y-6">
+      {/* Header with data source link */}
+      <div className="flex justify-end">
+        <DataSourceLink href={AI_CODE_METRICS_HEX_URL} />
+      </div>
+
       {/* Summary Statistics */}
       {summaryStats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

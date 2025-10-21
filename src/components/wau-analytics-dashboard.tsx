@@ -4,6 +4,8 @@ import React, { useRef, useMemo } from 'react';
 import { Users, BarChart3, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { DataSourceLink } from './DataSourceLink';
+import { WAU_ANALYTICS_HEX_URL } from '@/lib/data-source-links';
 import { WAUMoMChart } from './wau-mom-chart';
 import { WAUWoWChart } from './wau-wow-chart';
 import { 
@@ -65,6 +67,9 @@ export function WAUDashboard({
           <p className="text-gray-600">
             Upload a WAU CSV file to view analytics and visualizations.
           </p>
+          <div className="mt-3">
+            <DataSourceLink href={WAU_ANALYTICS_HEX_URL} />
+          </div>
         </CardContent>
       </Card>
     );
@@ -72,6 +77,11 @@ export function WAUDashboard({
 
   return (
     <div className="space-y-6">
+      {/* Header with data source link */}
+      <div className="flex justify-end">
+        <DataSourceLink href={WAU_ANALYTICS_HEX_URL} />
+      </div>
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>

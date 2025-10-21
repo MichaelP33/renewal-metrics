@@ -4,6 +4,13 @@ import React, { useCallback, useState } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, DollarSign, Users, Code, TrendingUp, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DataSourceLink } from './DataSourceLink';
+import { 
+  MODEL_COSTS_HEX_URL, 
+  WAU_ANALYTICS_HEX_URL, 
+  AI_CODE_METRICS_HEX_URL, 
+  TAM_MISSION_CONTROL_HEX_URL 
+} from '@/lib/data-source-links';
 import { validateCSVFormat } from '@/lib/data-processing';
 import { validateWAUCSVFormat } from '@/lib/wau-data-processing';
 import { validateAICodeCSVFormat } from '@/lib/ai-code-data-processing';
@@ -311,19 +318,44 @@ export function TripleFileUpload({
     hasData: boolean;
     borderColor: string;
     iconColor: string;
-  }) => (
-    <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <Icon className={`h-5 w-5 ${iconColor}`} />
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        {hasData && (
-          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-            Loaded
-          </span>
-        )}
-      </div>
-      
-      <p className="text-sm text-gray-600">{description}</p>
+  }) => {
+    // Map data type to Hex URL
+    const getHexUrl = () => {
+      switch (dataType) {
+        case 'MODEL_COSTS':
+          return MODEL_COSTS_HEX_URL;
+        case 'WAU_ANALYTICS':
+          return WAU_ANALYTICS_HEX_URL;
+        case 'AI_CODE_METRICS':
+          return AI_CODE_METRICS_HEX_URL;
+        case 'ACTIVE_USER_GROWTH':
+        case 'PERCENTILE_DATA':
+        case 'MCP_USAGE':
+        case 'RULE_USAGE':
+          return TAM_MISSION_CONTROL_HEX_URL;
+        default:
+          return null;
+      }
+    };
+
+    const hexUrl = getHexUrl();
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Icon className={`h-5 w-5 ${iconColor}`} />
+            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            {hasData && (
+              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                Loaded
+              </span>
+            )}
+          </div>
+          {hexUrl && <DataSourceLink href={hexUrl} />}
+        </div>
+        
+        <p className="text-sm text-gray-600">{description}</p>
       
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -387,8 +419,9 @@ export function TripleFileUpload({
           )}
         </div>
       </div>
-    </div>
-  );
+      </div>
+    );
+  };
 
   return (
     <Card>

@@ -5,6 +5,8 @@ import { Upload, FileText, AlertCircle, CheckCircle, Code, Users, Bot, Trash2 } 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { usePowerUsers } from '@/contexts/PowerUsersContext';
+import { DataSourceLink } from '../DataSourceLink';
+import { TAM_MISSION_CONTROL_HEX_URL } from '@/lib/data-source-links';
 
 interface FileUploadState {
   file: File | null;
@@ -77,13 +79,18 @@ export function PowerUsersUpload() {
 
     return (
       <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Icon className={`h-5 w-5 ${iconColor}`} />
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          {isSuccess && (
-            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-              Loaded
-            </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Icon className={`h-5 w-5 ${iconColor}`} />
+            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            {isSuccess && (
+              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                Loaded
+              </span>
+            )}
+          </div>
+          {(kind === 'features' || kind === 'agent') && (
+            <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
           )}
         </div>
         
