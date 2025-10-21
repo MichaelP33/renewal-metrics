@@ -86,17 +86,17 @@ interface DashboardDataContextType {
   handleRuleUsageUpload: (file: File, content: string) => Promise<void>;
   
   // Config update handlers
-  setFilterConfig: (config: FilterConfig) => void;
-  setWAUFilterConfig: (config: WAUFilterConfig) => void;
-  setChartConfig: (config: ChartConfig) => void;
-  setWAUChartConfig: (config: WAUChartConfig) => void;
-  setMAUUsageData: (data: MAUUsageData) => void;
-  setMAUUsageConfig: (config: MAUUsageConfig) => void;
-  setAICodeConfig: (config: AICodeMetricsConfig) => void;
-  setActiveUserGrowthConfig: (config: ActiveUserGrowthConfig) => void;
-  setPercentileConfig: (config: PercentileConfig) => void;
-  setMCPUsageConfig: (config: MCPUsageConfig) => void;
-  setRuleUsageConfig: (config: RuleUsageConfig) => void;
+  setFilterConfig: React.Dispatch<React.SetStateAction<FilterConfig>>;
+  setWAUFilterConfig: React.Dispatch<React.SetStateAction<WAUFilterConfig>>;
+  setChartConfig: React.Dispatch<React.SetStateAction<ChartConfig>>;
+  setWAUChartConfig: React.Dispatch<React.SetStateAction<WAUChartConfig>>;
+  setMAUUsageData: React.Dispatch<React.SetStateAction<MAUUsageData>>;
+  setMAUUsageConfig: React.Dispatch<React.SetStateAction<MAUUsageConfig>>;
+  setAICodeConfig: React.Dispatch<React.SetStateAction<AICodeMetricsConfig>>;
+  setActiveUserGrowthConfig: React.Dispatch<React.SetStateAction<ActiveUserGrowthConfig>>;
+  setPercentileConfig: React.Dispatch<React.SetStateAction<PercentileConfig>>;
+  setMCPUsageConfig: React.Dispatch<React.SetStateAction<MCPUsageConfig>>;
+  setRuleUsageConfig: React.Dispatch<React.SetStateAction<RuleUsageConfig>>;
   
   // Computed values
   hasModelCostsData: boolean;
