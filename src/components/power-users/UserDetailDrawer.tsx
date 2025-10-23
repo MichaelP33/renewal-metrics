@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { X, ExternalLink } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { X, ExternalLink, Save } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { MasterUserRecord } from '@/types/power-users';
+import { usePowerUsers } from '@/contexts/PowerUsersContext';
 
 interface UserDetailDrawerProps {
   user: MasterUserRecord | null;
@@ -19,6 +22,19 @@ interface UserDetailDrawerProps {
 
 export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const { updateUserName } = usePowerUsers();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  // Update form fields when user changes
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName || '');
+      setLastName(user.lastName || '');
+      setSaveStatus('idle');
+    }
+  }, [user]);
 
   // Focus management
   useEffect(() => {
@@ -26,6 +42,19 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
       closeButtonRef.current.focus();
     }
   }, [isOpen]);
+
+  const handleSave = () => {
+    if (!user) return;
+    
+    setSaveStatus('saving');
+    updateUserName(user.email, firstName, lastName);
+    
+    // Show success feedback
+    setTimeout(() => {
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    }, 100);
+  };
 
   if (!user) return null;
 
@@ -55,25 +84,56 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
           {/* Identity Section */}
           <section aria-labelledby="identity-heading">
             <h2 id="identity-heading" className="text-lg font-semibold mb-3">Identity</h2>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Email:</span>
                 <span className="font-medium">{user.email}</span>
               </div>
-              {user.firstName && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">First Name:</span>
-                  <span className="font-medium">{user.firstName}</span>
+              
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="firstName" className="text-sm text-gray-600 mb-1 block">
+                    First Name
+                  </Label>
+                  <Input
+                    id="firstName"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Enter first name"
+                    className="text-sm"
+                  />
                 </div>
-              )}
-              {user.lastName && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Last Name:</span>
-                  <span className="font-medium">{user.lastName}</span>
+                
+                <div>
+                  <Label htmlFor="lastName" className="text-sm text-gray-600 mb-1 block">
+                    Last Name
+                  </Label>
+                  <Input
+                    id="lastName"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Enter last name"
+                    className="text-sm"
+                  />
                 </div>
-              )}
+                
+                <Button
+                  onClick={handleSave}
+                  disabled={saveStatus === 'saving'}
+                  size="sm"
+                  className="w-full"
+                >
+                  <Save className="h-3 w-3 mr-2" />
+                  {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Name'}
+                </Button>
+                
+                {saveStatus === 'saved' && (
+                  <p className="text-xs text-green-600 text-center">Name saved successfully</p>
+                )}
+              </div>
+              
               {user.linkedinUrl && (
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center pt-2">
                   <span className="text-gray-600">LinkedIn:</span>
                   <a
                     href={user.linkedinUrl}

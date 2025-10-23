@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight, Edit2, Check, X } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -24,6 +24,8 @@ import { MasterUserRecord, EnhancedMasterUserRecord } from '@/types/power-users'
 import { exportCSV } from '@/lib/export-utils';
 import { FilterState } from './MasterTableFilters';
 import { UserDetailDrawer } from './UserDetailDrawer';
+import { usePowerUsers } from '@/contexts/PowerUsersContext';
+import { Input } from '@/components/ui/input';
 
 interface MasterTableProps {
   rows: MasterUserRecord[] | EnhancedMasterUserRecord[];
@@ -79,11 +81,14 @@ interface ColumnVisibility {
 const ROWS_PER_PAGE = 50;
 
 export function MasterTable({ rows, filters }: MasterTableProps) {
+  const { updateUserName } = usePowerUsers();
   const [sortColumn, setSortColumn] = useState<SortColumn>('email');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<MasterUserRecord | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editingCell, setEditingCell] = useState<{ email: string; field: 'firstName' | 'lastName' } | null>(null);
+  const [editValue, setEditValue] = useState('');
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     email: true,
     firstName: true,
@@ -306,6 +311,32 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
     }
     return <ArrowUpDown className="h-3 w-3 text-gray-400" />;
   }, [sortColumn, sortDirection]);
+
+  const handleStartEdit = useCallback((email: string, field: 'firstName' | 'lastName', currentValue: string) => {
+    setEditingCell({ email, field });
+    setEditValue(currentValue);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingCell(null);
+    setEditValue('');
+  }, []);
+
+  const handleSaveEdit = useCallback(() => {
+    if (!editingCell) return;
+    
+    const user = rows.find(r => r.email === editingCell.email);
+    if (!user) return;
+    
+    if (editingCell.field === 'firstName') {
+      updateUserName(editingCell.email, editValue, user.lastName || '');
+    } else {
+      updateUserName(editingCell.email, user.firstName || '', editValue);
+    }
+    
+    setEditingCell(null);
+    setEditValue('');
+  }, [editingCell, editValue, rows, updateUserName]);
 
   const handleExportCSV = useCallback(() => {
     if (filteredData.length === 0) return;
@@ -873,14 +904,102 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
                       )}
                       
                       {columnVisibility.firstName && (
-                        <TableCell>
-                          {row.firstName || '—'}
+                        <TableCell 
+                          className="group relative"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {editingCell?.email === row.email && editingCell?.field === 'firstName' ? (
+                            <div className="flex items-center space-x-1">
+                              <Input
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleSaveEdit();
+                                  } else if (e.key === 'Escape') {
+                                    handleCancelEdit();
+                                  }
+                                }}
+                                className="h-7 text-sm"
+                                autoFocus
+                              />
+                              <button
+                                onClick={handleSaveEdit}
+                                className="p-1 text-green-600 hover:text-green-700"
+                                aria-label="Save"
+                              >
+                                <Check className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="p-1 text-red-600 hover:text-red-700"
+                                aria-label="Cancel"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center space-x-1 group-hover:bg-gray-50 -mx-1 px-1 rounded">
+                              <span className="flex-1">{row.firstName || '—'}</span>
+                              <button
+                                onClick={() => handleStartEdit(row.email, 'firstName', row.firstName || '')}
+                                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600"
+                                aria-label="Edit first name"
+                              >
+                                <Edit2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          )}
                         </TableCell>
                       )}
                       
                       {columnVisibility.lastName && (
-                        <TableCell>
-                          {row.lastName || '—'}
+                        <TableCell 
+                          className="group relative"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {editingCell?.email === row.email && editingCell?.field === 'lastName' ? (
+                            <div className="flex items-center space-x-1">
+                              <Input
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleSaveEdit();
+                                  } else if (e.key === 'Escape') {
+                                    handleCancelEdit();
+                                  }
+                                }}
+                                className="h-7 text-sm"
+                                autoFocus
+                              />
+                              <button
+                                onClick={handleSaveEdit}
+                                className="p-1 text-green-600 hover:text-green-700"
+                                aria-label="Save"
+                              >
+                                <Check className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="p-1 text-red-600 hover:text-red-700"
+                                aria-label="Cancel"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center space-x-1 group-hover:bg-gray-50 -mx-1 px-1 rounded">
+                              <span className="flex-1">{row.lastName || '—'}</span>
+                              <button
+                                onClick={() => handleStartEdit(row.email, 'lastName', row.lastName || '')}
+                                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600"
+                                aria-label="Edit last name"
+                              >
+                                <Edit2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          )}
                         </TableCell>
                       )}
                       

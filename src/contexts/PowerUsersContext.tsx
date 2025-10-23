@@ -10,12 +10,18 @@ import type { MasterUserRecord, EnhancedMasterUserRecord, AICodeMetrics, PowerUs
 
 const STORAGE_KEY = 'power-users/v1';
 
+interface NameOverride {
+  firstName?: string;
+  lastName?: string;
+}
+
 interface StoredData {
   version: number;
   timestamp: string;
   aiCode: AICodeMetrics[];
   features: PowerUserFeatures[];
   agent: AgentRequests[];
+  nameOverrides?: Record<string, NameOverride>;
 }
 
 export interface PowerUsersContextValue {
@@ -26,6 +32,7 @@ export interface PowerUsersContextValue {
   clearData: () => void;
   cachedTimestamp: string | null;
   hasData: boolean;
+  updateUserName: (email: string, firstName: string, lastName: string) => void;
 }
 
 const PowerUsersContext = createContext<PowerUsersContextValue | undefined>(undefined);
@@ -34,6 +41,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
   const [aiCode, setAiCode] = useState<AICodeMetrics[] | null>(null);
   const [features, setFeatures] = useState<PowerUserFeatures[] | null>(null);
   const [agent, setAgent] = useState<AgentRequests[] | null>(null);
+  const [nameOverrides, setNameOverrides] = useState<Record<string, NameOverride>>({});
   const [uploadStatus, setUploadStatus] = useState<Record<'ai' | 'features' | 'agent', 'idle' | 'parsing' | 'success' | 'error'>>({
     ai: 'idle',
     features: 'idle',
@@ -42,10 +50,22 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
   const [cachedTimestamp, setCachedTimestamp] = useState<string | null>(null);
 
   // Aggregate master users whenever any dataset changes
-  const masterUsers = useMemo(
-    () => aggregateUserData(aiCode ?? [], features ?? [], agent ?? []),
-    [aiCode, features, agent]
-  );
+  const masterUsers = useMemo(() => {
+    const aggregated = aggregateUserData(aiCode ?? [], features ?? [], agent ?? []);
+    
+    // Apply name overrides
+    return aggregated.map(user => {
+      const override = nameOverrides[user.email];
+      if (override) {
+        return {
+          ...user,
+          firstName: override.firstName !== undefined ? override.firstName : user.firstName,
+          lastName: override.lastName !== undefined ? override.lastName : user.lastName,
+        };
+      }
+      return user;
+    });
+  }, [aiCode, features, agent, nameOverrides]);
 
   // Compute enhanced users with engagement scores
   const enhancedUsers = useMemo(() => {
@@ -81,6 +101,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         setAiCode(data.aiCode);
         setFeatures(data.features);
         setAgent(data.agent);
+        setNameOverrides(data.nameOverrides ?? {});
         setCachedTimestamp(data.timestamp);
         
         // Update upload status for loaded datasets
@@ -105,6 +126,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
           aiCode: aiCode ?? [],
           features: features ?? [],
           agent: agent ?? [],
+          nameOverrides,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         setCachedTimestamp(data.timestamp);
@@ -112,7 +134,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         console.error('Failed to save data to localStorage:', error);
       }
     }
-  }, [aiCode, features, agent]);
+  }, [aiCode, features, agent, nameOverrides]);
 
   const uploadDataset = useCallback(async (kind: 'ai' | 'features' | 'agent', file: File) => {
     console.log(`[PowerUsers] Uploading ${kind} file:`, file.name);
@@ -151,6 +173,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     setAiCode(null);
     setFeatures(null);
     setAgent(null);
+    setNameOverrides({});
     setUploadStatus({ ai: 'idle', features: 'idle', agent: 'idle' });
     setCachedTimestamp(null);
     try {
@@ -158,6 +181,16 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     } catch (error) {
       console.error('Failed to clear localStorage:', error);
     }
+  }, []);
+
+  const updateUserName = useCallback((email: string, firstName: string, lastName: string) => {
+    setNameOverrides(prev => ({
+      ...prev,
+      [email]: {
+        firstName: firstName.trim() || undefined,
+        lastName: lastName.trim() || undefined,
+      },
+    }));
   }, []);
 
   return (
@@ -170,6 +203,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         clearData,
         cachedTimestamp,
         hasData,
+        updateUserName,
       }}
     >
       {children}

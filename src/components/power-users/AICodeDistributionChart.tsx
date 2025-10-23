@@ -25,6 +25,7 @@ import {
 import { BarChart3, Download } from 'lucide-react';
 import { EnhancedMasterUserRecord } from '@/types/power-users';
 import { exportCSV } from '@/lib/export-utils';
+import { getUserDisplayName, getShortDisplayName } from '@/lib/power-users/name-utils';
 
 interface AICodeDistributionChartProps {
   data: EnhancedMasterUserRecord[];
@@ -32,7 +33,8 @@ interface AICodeDistributionChartProps {
 
 interface ChartDataPoint {
   email: string;
-  emailShort: string;
+  displayName: string;
+  shortName: string;
   firstName: string;
   lastName: string;
   totalLines: number;
@@ -69,14 +71,10 @@ export function AICodeDistributionChart({ data }: AICodeDistributionChartProps) 
       .slice(0, topN);
 
     return sorted.map(row => {
-      const emailParts = row.email.split('@');
-      const emailShort = emailParts[0].length > 12 
-        ? `${emailParts[0].substring(0, 12)}...@${emailParts[1]}`
-        : row.email;
-
       return {
         email: row.email,
-        emailShort,
+        displayName: getUserDisplayName(row),
+        shortName: getShortDisplayName(row),
         firstName: row.firstName || '',
         lastName: row.lastName || '',
         totalLines: row.totalLinesChanged ?? 0,
@@ -118,7 +116,10 @@ export function AICodeDistributionChart({ data }: AICodeDistributionChartProps) 
       const data = payload[0].payload;
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-900 mb-2">{data.email}</p>
+          <p className="font-semibold text-gray-900 mb-2">{data.displayName}</p>
+          {data.email !== data.displayName && (
+            <p className="text-xs text-gray-500 mb-2">{data.email}</p>
+          )}
           <div className="space-y-1">
             <div className="flex items-center justify-between min-w-[200px]">
               <span className="text-sm text-gray-700">Total Lines:</span>
@@ -290,7 +291,7 @@ export function AICodeDistributionChart({ data }: AICodeDistributionChartProps) 
               
               <YAxis 
                 type="category"
-                dataKey="emailShort"
+                dataKey="shortName"
                 tick={{ fontSize: 11 }}
                 axisLine={{ stroke: '#e0e0e0' }}
                 tickLine={{ stroke: '#e0e0e0' }}

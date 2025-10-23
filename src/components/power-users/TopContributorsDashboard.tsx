@@ -13,6 +13,7 @@ import {
 import { Trophy, Download } from 'lucide-react';
 import { EnhancedMasterUserRecord } from '@/types/power-users';
 import { exportCSV } from '@/lib/export-utils';
+import { getUserDisplayName } from '@/lib/power-users/name-utils';
 
 interface TopContributorsDashboardProps {
   data: EnhancedMasterUserRecord[];
@@ -178,9 +179,7 @@ export function TopContributorsDashboard({ data }: TopContributorsDashboardProps
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-900">
-                      {entry.firstName && entry.lastName 
-                        ? `${entry.firstName} ${entry.lastName}`
-                        : entry.email}
+                      {getUserDisplayName({ email: entry.email, firstName: entry.firstName, lastName: entry.lastName } as any)}
                     </div>
                     {entry.firstName && entry.lastName && (
                       <div className="text-xs text-gray-500">{entry.email}</div>
