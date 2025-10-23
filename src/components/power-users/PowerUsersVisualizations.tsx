@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { EnhancedMasterUserRecord } from '@/types/power-users';
-import { SessionsByUserChart } from './SessionsByUserChart';
-import { AgentRequestsByUserChart } from './AgentRequestsByUserChart';
+import { CombinedActivityChart } from './CombinedActivityChart';
 import { PowerFeaturesMatrix } from './PowerFeaturesMatrix';
 import { AICodeDistributionChart } from './AICodeDistributionChart';
 import { UserSegmentation } from './UserSegmentation';
@@ -67,13 +66,10 @@ export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps
         <AICodeDistributionChart data={data} />
       </section>
 
-      {/* Sessions & Requests */}
+      {/* User Activity */}
       <section>
-        <h2 className="text-lg font-semibold mb-4">Sessions & Requests</h2>
-        <div className="space-y-6">
-          <SessionsByUserChart data={data} />
-          <AgentRequestsByUserChart data={data} />
-        </div>
+        <h2 className="text-lg font-semibold mb-4">User Activity</h2>
+        <CombinedActivityChart data={data} />
       </section>
 
       {/* Feature Adoption */}
