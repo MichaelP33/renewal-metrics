@@ -22,17 +22,23 @@ interface StoredData {
   features: PowerUserFeatures[];
   agent: AgentRequests[];
   nameOverrides?: Record<string, NameOverride>;
+  selectedUsers?: string[];
 }
 
 export interface PowerUsersContextValue {
   masterUsers: MasterUserRecord[];
   enhancedUsers: EnhancedMasterUserRecord[];
+  filteredEnhancedUsers: EnhancedMasterUserRecord[];
   uploadStatus: Record<'ai' | 'features' | 'agent', 'idle' | 'parsing' | 'success' | 'error'>;
   uploadDataset: (kind: 'ai' | 'features' | 'agent', file: File) => Promise<void>;
   clearData: () => void;
   cachedTimestamp: string | null;
   hasData: boolean;
   updateUserName: (email: string, firstName: string, lastName: string) => void;
+  selectedUserEmails: Set<string>;
+  toggleUserSelection: (email: string) => void;
+  clearSelection: () => void;
+  selectAllUsers: (emails: string[]) => void;
 }
 
 const PowerUsersContext = createContext<PowerUsersContextValue | undefined>(undefined);
@@ -42,6 +48,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
   const [features, setFeatures] = useState<PowerUserFeatures[] | null>(null);
   const [agent, setAgent] = useState<AgentRequests[] | null>(null);
   const [nameOverrides, setNameOverrides] = useState<Record<string, NameOverride>>({});
+  const [selectedUserEmails, setSelectedUserEmails] = useState<Set<string>>(new Set());
   const [uploadStatus, setUploadStatus] = useState<Record<'ai' | 'features' | 'agent', 'idle' | 'parsing' | 'success' | 'error'>>({
     ai: 'idle',
     features: 'idle',
@@ -90,6 +97,14 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     });
   }, [masterUsers]);
 
+  // Compute filtered enhanced users based on selection
+  const filteredEnhancedUsers = useMemo(() => {
+    if (selectedUserEmails.size === 0) {
+      return enhancedUsers;
+    }
+    return enhancedUsers.filter(user => selectedUserEmails.has(user.email));
+  }, [enhancedUsers, selectedUserEmails]);
+
   const hasData = masterUsers.length > 0;
 
   // Load from localStorage on mount
@@ -103,6 +118,11 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         setAgent(data.agent);
         setNameOverrides(data.nameOverrides ?? {});
         setCachedTimestamp(data.timestamp);
+        
+        // Load selected users
+        if (data.selectedUsers && data.selectedUsers.length > 0) {
+          setSelectedUserEmails(new Set(data.selectedUsers));
+        }
         
         // Update upload status for loaded datasets
         setUploadStatus({
@@ -127,6 +147,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
           features: features ?? [],
           agent: agent ?? [],
           nameOverrides,
+          selectedUsers: Array.from(selectedUserEmails),
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         setCachedTimestamp(data.timestamp);
@@ -134,7 +155,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         console.error('Failed to save data to localStorage:', error);
       }
     }
-  }, [aiCode, features, agent, nameOverrides]);
+  }, [aiCode, features, agent, nameOverrides, selectedUserEmails]);
 
   const uploadDataset = useCallback(async (kind: 'ai' | 'features' | 'agent', file: File) => {
     console.log(`[PowerUsers] Uploading ${kind} file:`, file.name);
@@ -174,6 +195,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     setFeatures(null);
     setAgent(null);
     setNameOverrides({});
+    setSelectedUserEmails(new Set());
     setUploadStatus({ ai: 'idle', features: 'idle', agent: 'idle' });
     setCachedTimestamp(null);
     try {
@@ -193,17 +215,42 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     }));
   }, []);
 
+  const toggleUserSelection = useCallback((email: string) => {
+    setSelectedUserEmails(prev => {
+      const next = new Set(prev);
+      if (next.has(email)) {
+        next.delete(email);
+      } else {
+        next.add(email);
+      }
+      return next;
+    });
+  }, []);
+
+  const clearSelection = useCallback(() => {
+    setSelectedUserEmails(new Set());
+  }, []);
+
+  const selectAllUsers = useCallback((emails: string[]) => {
+    setSelectedUserEmails(new Set(emails));
+  }, []);
+
   return (
     <PowerUsersContext.Provider
       value={{
         masterUsers,
         enhancedUsers,
+        filteredEnhancedUsers,
         uploadStatus,
         uploadDataset,
         clearData,
         cachedTimestamp,
         hasData,
         updateUserName,
+        selectedUserEmails,
+        toggleUserSelection,
+        clearSelection,
+        selectAllUsers,
       }}
     >
       {children}

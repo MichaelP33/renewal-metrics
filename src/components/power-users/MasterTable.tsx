@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight, Edit2, Check, X } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight, Edit2, Check, X, XCircle } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -81,7 +81,7 @@ interface ColumnVisibility {
 const ROWS_PER_PAGE = 50;
 
 export function MasterTable({ rows, filters }: MasterTableProps) {
-  const { updateUserName } = usePowerUsers();
+  const { updateUserName, selectedUserEmails, toggleUserSelection, clearSelection, selectAllUsers } = usePowerUsers();
   const [sortColumn, setSortColumn] = useState<SortColumn>('email');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -180,6 +180,26 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       return true;
     });
   }, [rows, filters]);
+
+  // Handle select all checkbox state
+  const handleSelectAll = useCallback((checked: boolean) => {
+    if (checked) {
+      selectAllUsers(filteredData.map(row => row.email));
+    } else {
+      clearSelection();
+    }
+  }, [filteredData, selectAllUsers, clearSelection]);
+
+  // Check if all visible rows are selected
+  const allSelected = useMemo(() => {
+    if (filteredData.length === 0) return false;
+    return filteredData.every(row => selectedUserEmails.has(row.email));
+  }, [filteredData, selectedUserEmails]);
+
+  // Check if some rows are selected
+  const someSelected = useMemo(() => {
+    return filteredData.some(row => selectedUserEmails.has(row.email));
+  }, [filteredData, selectedUserEmails]);
 
   // Sort data
   const sortedData = useMemo(() => {
@@ -444,9 +464,26 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
           <span className="text-sm font-normal text-gray-500">
             ({filteredData.length} of {rows.length} users)
           </span>
+          {selectedUserEmails.size > 0 && (
+            <span className="text-sm font-normal text-blue-600 flex items-center space-x-1">
+              <span>•</span>
+              <span>{selectedUserEmails.size} selected</span>
+            </span>
+          )}
         </CardTitle>
         
         <div className="flex items-center space-x-2">
+          {selectedUserEmails.size > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearSelection}
+              className="flex items-center space-x-2"
+            >
+              <XCircle className="h-3 w-3" />
+              <span>Clear Selection</span>
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -603,6 +640,18 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
               <Table key={dataVersion}>
               <TableHeader>
                 <TableRow className="bg-gray-50">
+                  <TableHead className="w-12">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someSelected && !allSelected;
+                      }}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      aria-label="Select all users"
+                    />
+                  </TableHead>
                   {columnVisibility.email && (
                     <TableHead className="min-w-[200px]">
                       <Button
@@ -881,7 +930,7 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
                 {paginatedData.map((row) => (
                     <TableRow 
                       key={row.email} 
-                      className="hover:bg-gray-50 cursor-pointer"
+                      className={`hover:bg-gray-50 cursor-pointer ${selectedUserEmails.has(row.email) ? 'bg-blue-50' : ''}`}
                       onClick={() => {
                         setSelectedUser(row);
                         setIsDrawerOpen(true);
@@ -897,6 +946,18 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
                       role="button"
                       aria-label={`View details for ${row.email}`}
                     >
+                      <TableCell 
+                        className="w-12"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedUserEmails.has(row.email)}
+                          onChange={() => toggleUserSelection(row.email)}
+                          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          aria-label={`Select ${row.email}`}
+                        />
+                      </TableCell>
                       {columnVisibility.email && (
                         <TableCell className="font-medium">
                           {row.email}

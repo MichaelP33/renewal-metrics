@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AlertCircle, Upload, Table, BarChart3 } from 'lucide-react';
 
 function PowerUsersContent() {
-  const { hasData, masterUsers, enhancedUsers } = usePowerUsers();
+  const { hasData, masterUsers, enhancedUsers, filteredEnhancedUsers } = usePowerUsers();
   const [activeTab, setActiveTab] = useState<'upload' | 'table' | 'visualizations'>('upload');
   const [filters, setFilters] = useState<FilterState>({
     searchText: '',
@@ -139,7 +139,7 @@ function PowerUsersContent() {
 
         {activeTab === 'visualizations' && (
           hasData ? (
-            <PowerUsersVisualizations data={enhancedUsers} />
+            <PowerUsersVisualizations data={filteredEnhancedUsers} />
           ) : (
             <Card>
               <CardContent className="p-8 text-center">
