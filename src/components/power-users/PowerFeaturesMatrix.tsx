@@ -23,8 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MasterUserRecord } from '@/types/power-users';
+import { MasterUserRecord, NestedFilterGroups } from '@/types/power-users';
 import { exportCSV } from '@/lib/export-utils';
+import { filterUsers, hasActiveFilters } from '@/lib/power-users/filter-logic';
+import { PowerFeatureFilterBuilder } from './PowerFeatureFilterBuilder';
 
 interface PowerFeaturesMatrixProps {
   data: MasterUserRecord[];
@@ -36,18 +38,32 @@ export function PowerFeaturesMatrix({ data }: PowerFeaturesMatrixProps) {
   const [searchText, setSearchText] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
+  const [advancedFilters, setAdvancedFilters] = useState<NestedFilterGroups>({
+    group1: null,
+    group2: null,
+  });
 
-  // Filter data
+  // Filter data - apply advanced filters first, then search
   const filteredData = useMemo(() => {
-    if (!searchText) return data;
+    let result = data;
 
-    const searchLower = searchText.toLowerCase();
-    return data.filter(row => 
-      row.email.toLowerCase().includes(searchLower) ||
-      row.firstName?.toLowerCase().includes(searchLower) ||
-      row.lastName?.toLowerCase().includes(searchLower)
-    );
-  }, [data, searchText]);
+    // Apply advanced filters
+    if (hasActiveFilters(advancedFilters)) {
+      result = filterUsers(result, advancedFilters);
+    }
+
+    // Apply search filter
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      result = result.filter(row => 
+        row.email.toLowerCase().includes(searchLower) ||
+        row.firstName?.toLowerCase().includes(searchLower) ||
+        row.lastName?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return result;
+  }, [data, searchText, advancedFilters]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -64,6 +80,11 @@ export function PowerFeaturesMatrix({ data }: PowerFeaturesMatrixProps) {
 
   const handleRowsPerPageChange = (value: string) => {
     setRowsPerPage(Number(value));
+    setCurrentPage(1);
+  };
+
+  const handleAdvancedFiltersChange = (filters: NestedFilterGroups) => {
+    setAdvancedFilters(filters);
     setCurrentPage(1);
   };
 
@@ -104,6 +125,8 @@ export function PowerFeaturesMatrix({ data }: PowerFeaturesMatrixProps) {
     return value ? '✅' : '✖';
   };
 
+  const activeFilterCount = hasActiveFilters(advancedFilters) ? filteredData.length : null;
+
   if (data.length === 0) {
     return (
       <Card>
@@ -135,6 +158,20 @@ export function PowerFeaturesMatrix({ data }: PowerFeaturesMatrixProps) {
       </CardHeader>
       
       <CardContent>
+        {/* Advanced Filters */}
+        <div className="mb-4 pb-4 border-b">
+          <PowerFeatureFilterBuilder 
+            filters={advancedFilters} 
+            onChange={handleAdvancedFiltersChange}
+          />
+          {activeFilterCount !== null && (
+            <div className="mt-3 text-xs text-gray-600">
+              {activeFilterCount} user{activeFilterCount !== 1 ? 's' : ''} match the filter criteria
+            </div>
+          )}
+        </div>
+
+        {/* Search and Pagination Controls */}
         <div className="mb-4 flex items-end space-x-4">
           <div className="flex-1">
             <Label htmlFor="search" className="text-sm">Search Users</Label>

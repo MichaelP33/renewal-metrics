@@ -91,6 +91,45 @@ export interface MasterUserRecord {
 export type UserSegment = 'power' | 'active' | 'casual' | 'at-risk';
 
 /**
+ * Power feature field names for filtering
+ */
+export type PowerFeatureField = 
+  | 'isMcpUser' 
+  | 'isRuleCreator' 
+  | 'isRuleUser' 
+  | 'isCommandCreator' 
+  | 'isCommandUser';
+
+/**
+ * Filter operator types
+ */
+export type FilterOperator = 'AND' | 'OR';
+
+/**
+ * Single filter condition
+ */
+export interface FilterCondition {
+  field: PowerFeatureField;
+  value: boolean;
+}
+
+/**
+ * Filter group containing multiple conditions
+ */
+export interface FilterGroup {
+  operator: FilterOperator;
+  conditions: FilterCondition[];
+}
+
+/**
+ * Nested filter groups (supports up to 2 groups)
+ */
+export interface NestedFilterGroups {
+  group1: FilterGroup | null;
+  group2: FilterGroup | null;
+}
+
+/**
  * Enhanced Master User Record with computed analytics
  */
 export interface EnhancedMasterUserRecord extends MasterUserRecord {
