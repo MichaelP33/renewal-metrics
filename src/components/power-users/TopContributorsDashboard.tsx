@@ -179,7 +179,7 @@ export function TopContributorsDashboard({ data }: TopContributorsDashboardProps
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-900">
-                      {getUserDisplayName({ email: entry.email, firstName: entry.firstName, lastName: entry.lastName } as any)}
+                      {getUserDisplayName({ email: entry.email, firstName: entry.firstName, lastName: entry.lastName })}
                     </div>
                     {entry.firstName && entry.lastName && (
                       <div className="text-xs text-gray-500">{entry.email}</div>

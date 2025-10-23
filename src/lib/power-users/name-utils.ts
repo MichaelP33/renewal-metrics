@@ -4,7 +4,9 @@ import { MasterUserRecord } from '@/types/power-users';
  * Get the display name for a user
  * Priority: firstName + lastName > email
  */
-export function getUserDisplayName(user: MasterUserRecord): string {
+export function getUserDisplayName(
+  user: Pick<MasterUserRecord, 'email' | 'firstName' | 'lastName'>
+): string {
   const firstName = user.firstName?.trim();
   const lastName = user.lastName?.trim();
   
@@ -27,7 +29,10 @@ export function getUserDisplayName(user: MasterUserRecord): string {
  * Get a short display name for charts (limited space)
  * Returns: "F. LastName" or truncated name/email
  */
-export function getShortDisplayName(user: MasterUserRecord, maxLength: number = 15): string {
+export function getShortDisplayName(
+  user: Pick<MasterUserRecord, 'email' | 'firstName' | 'lastName'>,
+  maxLength: number = 15
+): string {
   const firstName = user.firstName?.trim();
   const lastName = user.lastName?.trim();
   
@@ -60,7 +65,9 @@ export function getShortDisplayName(user: MasterUserRecord, maxLength: number = 
 /**
  * Check if a user has a name (firstName or lastName)
  */
-export function hasUserName(user: MasterUserRecord): boolean {
+export function hasUserName(
+  user: Pick<MasterUserRecord, 'email' | 'firstName' | 'lastName'>
+): boolean {
   return Boolean(user.firstName?.trim() || user.lastName?.trim());
 }
 

@@ -87,7 +87,6 @@ export function validateCSVColumns(
   missingColumns: string[];
   foundColumns: Record<string, string>;
 } {
-  const header = headerLine.toLowerCase();
   const actualColumns = headerLine.split(',').map(col => col.trim());
   
   const { mapping, missingColumns } = createFlexibleColumnMapping(
