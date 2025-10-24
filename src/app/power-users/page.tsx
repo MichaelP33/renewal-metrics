@@ -20,7 +20,7 @@ function PowerUsersContent() {
     isRuleUser: null,
     isCommandCreator: null,
     isCommandUser: null,
-    isPowerUser: null,
+    isPowerUserFilter: ['true', 'false', 'unmarked'],
     aiLinesMin: '',
     aiLinesMax: '',
     sessionsMin: '',
