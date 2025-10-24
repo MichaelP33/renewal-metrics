@@ -110,7 +110,7 @@ function extractMetricValues(
   metricKey: string
 ): number[] {
   return users
-    .map(user => (user as any)[metricKey])
+    .map(user => (user as Record<string, unknown>)[metricKey])
     .filter((val): val is number => typeof val === 'number' && !isNaN(val));
 }
 
