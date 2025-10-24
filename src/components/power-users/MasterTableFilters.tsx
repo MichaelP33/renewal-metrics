@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 // import { Switch } from '@/components/ui/switch';
 // import { MasterUserRecord } from '@/types/power-users';
 
@@ -16,6 +17,7 @@ export interface FilterState {
   isRuleUser: boolean | null;
   isCommandCreator: boolean | null;
   isCommandUser: boolean | null;
+  isPowerUserFilter: ('true' | 'false' | 'unmarked')[];
   aiLinesMin: string;
   aiLinesMax: string;
   sessionsMin: string;
@@ -39,6 +41,7 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
     isRuleUser: null,
     isCommandCreator: null,
     isCommandUser: null,
+    isPowerUserFilter: ['true', 'false', 'unmarked'],
     aiLinesMin: '',
     aiLinesMax: '',
     sessionsMin: '',
@@ -106,6 +109,7 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
       isRuleUser: null,
       isCommandCreator: null,
       isCommandUser: null,
+      isPowerUserFilter: ['true', 'false', 'unmarked'],
       aiLinesMin: '',
       aiLinesMax: '',
       sessionsMin: '',
@@ -121,6 +125,7 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
     filters.isRuleUser !== null ||
     filters.isCommandCreator !== null ||
     filters.isCommandUser !== null ||
+    filters.isPowerUserFilter.length < 3 ||
     filters.aiLinesMin ||
     filters.aiLinesMax ||
     filters.sessionsMin ||
@@ -390,6 +395,64 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
                   className="text-sm"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Power User Filter */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Power User Status</Label>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="power-users-filter"
+                checked={filters.isPowerUserFilter.includes('true')}
+                onCheckedChange={(checked) => {
+                  setFilters(prev => ({
+                    ...prev,
+                    isPowerUserFilter: checked
+                      ? [...prev.isPowerUserFilter.filter(v => v !== 'true'), 'true']
+                      : prev.isPowerUserFilter.filter(v => v !== 'true')
+                  }));
+                }}
+              />
+              <Label htmlFor="power-users-filter" className="text-sm font-normal cursor-pointer">
+                Power Users
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="non-power-users-filter"
+                checked={filters.isPowerUserFilter.includes('false')}
+                onCheckedChange={(checked) => {
+                  setFilters(prev => ({
+                    ...prev,
+                    isPowerUserFilter: checked
+                      ? [...prev.isPowerUserFilter.filter(v => v !== 'false'), 'false']
+                      : prev.isPowerUserFilter.filter(v => v !== 'false')
+                  }));
+                }}
+              />
+              <Label htmlFor="non-power-users-filter" className="text-sm font-normal cursor-pointer">
+                Not Power Users
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="unmarked-filter"
+                checked={filters.isPowerUserFilter.includes('unmarked')}
+                onCheckedChange={(checked) => {
+                  setFilters(prev => ({
+                    ...prev,
+                    isPowerUserFilter: checked
+                      ? [...prev.isPowerUserFilter.filter(v => v !== 'unmarked'), 'unmarked']
+                      : prev.isPowerUserFilter.filter(v => v !== 'unmarked')
+                  }));
+                }}
+              />
+              <Label htmlFor="unmarked-filter" className="text-sm font-normal cursor-pointer">
+                Unmarked/Unclassified
+              </Label>
             </div>
           </div>
         </div>

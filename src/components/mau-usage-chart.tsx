@@ -23,8 +23,8 @@ interface ChartDataPoint {
 }
 
 const MAU_COLORS = {
-  agent: '#ED5F2E', // Orange color as requested
-  tab: '#ED5F2E'    // Same orange color for consistency
+  agent: '#f54e00', // Primary brand orange
+  tab: '#f54e00'    // Primary brand orange for consistency
 };
 
 export const MAUUsageChart = forwardRef<HTMLDivElement, MAUUsageChartProps>(

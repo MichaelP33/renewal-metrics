@@ -48,8 +48,8 @@ const TOP_N_OPTIONS = [10, 20, 50, 100];
 
 // Color constants matching existing chart colors
 const COLORS = {
-  requests: '#ED5F2E', // Orange
-  sessions: '#D4A27F', // Tan/beige
+  requests: '#f54e00', // Primary brand orange
+  sessions: '#D4A27F', // Tan/beige (consistent secondary)
 };
 
 export function CombinedActivityChart({ data }: CombinedActivityChartProps) {

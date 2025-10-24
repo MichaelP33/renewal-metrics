@@ -248,41 +248,41 @@ export const MODEL_COLORS: Record<ModelCategory, string> = {
 
 // WAU chart colors
 export const WAU_COLORS = {
-  primary: '#ED5F2E',          // Custom orange
-  secondary: '#ED5F2E',        // Same color for consistency
-  accent: '#ED5F2E',           // Same color for consistency
+  primary: '#f54e00',          // Primary brand orange
+  secondary: '#f54e00',        // Same color for consistency
+  accent: '#f54e00',           // Same color for consistency
   background: '#FEF3C7'        // Orange-100 background
 };
 
 // AI Code Metrics colors
 export const AI_CODE_COLORS = {
-  aiCode: '#ED5F2E',           // Orange for AI code percentage
+  aiCode: '#f54e00',           // Primary brand orange for AI code percentage
   background: '#F3F4F6'        // Light gray background
 };
 
 // Active User Growth colors
 export const ACTIVE_USER_GROWTH_COLORS = {
-  agent_wau: '#ED5F2E',       // Main orange
-  agent_l4: '#D4A27F',        // Golden/beige tone
-  agent_power_user: '#8B9A7A' // Muted green tone
+  agent_wau: '#f54e00',       // Primary brand orange
+  agent_l4: '#D4A27F',        // Tan/beige (consistent secondary)
+  agent_power_user: '#526070' // Muted slate (tertiary)
 };
 
 // Percentile Distribution colors
 export const PERCENTILE_COLORS = {
-  bar: '#EA580C',             // Orange-600
+  bar: '#f54e00',             // Primary brand orange
   background: '#FFF7ED'       // Orange-50
 };
 
 // MCP Usage colors
 export const MCP_USAGE_COLORS = {
-  mcp_usage_wau: '#ED5F2E',   // Main orange
-  agent_l4: '#D4A27F'         // Golden/beige tone
+  mcp_usage_wau: '#f54e00',   // Primary brand orange
+  agent_l4: '#D4A27F'         // Tan/beige (consistent secondary)
 };
 
 // Rule Usage colors
 export const RULE_USAGE_COLORS = {
-  rule_usage_wau: '#ED5F2E',  // Main orange
-  agent_l4: '#D4A27F'         // Golden/beige tone (consistent with MCP and percentile theme)
+  rule_usage_wau: '#f54e00',  // Primary brand orange
+  agent_l4: '#D4A27F'         // Tan/beige (consistent secondary)
 };
 
 // Default category order for consistent display

@@ -91,6 +91,7 @@ describe('MasterTable', () => {
       sessionsMax: '',
       requestsMin: '',
       requestsMax: '',
+      isPowerUser: null,
     };
     render(<MasterTable rows={mockUsers} filters={filters} />);
     expect(screen.getByText(/1 of 2 users/)).toBeInTheDocument();

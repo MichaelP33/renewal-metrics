@@ -1,4 +1,4 @@
 {
-  "externalUrl": "http://127.0.0.1:63249/ingest",
+  "externalUrl": "http://127.0.0.1:53057/ingest",
   "logPath": "/Users/mpotteiger/Developer/renewal-metrics/.cursor/debug.log"
 }

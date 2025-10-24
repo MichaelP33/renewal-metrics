@@ -44,7 +44,7 @@ interface ChartDataPoint {
 }
 
 const TOP_N_OPTIONS = [10, 20, 50, 100];
-const AI_CODE_COLOR = '#f97316'; // Orange
+const AI_CODE_COLOR = '#f54e00'; // Primary brand orange
 
 export function AICodeDistributionChart({ data }: AICodeDistributionChartProps) {
   const [topN, setTopN] = useState(10);

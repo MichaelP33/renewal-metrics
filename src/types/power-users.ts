@@ -77,6 +77,13 @@ export interface MasterUserRecord {
   numProductsUsed?: number;
   membershipDays?: number;
 
+  // Power User Classification (manual)
+  /** 
+   * Manual flag to indicate if this user is classified as a "power user"
+   * Used for comparative analysis between power users and non-power users
+   */
+  isPowerUser?: boolean;
+
   // Metadata
   sourceFlags: {
     aiCode: boolean;

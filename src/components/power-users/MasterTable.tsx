@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight, Edit2, Check, X, XCircle } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight, Edit2, Check, X, XCircle, Users, UserCheck, UserX } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -16,6 +16,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -26,6 +27,7 @@ import { FilterState } from './MasterTableFilters';
 import { UserDetailDrawer } from './UserDetailDrawer';
 import { usePowerUsers } from '@/contexts/PowerUsersContext';
 import { Input } from '@/components/ui/input';
+import { PowerUserStateButton } from './PowerUserStateButton';
 
 interface MasterTableProps {
   rows: MasterUserRecord[] | EnhancedMasterUserRecord[];
@@ -51,7 +53,8 @@ type SortColumn =
   | 'membershipDays'
   | 'engagementScore'
   | 'engagementPercentile'
-  | 'segment';
+  | 'segment'
+  | 'isPowerUser';
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -76,12 +79,13 @@ interface ColumnVisibility {
   engagementScore: boolean;
   engagementPercentile: boolean;
   segment: boolean;
+  isPowerUser: boolean;
 }
 
 const ROWS_PER_PAGE = 50;
 
 export function MasterTable({ rows, filters }: MasterTableProps) {
-  const { updateUserName, selectedUserEmails, toggleUserSelection, clearSelection, selectAllUsers } = usePowerUsers();
+  const { updateUserName, selectedUserEmails, toggleUserSelection, clearSelection, selectAllUsers, togglePowerUser, setPowerUsers, powerUserCount } = usePowerUsers();
   const [sortColumn, setSortColumn] = useState<SortColumn>('email');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -110,6 +114,7 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
     engagementScore: false,
     engagementPercentile: false,
     segment: false,
+    isPowerUser: true,
   });
 
   // Reset pagination when data changes to ensure fresh render
@@ -155,6 +160,14 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       }
       if (filters.isCommandUser !== null && row.isCommandUser !== filters.isCommandUser) {
         return false;
+      }
+
+      // Power user filter
+      if (filters.isPowerUserFilter && filters.isPowerUserFilter.length > 0) {
+        const userState = row.isPowerUser === true ? 'true' : row.isPowerUser === false ? 'false' : 'unmarked';
+        if (!filters.isPowerUserFilter.includes(userState)) {
+          return false;
+        }
       }
 
       // Numeric range filters
@@ -286,6 +299,13 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
           aValue = (a as EnhancedMasterUserRecord).segment || '';
           bValue = (b as EnhancedMasterUserRecord).segment || '';
           break;
+        case 'isPowerUser':
+          // Sort order: true (power users) → false (non-power users) → undefined (unlabeled)
+          if (a.isPowerUser === true && b.isPowerUser !== true) return -1;
+          if (a.isPowerUser === false && b.isPowerUser === undefined) return -1;
+          if (a.isPowerUser === undefined && b.isPowerUser !== undefined) return 1;
+          if (a.isPowerUser === false && b.isPowerUser === true) return 1;
+          return 0;
         default:
           return 0;
       }
@@ -367,6 +387,7 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
     if (columnVisibility.firstName) headers.push('First Name');
     if (columnVisibility.lastName) headers.push('Last Name');
     if (columnVisibility.linkedinUrl) headers.push('LinkedIn URL');
+    if (columnVisibility.isPowerUser) headers.push('Power User');
     if (columnVisibility.aiLinesChanged) headers.push('AI Lines Changed');
     if (columnVisibility.totalLinesChanged) headers.push('Total Lines Changed');
     if (columnVisibility.pctAiCode) headers.push('AI %');
@@ -391,6 +412,7 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       if (columnVisibility.firstName) values.push(row.firstName || '');
       if (columnVisibility.lastName) values.push(row.lastName || '');
       if (columnVisibility.linkedinUrl) values.push(row.linkedinUrl || '');
+      if (columnVisibility.isPowerUser) values.push(row.isPowerUser === true ? 'Yes' : row.isPowerUser === false ? 'No' : 'Unmarked');
       if (columnVisibility.aiLinesChanged) values.push(String(row.aiLinesChanged ?? ''));
       if (columnVisibility.totalLinesChanged) values.push(String(row.totalLinesChanged ?? ''));
       if (columnVisibility.pctAiCode) values.push(row.pctAiCode ? `${row.pctAiCode.toFixed(1)}%` : '');
@@ -462,7 +484,8 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
         <CardTitle className="text-base flex items-center space-x-2">
           <span>Master User Table</span>
           <span className="text-sm font-normal text-gray-500">
-            ({filteredData.length} of {rows.length} users)
+            ({filteredData.length} of {rows.length} users
+            {powerUserCount > 0 && ` • ${powerUserCount} power users`})
           </span>
           {selectedUserEmails.size > 0 && (
             <span className="text-sm font-normal text-blue-600 flex items-center space-x-1">
@@ -483,6 +506,44 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
               <XCircle className="h-3 w-3" />
               <span>Clear Selection</span>
             </Button>
+          )}
+          {selectedUserEmails.size > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Users className="h-3 w-3 mr-2" />
+                  Bulk Actions
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Power User Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setPowerUsers(Array.from(selectedUserEmails), true);
+                  }}
+                >
+                  <UserCheck className="h-3 w-3 mr-2" />
+                  Set as Power Users ✓
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setPowerUsers(Array.from(selectedUserEmails), false);
+                  }}
+                >
+                  <UserX className="h-3 w-3 mr-2" />
+                  Set as Not Power Users ✗
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setPowerUsers(Array.from(selectedUserEmails), undefined);
+                  }}
+                >
+                  <XCircle className="h-3 w-3 mr-2" />
+                  Clear Classification —
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -517,6 +578,12 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
                 onCheckedChange={(checked) => setColumnVisibility(prev => ({ ...prev, linkedinUrl: checked }))}
               >
                 LinkedIn
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={columnVisibility.isPowerUser}
+                onCheckedChange={(checked) => setColumnVisibility(prev => ({ ...prev, isPowerUser: checked }))}
+              >
+                Power User
               </DropdownMenuCheckboxItem>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
@@ -697,6 +764,20 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
                   {columnVisibility.linkedinUrl && (
                     <TableHead className="min-w-[150px]">
                       <span className="font-semibold">LinkedIn</span>
+                    </TableHead>
+                  )}
+                  
+                  {columnVisibility.isPowerUser && (
+                    <TableHead className="text-center w-[120px]">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-1 font-semibold hover:bg-gray-100"
+                        onClick={() => handleSort('isPowerUser')}
+                      >
+                        <span>Power User</span>
+                        {getSortIcon('isPowerUser')}
+                      </Button>
                     </TableHead>
                   )}
                   
@@ -1080,6 +1161,18 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
                           ) : (
                             <span className="text-gray-400 text-sm">—</span>
                           )}
+                        </TableCell>
+                      )}
+                      
+                      {columnVisibility.isPowerUser && (
+                        <TableCell 
+                          className="text-center"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <PowerUserStateButton
+                            isPowerUser={row.isPowerUser}
+                            onClick={() => togglePowerUser(row.email)}
+                          />
                         </TableCell>
                       )}
                       

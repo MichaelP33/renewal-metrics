@@ -8,6 +8,7 @@ import { AICodeDistributionChart } from './AICodeDistributionChart';
 import { UserSegmentation } from './UserSegmentation';
 import { TopContributorsDashboard } from './TopContributorsDashboard';
 import { FeatureAdoptionMatrix } from './FeatureAdoptionMatrix';
+import { PowerUserComparison } from './PowerUserComparison';
 import { usePowerUsers } from '@/contexts/PowerUsersContext';
 import { XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,9 @@ interface PowerUsersVisualizationsProps {
 export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps) {
   const { selectedUserEmails, clearSelection } = usePowerUsers();
   const isFiltered = selectedUserEmails.size > 0;
+
+  // Check if any users are labeled as power users or non-power users
+  const hasLabeledUsers = data.some(u => u.isPowerUser === true || u.isPowerUser === false);
 
   return (
     <div className="space-y-8">
@@ -48,6 +52,15 @@ export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps
           </Button>
         </div>
       )}
+
+      {/* Power User Comparison */}
+      {hasLabeledUsers && (
+        <section>
+          <h2 className="text-lg font-semibold mb-4">Power User Comparison</h2>
+          <PowerUserComparison data={data} />
+        </section>
+      )}
+
       {/* User Segmentation */}
       <section>
         <h2 className="text-lg font-semibold mb-4">User Segmentation</h2>

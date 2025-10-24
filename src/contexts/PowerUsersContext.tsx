@@ -22,6 +22,7 @@ interface StoredData {
   features: PowerUserFeatures[];
   agent: AgentRequests[];
   nameOverrides?: Record<string, NameOverride>;
+  powerUserFlags?: Record<string, boolean>;
   selectedUsers?: string[];
 }
 
@@ -39,6 +40,10 @@ export interface PowerUsersContextValue {
   toggleUserSelection: (email: string) => void;
   clearSelection: () => void;
   selectAllUsers: (emails: string[]) => void;
+  togglePowerUser: (email: string) => void;
+  setPowerUsers: (emails: string[], isPowerUser: boolean | undefined) => void;
+  powerUserCount: number;
+  nonPowerUserCount: number;
 }
 
 const PowerUsersContext = createContext<PowerUsersContextValue | undefined>(undefined);
@@ -48,6 +53,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
   const [features, setFeatures] = useState<PowerUserFeatures[] | null>(null);
   const [agent, setAgent] = useState<AgentRequests[] | null>(null);
   const [nameOverrides, setNameOverrides] = useState<Record<string, NameOverride>>({});
+  const [powerUserFlags, setPowerUserFlags] = useState<Record<string, boolean>>({});
   const [selectedUserEmails, setSelectedUserEmails] = useState<Set<string>>(new Set());
   const [uploadStatus, setUploadStatus] = useState<Record<'ai' | 'features' | 'agent', 'idle' | 'parsing' | 'success' | 'error'>>({
     ai: 'idle',
@@ -60,19 +66,19 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
   const masterUsers = useMemo(() => {
     const aggregated = aggregateUserData(aiCode ?? [], features ?? [], agent ?? []);
     
-    // Apply name overrides
+    // Apply name overrides and power user flags
     return aggregated.map(user => {
       const override = nameOverrides[user.email];
-      if (override) {
-        return {
-          ...user,
-          firstName: override.firstName !== undefined ? override.firstName : user.firstName,
-          lastName: override.lastName !== undefined ? override.lastName : user.lastName,
-        };
-      }
-      return user;
+      const isPowerUser = powerUserFlags[user.email];
+      
+      return {
+        ...user,
+        firstName: override?.firstName !== undefined ? override.firstName : user.firstName,
+        lastName: override?.lastName !== undefined ? override.lastName : user.lastName,
+        isPowerUser: isPowerUser,
+      };
     });
-  }, [aiCode, features, agent, nameOverrides]);
+  }, [aiCode, features, agent, nameOverrides, powerUserFlags]);
 
   // Compute enhanced users with engagement scores
   const enhancedUsers = useMemo(() => {
@@ -107,6 +113,16 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
 
   const hasData = masterUsers.length > 0;
 
+  const powerUserCount = useMemo(() => 
+    masterUsers.filter(u => u.isPowerUser === true).length, 
+    [masterUsers]
+  );
+
+  const nonPowerUserCount = useMemo(() => 
+    masterUsers.filter(u => u.isPowerUser === false).length, 
+    [masterUsers]
+  );
+
   // Load from localStorage on mount
   useEffect(() => {
     try {
@@ -117,6 +133,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         setFeatures(data.features);
         setAgent(data.agent);
         setNameOverrides(data.nameOverrides ?? {});
+        setPowerUserFlags(data.powerUserFlags ?? {});
         setCachedTimestamp(data.timestamp);
         
         // Load selected users
@@ -147,6 +164,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
           features: features ?? [],
           agent: agent ?? [],
           nameOverrides,
+          powerUserFlags,
           selectedUsers: Array.from(selectedUserEmails),
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -155,7 +173,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         console.error('Failed to save data to localStorage:', error);
       }
     }
-  }, [aiCode, features, agent, nameOverrides, selectedUserEmails]);
+  }, [aiCode, features, agent, nameOverrides, powerUserFlags, selectedUserEmails]);
 
   const uploadDataset = useCallback(async (kind: 'ai' | 'features' | 'agent', file: File) => {
     console.log(`[PowerUsers] Uploading ${kind} file:`, file.name);
@@ -195,6 +213,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     setFeatures(null);
     setAgent(null);
     setNameOverrides({});
+    setPowerUserFlags({});
     setSelectedUserEmails(new Set());
     setUploadStatus({ ai: 'idle', features: 'idle', agent: 'idle' });
     setCachedTimestamp(null);
@@ -235,6 +254,34 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     setSelectedUserEmails(new Set(emails));
   }, []);
 
+  const togglePowerUser = useCallback((email: string) => {
+    setPowerUserFlags(prev => {
+      const next = { ...prev };
+      if (next[email] === true) {
+        next[email] = false;
+      } else if (next[email] === false) {
+        delete next[email]; // Remove to save space
+      } else {
+        next[email] = true;
+      }
+      return next;
+    });
+  }, []);
+
+  const setPowerUsers = useCallback((emails: string[], isPowerUser: boolean | undefined) => {
+    setPowerUserFlags(prev => {
+      const next = { ...prev };
+      for (const email of emails) {
+        if (isPowerUser === undefined) {
+          delete next[email];
+        } else {
+          next[email] = isPowerUser;
+        }
+      }
+      return next;
+    });
+  }, []);
+
   return (
     <PowerUsersContext.Provider
       value={{
@@ -251,6 +298,10 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         toggleUserSelection,
         clearSelection,
         selectAllUsers,
+        togglePowerUser,
+        setPowerUsers,
+        powerUserCount,
+        nonPowerUserCount,
       }}
     >
       {children}
