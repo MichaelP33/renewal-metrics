@@ -1,5 +1,17 @@
 import type { EnhancedMasterUserRecord } from '@/types/power-users';
 
+// Keys of numeric metrics we compare between groups
+type NumericMetricKey =
+  | 'totalLinesChanged'
+  | 'aiLinesChanged'
+  | 'commitCount'
+  | 'pctAiCode'
+  | 'totalSessions'
+  | 'totalAgentRequests'
+  | 'numProductsUsed'
+  | 'membershipDays'
+  | 'engagementScore';
+
 /**
  * Statistics for a single metric within a user group
  */
@@ -17,7 +29,7 @@ export interface GroupStats {
  */
 export interface ComparisonMetric {
   metricName: string;
-  metricKey: string;
+  metricKey: NumericMetricKey;
   powerUsers: GroupStats;
   nonPowerUsers: GroupStats;
   ratio: number; // powerUsers.mean / nonPowerUsers.mean
@@ -107,10 +119,10 @@ function calculateDifferencePercent(powerMean: number, nonPowerMean: number): nu
  */
 function extractMetricValues(
   users: EnhancedMasterUserRecord[],
-  metricKey: string
+  metricKey: NumericMetricKey
 ): number[] {
   return users
-    .map(user => (user as Record<string, unknown>)[metricKey])
+    .map(user => user[metricKey])
     .filter((val): val is number => typeof val === 'number' && !isNaN(val));
 }
 
@@ -131,7 +143,7 @@ export function calculateComparisonStats(
   const totalCount = users.length;
 
   // Define metrics to compare
-  const metricDefinitions = [
+  const metricDefinitions: { key: NumericMetricKey; name: string }[] = [
     { key: 'totalLinesChanged', name: 'Total Lines of Code' },
     { key: 'aiLinesChanged', name: 'AI-Assisted Lines of Code' },
     { key: 'commitCount', name: 'Commit Count' },
