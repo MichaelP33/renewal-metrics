@@ -7,6 +7,9 @@ import { parseCSV as parseAgent } from '@/lib/power-users/agent-requests-parser'
 import { aggregateUserData } from '@/lib/power-users/aggregator';
 import { calculateEngagementScore, calculatePercentiles, segmentUser } from '@/lib/power-users/engagement-score';
 import type { MasterUserRecord, EnhancedMasterUserRecord, AICodeMetrics, PowerUserFeatures, AgentRequests } from '@/types/power-users';
+import { FilterState } from '@/components/power-users/MasterTableFilters';
+import * as CohortManager from '@/lib/power-users/cohort-manager';
+import type { StoredCohort } from '@/lib/power-users/cohort-manager';
 
 const STORAGE_KEY = 'power-users/v1';
 
@@ -44,6 +47,17 @@ export interface PowerUsersContextValue {
   setPowerUsers: (emails: string[], isPowerUser: boolean | undefined) => void;
   powerUserCount: number;
   nonPowerUserCount: number;
+  
+  // Cohort management
+  savedCohorts: StoredCohort[];
+  selectedCohortIds: string[];
+  createAndSaveCohort: (name: string, filterCriteria: FilterState) => StoredCohort;
+  deleteCohort: (id: string) => void;
+  updateCohort: (id: string, updates: Partial<StoredCohort>) => void;
+  selectCohortForComparison: (cohortId: string) => void;
+  deselectCohortForComparison: (cohortId: string) => void;
+  clearComparisonCohorts: () => void;
+  getSelectedCohorts: () => StoredCohort[];
 }
 
 const PowerUsersContext = createContext<PowerUsersContextValue | undefined>(undefined);
@@ -61,6 +75,8 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     agent: 'idle',
   });
   const [cachedTimestamp, setCachedTimestamp] = useState<string | null>(null);
+  const [savedCohorts, setSavedCohorts] = useState<StoredCohort[]>([]);
+  const [selectedCohortIds, setSelectedCohortIds] = useState<string[]>([]);
 
   // Aggregate master users whenever any dataset changes
   const masterUsers = useMemo(() => {
@@ -148,6 +164,10 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
           agent: data.agent.length > 0 ? 'success' : 'idle',
         });
       }
+      
+      // Load saved cohorts
+      const cohorts = CohortManager.loadCohorts();
+      setSavedCohorts(cohorts);
     } catch (error) {
       console.error('Failed to load cached data:', error);
     }
@@ -282,6 +302,47 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
     });
   }, []);
 
+  // Cohort management functions
+  const createAndSaveCohort = useCallback((name: string, filterCriteria: FilterState) => {
+    const cohort = CohortManager.createCohort(name, filterCriteria);
+    CohortManager.saveCohort(cohort);
+    setSavedCohorts(CohortManager.loadCohorts());
+    return cohort;
+  }, []);
+
+  const deleteCohortHandler = useCallback((id: string) => {
+    CohortManager.deleteCohort(id);
+    setSavedCohorts(CohortManager.loadCohorts());
+    setSelectedCohortIds(prev => prev.filter(cid => cid !== id));
+  }, []);
+
+  const updateCohortHandler = useCallback((id: string, updates: Partial<StoredCohort>) => {
+    CohortManager.updateCohort(id, updates);
+    setSavedCohorts(CohortManager.loadCohorts());
+  }, []);
+
+  const selectCohortForComparison = useCallback((cohortId: string) => {
+    setSelectedCohortIds(prev => {
+      if (prev.includes(cohortId)) return prev;
+      if (prev.length >= 6) return prev; // Max 6 cohorts
+      return [...prev, cohortId];
+    });
+  }, []);
+
+  const deselectCohortForComparison = useCallback((cohortId: string) => {
+    setSelectedCohortIds(prev => prev.filter(id => id !== cohortId));
+  }, []);
+
+  const clearComparisonCohorts = useCallback(() => {
+    setSelectedCohortIds([]);
+  }, []);
+
+  const getSelectedCohorts = useCallback(() => {
+    return selectedCohortIds
+      .map(id => savedCohorts.find(c => c.id === id))
+      .filter((c): c is StoredCohort => c !== undefined);
+  }, [selectedCohortIds, savedCohorts]);
+
   return (
     <PowerUsersContext.Provider
       value={{
@@ -302,6 +363,15 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         setPowerUsers,
         powerUserCount,
         nonPowerUserCount,
+        savedCohorts,
+        selectedCohortIds,
+        createAndSaveCohort,
+        deleteCohort: deleteCohortHandler,
+        updateCohort: updateCohortHandler,
+        selectCohortForComparison,
+        deselectCohortForComparison,
+        clearComparisonCohorts,
+        getSelectedCohorts,
       }}
     >
       {children}

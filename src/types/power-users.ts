@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
 /**
+ * Note: FilterState is defined in @/components/power-users/MasterTableFilters
+ * and imported where needed for Cohort type usage
+ */
+
+/**
  * Normalizes an email address for use as a unique key.
  * - Trims whitespace
  * - Converts to lowercase
@@ -192,4 +197,25 @@ export const AgentRequestsCsvRowSchema = z.object({
   total_sessions: z.number().nonnegative(),
   combined_score: z.number(),
 });
+
+/**
+ * Cohort definition with filter criteria
+ * Note: FilterState is imported from MasterTableFilters where used
+ */
+export interface Cohort {
+  id: string;                    // Unique identifier (UUID)
+  name: string;                  // User-provided name
+  color: string;                 // Hex color code
+  createdAt: string;             // ISO timestamp
+  filterCriteria: Record<string, unknown>; // FilterState - the filter state that defines this cohort
+  userCount?: number;            // Cached count (optional, calculated on demand)
+}
+
+/**
+ * Cohort comparison configuration
+ */
+export interface CohortComparison {
+  cohorts: Cohort[];            // Selected cohorts to compare (2-6)
+  timestamp: string;             // When comparison was created
+}
 

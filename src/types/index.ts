@@ -285,6 +285,30 @@ export const RULE_USAGE_COLORS = {
   agent_l4: '#D4A27F'         // Tan/beige (consistent secondary)
 };
 
+// Cohort colors for multi-cohort comparison
+export const COHORT_COLORS = {
+  cohort1: '#f54e00',  // Cursor orange (primary)
+  cohort2: '#526070',  // Muted slate
+  cohort3: '#D4A27F',  // Tan/beige
+  cohort4: '#7C9885',  // Muted sage green
+  cohort5: '#9B7E6B',  // Muted brown
+  cohort6: '#6B8E9F',  // Muted blue-gray
+  cohort7: '#B4846C',  // Muted terracotta
+  cohort8: '#8A9BA8',  // Muted steel blue
+  default: '#9CA3AF'   // Cool gray
+} as const;
+
+export const COHORT_COLOR_ARRAY = [
+  COHORT_COLORS.cohort1,
+  COHORT_COLORS.cohort2,
+  COHORT_COLORS.cohort3,
+  COHORT_COLORS.cohort4,
+  COHORT_COLORS.cohort5,
+  COHORT_COLORS.cohort6,
+  COHORT_COLORS.cohort7,
+  COHORT_COLORS.cohort8,
+] as const;
+
 // Default category order for consistent display
 export const CATEGORY_ORDER: ModelCategory[] = [
   'Opus',
