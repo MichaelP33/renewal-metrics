@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useMemo, memo, useCallback } from 'react';
+import React, { forwardRef, useMemo, memo } from 'react';
 import {
   LineChart,
   Line,
@@ -31,7 +31,7 @@ interface TooltipProps {
     color: string;
     name?: string;
   }>;
-  label?: string;
+  label?: string | number;
 }
 
 const CustomTooltip = memo(({ active, payload, label }: TooltipProps) => {
@@ -67,9 +67,6 @@ const ActiveUserGrowthChartComponent = forwardRef<HTMLDivElement, ActiveUserGrow
       agent_l4: { fill: ACTIVE_USER_GROWTH_COLORS.agent_l4, r: 4 },
       agent_power_user: { fill: ACTIVE_USER_GROWTH_COLORS.agent_power_user, r: 4 }
     }), []);
-
-    // Create stable tooltip renderer
-    const renderTooltip = useCallback((props: TooltipProps) => <CustomTooltip {...props} />, []);
 
     if (data.length === 0) {
       return (
@@ -117,7 +114,7 @@ const ActiveUserGrowthChartComponent = forwardRef<HTMLDivElement, ActiveUserGrow
                   label={{ value: 'Active Users', angle: -90, position: 'insideLeft' }}
                 />
                 
-                <Tooltip content={renderTooltip} />
+                <Tooltip content={<CustomTooltip />} />
                 
                 <Legend 
                   wrapperStyle={{ paddingTop: '20px' }}
