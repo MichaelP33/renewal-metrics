@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { exportCSV } from '@/lib/export-utils';
 import { MasterTable } from '../MasterTable';
 import { MasterUserRecord } from '@/types/power-users';
+import type { FilterState } from '../MasterTableFilters';
 
 // Mock the UserDetailDrawer component
 jest.mock('../UserDetailDrawer', () => ({
@@ -78,7 +79,7 @@ describe('MasterTable', () => {
   });
 
   it('displays filtered count', () => {
-    const filters: any = {
+    const filters: FilterState = {
       searchText: 'user1',
       isMcpUser: null,
       isRuleCreator: null,

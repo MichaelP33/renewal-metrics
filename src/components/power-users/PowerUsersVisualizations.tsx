@@ -9,16 +9,18 @@ import { UserSegmentation } from './UserSegmentation';
 import { TopContributorsDashboard } from './TopContributorsDashboard';
 import { FeatureAdoptionMatrix } from './FeatureAdoptionMatrix';
 import { PowerUserComparison } from './PowerUserComparison';
+import { ComparisonBuilder } from './ComparisonBuilder';
 import { usePowerUsers } from '@/contexts/PowerUsersContext';
-import { XCircle } from 'lucide-react';
+import { XCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface PowerUsersVisualizationsProps {
   data: EnhancedMasterUserRecord[];
 }
 
 export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps) {
-  const { selectedUserEmails, clearSelection } = usePowerUsers();
+  const { selectedUserEmails, clearSelection, savedCohorts, selectedCohortIds } = usePowerUsers();
   const isFiltered = selectedUserEmails.size > 0;
 
   // Check if any users are labeled as power users or non-power users
@@ -51,6 +53,46 @@ export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps
             <span>View All Users</span>
           </Button>
         </div>
+      )}
+
+      {/* Cohort Comparison Section */}
+      {savedCohorts.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-4">Cohort Comparison</h2>
+          <div className="space-y-4">
+            <ComparisonBuilder />
+            
+            {/* Comparison View or Placeholder */}
+            {selectedCohortIds.length >= 2 ? (
+              <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
+                <CardContent className="p-8 text-center">
+                  <Info className="h-12 w-12 text-orange-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Multi-Cohort Comparison Ready
+                  </h3>
+                  <p className="text-gray-600 mb-2">
+                    {selectedCohortIds.length} cohorts selected for comparison
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Phase 5 & 6: Advanced comparison visualizations will appear here
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="p-8 text-center">
+                  <Info className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Select Cohorts to Compare
+                  </h3>
+                  <p className="text-gray-600">
+                    Choose at least 2 cohorts from the builder above to see detailed comparisons
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </section>
       )}
 
       {/* Power User Comparison */}
