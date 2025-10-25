@@ -10,6 +10,7 @@ import type { MasterUserRecord, EnhancedMasterUserRecord, AICodeMetrics, PowerUs
 import { FilterState } from '@/components/power-users/MasterTableFilters';
 import * as CohortManager from '@/lib/power-users/cohort-manager';
 import type { StoredCohort } from '@/lib/power-users/cohort-manager';
+import { calculateMultiCohortStats, type MultiCohortStats } from '@/lib/power-users/multi-cohort-stats';
 
 const STORAGE_KEY = 'power-users/v1';
 
@@ -58,6 +59,7 @@ export interface PowerUsersContextValue {
   deselectCohortForComparison: (cohortId: string) => void;
   clearComparisonCohorts: () => void;
   getSelectedCohorts: () => StoredCohort[];
+  getMultiCohortStats: (cohortIds: string[]) => MultiCohortStats | null;
 }
 
 const PowerUsersContext = createContext<PowerUsersContextValue | undefined>(undefined);
@@ -343,6 +345,18 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
       .filter((c): c is StoredCohort => c !== undefined);
   }, [selectedCohortIds, savedCohorts]);
 
+  const getMultiCohortStats = useCallback((cohortIds: string[]) => {
+    if (cohortIds.length < 2) return null;
+    
+    const cohorts = cohortIds
+      .map(id => savedCohorts.find(c => c.id === id))
+      .filter((c): c is StoredCohort => c !== undefined);
+    
+    if (cohorts.length < 2) return null;
+    
+    return calculateMultiCohortStats(enhancedUsers, cohorts);
+  }, [enhancedUsers, savedCohorts]);
+
   return (
     <PowerUsersContext.Provider
       value={{
@@ -372,6 +386,7 @@ export function PowerUsersProvider({ children }: { children: React.ReactNode }) 
         deselectCohortForComparison,
         clearComparisonCohorts,
         getSelectedCohorts,
+        getMultiCohortStats,
       }}
     >
       {children}

@@ -219,3 +219,59 @@ export interface CohortComparison {
   timestamp: string;             // When comparison was created
 }
 
+/**
+ * Numeric metric keys used for cohort comparisons
+ */
+export type NumericMetricKey =
+  | 'totalLinesChanged'
+  | 'aiLinesChanged'
+  | 'commitCount'
+  | 'pctAiCode'
+  | 'totalSessions'
+  | 'totalAgentRequests'
+  | 'numProductsUsed'
+  | 'membershipDays'
+  | 'engagementScore';
+
+/**
+ * Metrics for a single cohort
+ */
+export interface CohortMetrics {
+  userCount: number;
+  metrics: {
+    [key in NumericMetricKey]: {
+      mean: number;
+      median: number;
+      p75: number;
+      p90: number;
+      min: number;
+      max: number;
+      total: number;
+    };
+  };
+  featureAdoption: {
+    isMcpUser: number;      // percentage
+    isRuleCreator: number;
+    isRuleUser: number;
+    isCommandCreator: number;
+    isCommandUser: number;
+  };
+}
+
+/**
+ * Multi-cohort comparison result
+ */
+export interface MultiCohortStats {
+  cohorts: Array<{
+    cohort: Cohort;
+    metrics: CohortMetrics;
+  }>;
+  comparisonMetrics: Array<{
+    metricName: string;
+    metricKey: string;
+    values: Record<string, number>;  // cohortId -> mean value
+    range: { min: number; max: number };
+    spread: number;
+  }>;
+}
+
