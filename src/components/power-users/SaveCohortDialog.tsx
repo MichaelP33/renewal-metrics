@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Save } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -35,18 +35,20 @@ export function SaveCohortDialog({
 }: SaveCohortDialogProps) {
   const [cohortName, setCohortName] = useState('');
   const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Reset state when dialog opens/closes
   useEffect(() => {
     if (isOpen) {
       setCohortName('');
       setError('');
+      setIsSaving(false);
     }
   }, [isOpen]);
 
   const filterSummary = getFilterSummary(currentFilters);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validation
     const trimmedName = cohortName.trim();
     
@@ -66,8 +68,14 @@ export function SaveCohortDialog({
     }
 
     // Save the cohort
-    onSave(trimmedName);
-    onClose();
+    setIsSaving(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Simulate async operation
+      onSave(trimmedName);
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -144,12 +152,21 @@ export function SaveCohortDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isSaving}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!!error || !cohortName.trim()}>
-            <Save className="h-4 w-4 mr-2" />
-            Save Cohort
+          <Button onClick={handleSave} disabled={!!error || !cohortName.trim() || isSaving}>
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Cohort
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, DollarSign, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,10 @@ export function GeneralAdoptionUpload({
   });
 
   const [isDragOver, setIsDragOver] = useState<DataType | null>(null);
+
+  // Create refs for file inputs
+  const modelCostsInputRef = useRef<HTMLInputElement>(null);
+  const wauInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(async (file: File, dataType: DataType) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
@@ -186,6 +190,9 @@ export function GeneralAdoptionUpload({
     iconColor: string;
     hexUrl: string | null;
   }) => {
+    // Get the appropriate ref for this data type
+    const inputRef = dataType === 'MODEL_COSTS' ? modelCostsInputRef : wauInputRef;
+
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -204,7 +211,7 @@ export function GeneralAdoptionUpload({
         <p className="text-sm text-gray-600">{description}</p>
       
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
             isDragOver === dataType
               ? `${borderColor} bg-blue-50`
               : state.validationStatus === 'valid'
@@ -216,6 +223,7 @@ export function GeneralAdoptionUpload({
           onDrop={(e) => handleDrop(e, dataType)}
           onDragOver={(e) => handleDragOver(e, dataType)}
           onDragLeave={handleDragLeave}
+          onClick={() => inputRef.current?.click()}
         >
           <div className="space-y-4">
             <div className="flex justify-center">
@@ -225,19 +233,21 @@ export function GeneralAdoptionUpload({
             <div>
               <p className="text-sm font-medium text-gray-900">
                 Drop your CSV file here, or{' '}
-                <label className="text-blue-600 hover:text-blue-500 cursor-pointer">
+                <span className="text-blue-600 hover:text-blue-500 cursor-pointer underline">
                   browse
-                  <input
-                    type="file"
-                    accept=".csv"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileSelect(file, dataType);
-                    }}
-                  />
-                </label>
+                </span>
               </p>
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileSelect(file, dataType);
+                  e.currentTarget.value = '';
+                }}
+              />
               <p className="text-xs text-gray-500 mt-1">CSV files only</p>
             </div>
             

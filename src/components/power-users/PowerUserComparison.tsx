@@ -8,9 +8,16 @@ import { ComparisonMetricsTable } from './ComparisonMetricsTable';
 import { ComparisonChartsGrid } from './ComparisonChartsGrid';
 import { FeatureAdoptionHeatmap } from './FeatureAdoptionHeatmap';
 import { RadarChartComparison } from './RadarChartComparison';
-import { Download, Info } from 'lucide-react';
+import { Download, Info, ChevronDown } from 'lucide-react';
 import { exportCSV } from '@/lib/export-utils';
+import { exportCohortComparison } from '@/lib/power-users/cohort-export-utils';
 import { COHORT_COLOR_ARRAY } from '@/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface PowerUserComparisonProps {
   stats: MultiCohortStats;
@@ -104,14 +111,25 @@ export function PowerUserComparison({ stats }: PowerUserComparisonProps) {
                 Compare metrics across selected cohorts
               </CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleExport(stats)}
-            >
-              <Download className="h-3 w-3 mr-2" />
-              Export Comparison
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="h-3 w-3 mr-2" />
+                  Export Comparison
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => exportCohortComparison(stats)}>
+                  <Download className="h-3 w-3 mr-2" />
+                  Export All Metrics (CSV)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport(stats)}>
+                  <Download className="h-3 w-3 mr-2" />
+                  Export Summary (CSV)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardHeader>
         <CardContent>

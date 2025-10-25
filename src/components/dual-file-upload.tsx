@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, DollarSign, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,10 @@ export function DualFileUpload({
   });
 
   const [isDragOver, setIsDragOver] = useState<DataType | null>(null);
+
+  // Create refs for file inputs
+  const modelCostsInputRef = useRef<HTMLInputElement>(null);
+  const wauInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(async (file: File, dataType: DataType) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
@@ -130,6 +134,7 @@ export function DualFileUpload({
     if (file) {
       await processFile(file, dataType);
     }
+    e.currentTarget.value = '';
   }, [processFile]);
 
   const resetUpload = (dataType: DataType) => {
@@ -178,6 +183,7 @@ export function DualFileUpload({
     const isActive = isDragOver === dataType;
     const isDisabled = isLoading;
     const hasData = dataType === 'MODEL_COSTS' ? hasModelCostsData : hasWAUData;
+    const inputRef = dataType === 'MODEL_COSTS' ? modelCostsInputRef : wauInputRef;
 
     return (
       <div className="space-y-4">
@@ -207,10 +213,11 @@ export function DualFileUpload({
           onDrop={(e) => handleDrop(e, dataType)}
           onDragOver={(e) => handleDragOver(e, dataType)}
           onDragLeave={handleDragLeave}
-          onClick={() => document.getElementById(`${dataType}-file-input`)?.click()}
+          onClick={() => inputRef.current?.click()}
         >
           <input
             id={`${dataType}-file-input`}
+            ref={inputRef}
             type="file"
             accept=".csv"
             onChange={(e) => handleFileInput(e, dataType)}

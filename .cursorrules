@@ -1,0 +1,11 @@
+# Project Rules
+
+## Package Manager
+
+This project uses **pnpm** as its package manager. Always use `pnpm` commands instead of `npm` or `yarn`:
+
+- Use `pnpm install` instead of `npm install` or `yarn install`
+- Use `pnpm add <package>` instead of `npm install <package>` or `yarn add <package>`
+- Use `pnpm run <script>` instead of `npm run <script>` or `yarn run <script>`
+- Use `pnpm remove <package>` instead of `npm uninstall <package>` or `yarn remove <package>`
+

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight, Edit2, Check, X, XCircle, Users, UserCheck, UserX } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, ExternalLink, Eye, ChevronLeft, ChevronRight, Edit2, Check, X, XCircle, Users, UserCheck, UserX, FilterX } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -485,6 +485,21 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       <Card>
         <CardContent className="p-6 text-center">
           <p className="text-gray-500">No data to display</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Enhanced empty state when filters applied but no results
+  if (filteredData.length === 0 && rows.length > 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <FilterX className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No users match your current filters</h3>
+          <p className="text-gray-600 mb-4">
+            Try adjusting your filters or clear all filters to see all users.
+          </p>
         </CardContent>
       </Card>
     );

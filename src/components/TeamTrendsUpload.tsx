@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle, TrendingUp, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,12 @@ export function TeamTrendsUpload({
   });
 
   const [isDragOver, setIsDragOver] = useState<DataType | null>(null);
+
+  // Create refs for file inputs
+  const activeUserGrowthInputRef = useRef<HTMLInputElement>(null);
+  const percentileInputRef = useRef<HTMLInputElement>(null);
+  const mcpUsageInputRef = useRef<HTMLInputElement>(null);
+  const ruleUsageInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(async (file: File, dataType: DataType) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
@@ -236,6 +242,24 @@ export function TeamTrendsUpload({
     borderColor: string;
     iconColor: string;
   }) => {
+    // Get the appropriate ref for this data type
+    const getInputRef = () => {
+      switch (dataType) {
+        case 'ACTIVE_USER_GROWTH':
+          return activeUserGrowthInputRef;
+        case 'PERCENTILE_DATA':
+          return percentileInputRef;
+        case 'MCP_USAGE':
+          return mcpUsageInputRef;
+        case 'RULE_USAGE':
+          return ruleUsageInputRef;
+        default:
+          return activeUserGrowthInputRef;
+      }
+    };
+
+    const inputRef = getInputRef();
+
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -254,7 +278,7 @@ export function TeamTrendsUpload({
         <p className="text-sm text-gray-600">{description}</p>
       
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
             isDragOver === dataType
               ? `${borderColor} bg-orange-50`
               : state.validationStatus === 'valid'
@@ -266,6 +290,7 @@ export function TeamTrendsUpload({
           onDrop={(e) => handleDrop(e, dataType)}
           onDragOver={(e) => handleDragOver(e, dataType)}
           onDragLeave={handleDragLeave}
+          onClick={() => inputRef.current?.click()}
         >
           <div className="space-y-4">
             <div className="flex justify-center">
@@ -275,19 +300,21 @@ export function TeamTrendsUpload({
             <div>
               <p className="text-sm font-medium text-gray-900">
                 Drop your CSV file here, or{' '}
-                <label className="text-orange-600 hover:text-orange-500 cursor-pointer">
+                <span className="text-orange-600 hover:text-orange-500 cursor-pointer underline">
                   browse
-                  <input
-                    type="file"
-                    accept=".csv"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileSelect(file, dataType);
-                    }}
-                  />
-                </label>
+                </span>
               </p>
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileSelect(file, dataType);
+                  e.currentTarget.value = '';
+                }}
+              />
               <p className="text-xs text-gray-500 mt-1">CSV files only</p>
             </div>
             

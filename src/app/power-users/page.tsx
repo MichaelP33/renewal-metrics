@@ -31,7 +31,10 @@ function PowerUsersContent() {
     engagementScoreMax: '',
   });
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
+  const [showSaveCohortDialog, setShowSaveCohortDialog] = useState(false);
+  const [showComparisonBuilder, setShowComparisonBuilder] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const filterRef = useRef<{ clearAll: () => void; openSaveDialog: () => void } | null>(null);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -42,10 +45,47 @@ function PowerUsersContent() {
         return;
       }
 
-      // Focus search input
-      if (e.key === '/' && activeTab === 'table') {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      // Focus search input: / or Cmd/Ctrl + K
+      if ((e.key === '/' || (cmdOrCtrl && e.key === 'k')) && activeTab === 'table') {
         e.preventDefault();
         searchInputRef.current?.focus();
+      }
+
+      // Save as cohort: Cmd/Ctrl + S
+      if (cmdOrCtrl && e.key === 's' && activeTab === 'table') {
+        e.preventDefault();
+        setShowSaveCohortDialog(true);
+      }
+
+      // Clear all filters: Cmd/Ctrl + E
+      if (cmdOrCtrl && e.key === 'e' && activeTab === 'table') {
+        e.preventDefault();
+        setFilters({
+          searchText: '',
+          isMcpUser: null,
+          isRuleCreator: null,
+          isRuleUser: null,
+          isCommandCreator: null,
+          isCommandUser: null,
+          isPowerUserFilter: ['true', 'false', 'unmarked'],
+          aiLinesMin: '',
+          aiLinesMax: '',
+          sessionsMin: '',
+          sessionsMax: '',
+          requestsMin: '',
+          requestsMax: '',
+          engagementScoreMin: '',
+          engagementScoreMax: '',
+        });
+      }
+
+      // Toggle comparison builder: Cmd/Ctrl + \
+      if (cmdOrCtrl && e.key === '\\' && activeTab === 'visualizations') {
+        e.preventDefault();
+        setShowComparisonBuilder(prev => !prev);
       }
 
       // Toggle shortcuts dialog

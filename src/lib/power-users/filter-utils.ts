@@ -68,13 +68,13 @@ export function applyFilters(
     }
 
     // Engagement score range filter
-    if (filters.engagementScoreMin && row.engagementScore !== undefined) {
-      if (row.engagementScore < Number(filters.engagementScoreMin)) {
+    if (filters.engagementScoreMin) {
+      if (row.engagementScore === undefined || row.engagementScore < Number(filters.engagementScoreMin)) {
         return false;
       }
     }
-    if (filters.engagementScoreMax && row.engagementScore !== undefined) {
-      if (row.engagementScore > Number(filters.engagementScoreMax)) {
+    if (filters.engagementScoreMax) {
+      if (row.engagementScore === undefined || row.engagementScore > Number(filters.engagementScoreMax)) {
         return false;
       }
     }

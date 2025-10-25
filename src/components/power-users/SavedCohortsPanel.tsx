@@ -1,24 +1,28 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { ChevronDown, ChevronUp, Users } from 'lucide-react';
+import React, { useState, useMemo, useRef } from 'react';
+import { ChevronDown, ChevronUp, Users, Download, Upload } from 'lucide-react';
 import { CohortBadge } from './CohortBadge';
 import { EditCohortDialog } from './EditCohortDialog';
 import { DeleteCohortDialog } from './DeleteCohortDialog';
 import { usePowerUsers } from '@/contexts/PowerUsersContext';
 import type { FilterState } from './MasterTableFilters';
 import { applyFilters } from '@/lib/power-users/filter-utils';
+import { exportCohortDefinitions, exportAllCohorts, importCohortDefinitions } from '@/lib/power-users/cohort-export-utils';
 import type { StoredCohort } from '@/lib/power-users/cohort-manager';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface SavedCohortsPanelProps {
   onApplyFilters: (filters: FilterState) => void;
 }
 
 export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
-  const { savedCohorts, enhancedUsers, deleteCohort, updateCohort } = usePowerUsers();
+  const { savedCohorts, enhancedUsers, deleteCohort, updateCohort, createAndSaveCohort } = usePowerUsers();
   const [isExpanded, setIsExpanded] = useState(savedCohorts.length > 0);
   const [editingCohort, setEditingCohort] = useState<StoredCohort | null>(null);
   const [deletingCohort, setDeletingCohort] = useState<StoredCohort | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Calculate user counts for each cohort
   const cohortsWithCounts = useMemo(() => {
@@ -66,6 +70,39 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
     }
   };
 
+  const handleExportAll = () => {
+    exportCohortDefinitions(savedCohorts);
+  };
+
+  const handleExportAllCohorts = () => {
+    exportAllCohorts(savedCohorts, enhancedUsers);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const { cohorts, errors } = await importCohortDefinitions(file);
+    
+    if (errors.length > 0) {
+      alert(`Import errors:\n${errors.join('\n')}`);
+    }
+
+    // Import cohorts
+    cohorts.forEach(cohort => {
+      createAndSaveCohort(cohort.name, cohort.filterCriteria as FilterState);
+    });
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Auto-expand if cohorts exist
   React.useEffect(() => {
     if (savedCohorts.length > 0 && !isExpanded) {
@@ -76,12 +113,11 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
   return (
     <div className="space-y-2">
       {/* Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between w-full text-left hover:bg-gray-50 -mx-2 px-2 py-1.5 rounded transition-colors"
-        aria-expanded={isExpanded}
-      >
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between -mx-2 px-2">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center gap-2 text-left hover:bg-gray-50 px-2 py-1.5 rounded transition-colors flex-1"
+          aria-expanded={isExpanded}>
           <Users className="h-4 w-4 text-gray-600" />
           <span className="text-sm font-medium text-gray-900">
             Saved Cohorts
@@ -91,13 +127,42 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
               ({savedCohorts.length})
             </span>
           )}
-        </div>
-        {isExpanded ? (
-          <ChevronUp className="h-4 w-4 text-gray-500" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          {isExpanded ? (
+            <ChevronUp className="h-4 w-4 text-gray-500 ml-auto" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-gray-500 ml-auto" />
+          )}
+        </button>
+        {savedCohorts.length > 0 && isExpanded && (
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleExportAll}
+              className="h-7 px-2 text-xs"
+              title="Export cohort definitions"
+            >
+              <Download className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleImportClick}
+              className="h-7 px-2 text-xs"
+              title="Import cohort definitions"
+            >
+              <Upload className="h-3 w-3" />
+            </Button>
+            <Input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
         )}
-      </button>
+      </div>
 
       {/* Cohorts list */}
       {isExpanded && (
@@ -118,6 +183,7 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
                 onEdit={() => handleEdit(cohort)}
                 onDelete={() => handleDelete(cohort)}
                 showActions
+                users={enhancedUsers}
               />
             ))
           )}

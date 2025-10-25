@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,9 @@ export function FileUpload({ onFileUpload, isLoading = false, error }: FileUploa
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [validationStatus, setValidationStatus] = useState<'idle' | 'validating' | 'valid' | 'invalid'>('idle');
+  
+  // Create ref for file input
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(async (file: File) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
@@ -77,6 +80,7 @@ export function FileUpload({ onFileUpload, isLoading = false, error }: FileUploa
     if (file) {
       await processFile(file);
     }
+    e.currentTarget.value = '';
   }, [processFile]);
 
   const resetUpload = () => {
@@ -129,10 +133,11 @@ export function FileUpload({ onFileUpload, isLoading = false, error }: FileUploa
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          onClick={() => document.getElementById('file-input')?.click()}
+          onClick={() => inputRef.current?.click()}
         >
           <input
             id="file-input"
+            ref={inputRef}
             type="file"
             accept=".csv"
             onChange={handleFileInput}

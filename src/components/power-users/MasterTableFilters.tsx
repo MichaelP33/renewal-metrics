@@ -9,8 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { SaveCohortDialog } from './SaveCohortDialog';
 import { SavedCohortsPanel } from './SavedCohortsPanel';
+import { CohortWorkflowGuide } from './CohortWorkflowGuide';
 import { usePowerUsers } from '@/contexts/PowerUsersContext';
 import { applyFilters } from '@/lib/power-users/filter-utils';
+import { useDebounce } from '@/hooks/useDebounce';
 // import { Switch } from '@/components/ui/switch';
 // import { MasterUserRecord } from '@/types/power-users';
 
@@ -38,8 +40,6 @@ interface MasterTableFiltersProps {
   onApplyCohortFilters?: (filters: FilterState) => void;
 }
 
-const DEBOUNCE_MS = 300;
-
 export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCohortFilters }: MasterTableFiltersProps) {
   const { enhancedUsers, savedCohorts, createAndSaveCohort } = usePowerUsers();
   const [filters, setFilters] = useState<FilterState>({
@@ -60,13 +60,48 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
     engagementScoreMax: '',
   });
 
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
-  // Calculate filtered user count for save dialog
+  // Debounce search text and numeric inputs
+  const debouncedSearch = useDebounce(filters.searchText, 300);
+  const debouncedAiLinesMin = useDebounce(filters.aiLinesMin, 300);
+  const debouncedAiLinesMax = useDebounce(filters.aiLinesMax, 300);
+  const debouncedSessionsMin = useDebounce(filters.sessionsMin, 300);
+  const debouncedSessionsMax = useDebounce(filters.sessionsMax, 300);
+  const debouncedRequestsMin = useDebounce(filters.requestsMin, 300);
+  const debouncedRequestsMax = useDebounce(filters.requestsMax, 300);
+  const debouncedEngagementScoreMin = useDebounce(filters.engagementScoreMin, 300);
+  const debouncedEngagementScoreMax = useDebounce(filters.engagementScoreMax, 300);
+
+  // Calculate filtered user count for save dialog with debounced values
   const filteredUserCount = useMemo(() => {
-    return applyFilters(enhancedUsers, filters).length;
-  }, [enhancedUsers, filters]);
+    const debouncedFilters = {
+      ...filters,
+      searchText: debouncedSearch,
+      aiLinesMin: debouncedAiLinesMin,
+      aiLinesMax: debouncedAiLinesMax,
+      sessionsMin: debouncedSessionsMin,
+      sessionsMax: debouncedSessionsMax,
+      requestsMin: debouncedRequestsMin,
+      requestsMax: debouncedRequestsMax,
+      engagementScoreMin: debouncedEngagementScoreMin,
+      engagementScoreMax: debouncedEngagementScoreMax,
+    };
+    return applyFilters(enhancedUsers, debouncedFilters).length;
+  }, [
+    enhancedUsers,
+    filters,
+    debouncedSearch,
+    debouncedAiLinesMin,
+    debouncedAiLinesMax,
+    debouncedSessionsMin,
+    debouncedSessionsMax,
+    debouncedRequestsMin,
+    debouncedRequestsMax,
+    debouncedEngagementScoreMin,
+    debouncedEngagementScoreMax,
+  ]);
 
   // Get existing cohort names for validation
   const existingCohortNames = useMemo(() => {
@@ -84,19 +119,33 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
     }
   }, [onApplyCohortFilters]);
 
-  // Debounce search text
+  // Notify parent when filters change (with debounced values)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(filters.searchText);
-    }, DEBOUNCE_MS);
-
-    return () => clearTimeout(timer);
-  }, [filters.searchText]);
-
-  // Notify parent when filters change
-  useEffect(() => {
-    onFilterChange({ ...filters, searchText: debouncedSearch });
-  }, [debouncedSearch, filters, onFilterChange]);
+    onFilterChange({
+      ...filters,
+      searchText: debouncedSearch,
+      aiLinesMin: debouncedAiLinesMin,
+      aiLinesMax: debouncedAiLinesMax,
+      sessionsMin: debouncedSessionsMin,
+      sessionsMax: debouncedSessionsMax,
+      requestsMin: debouncedRequestsMin,
+      requestsMax: debouncedRequestsMax,
+      engagementScoreMin: debouncedEngagementScoreMin,
+      engagementScoreMax: debouncedEngagementScoreMax,
+    });
+  }, [
+    debouncedSearch,
+    debouncedAiLinesMin,
+    debouncedAiLinesMax,
+    debouncedSessionsMin,
+    debouncedSessionsMax,
+    debouncedRequestsMin,
+    debouncedRequestsMax,
+    debouncedEngagementScoreMin,
+    debouncedEngagementScoreMax,
+    filters,
+    onFilterChange,
+  ]);
 
   const handleSearchChange = useCallback((value: string) => {
     setFilters(prev => ({ ...prev, searchText: value }));
@@ -216,6 +265,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
       </CardHeader>
       
       <CardContent className="space-y-6">
+        {/* Cohort Workflow Guide */}
+        <CohortWorkflowGuide />
         {/* Search */}
         <div className="space-y-2">
           <Label htmlFor="search" className="text-sm font-medium flex items-center space-x-2">
