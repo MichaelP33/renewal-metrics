@@ -61,6 +61,7 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
   });
 
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showGuide, setShowGuide] = useState(false);
 
   // Debounce search text and numeric inputs

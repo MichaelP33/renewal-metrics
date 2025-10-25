@@ -3,6 +3,9 @@
  * Creates realistic distributions for AI code metrics, power user features, and agent requests
  */
 
+import fs from 'fs';
+import path from 'path';
+
 // Sample first and last names for generating realistic users
 const FIRST_NAMES = [
   'James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda',
@@ -388,9 +391,6 @@ const powerFeaturesCSV = generatePowerUserFeaturesCSV(users);
 const agentRequestsCSV = generateAgentRequestsCSV(users);
 
 // Write files
-const fs = require('fs');
-const path = require('path');
-
 const sampleDataDir = path.join(__dirname, '..', 'sample-data');
 if (!fs.existsSync(sampleDataDir)) {
   fs.mkdirSync(sampleDataDir, { recursive: true });

@@ -74,6 +74,7 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
     exportCohortDefinitions(savedCohorts);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleExportAllCohorts = () => {
     exportAllCohorts(savedCohorts, enhancedUsers);
   };

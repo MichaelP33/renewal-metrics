@@ -4,6 +4,7 @@ import { exportCSV } from '@/lib/export-utils';
 import { applyFilters } from './filter-utils';
 import type { StoredCohort } from './cohort-manager';
 import type { MultiCohortStats } from './multi-cohort-stats';
+import type { FilterState } from '@/components/power-users/MasterTableFilters';
 
 /**
  * Export cohort comparison data as CSV
@@ -16,7 +17,7 @@ export function exportCohortComparison(
   const csvRows: string[] = [];
 
   // Header row
-  const headers = ['Metric', 'Spread', ...cohorts.map(c => c.name)];
+  const headers = ['Metric', 'Spread', ...cohorts.map(c => c.cohort.name)];
   csvRows.push(headers.map(h => `"${h}"`).join(','));
 
   // Metric rows
@@ -47,36 +48,36 @@ export function exportCohortComparison(
   metrics.forEach((metricName, index) => {
     const metricKey = metricKeys[index];
     const values = cohorts.map(cohort => {
-      const metric = cohort.metrics[metricKey];
+      const metric = cohort.metrics.metrics[metricKey];
       return metric.mean.toFixed(2);
     });
     
     // Calculate spread
-    const allValues = cohorts.map(cohort => cohort.metrics[metricKey].mean);
+    const allValues = cohorts.map(cohort => cohort.metrics.metrics[metricKey].mean);
     const spread = (Math.max(...allValues) - Math.min(...allValues)).toFixed(2);
 
     csvRows.push([metricName, spread, ...values].map(v => `"${v}"`).join(','));
   });
 
   // Feature adoption rows
-  csvRows.push(['']); // Empty row
+  csvRows.push(''); // Empty row
   csvRows.push(['Feature Adoption'].map(h => `"${h}"`).join(','));
   
-  const featureHeaders = ['Feature', 'Spread', ...cohorts.map(c => c.name)];
+  const featureHeaders = ['Feature', 'Spread', ...cohorts.map(c => c.cohort.name)];
   csvRows.push(featureHeaders.map(h => `"${h}"`).join(','));
 
   const features = ['MCP', 'Rules (Creator)', 'Rules (User)', 'Commands (Creator)', 'Commands (User)'] as const;
-  const featureKeys = ['mcp', 'rulesCreator', 'rulesUser', 'commandsCreator', 'commandsUser'] as const;
+  const featureKeys = ['isMcpUser', 'isRuleCreator', 'isRuleUser', 'isCommandCreator', 'isCommandUser'] as const;
 
   features.forEach((featureName, index) => {
     const featureKey = featureKeys[index];
     const values = cohorts.map(cohort => {
-      const adoption = cohort.featureAdoption[featureKey];
+      const adoption = cohort.metrics.featureAdoption[featureKey];
       return `${adoption.toFixed(1)}%`;
     });
 
     // Calculate spread
-    const allValues = cohorts.map(cohort => cohort.featureAdoption[featureKey]);
+    const allValues = cohorts.map(cohort => cohort.metrics.featureAdoption[featureKey]);
     const spread = (Math.max(...allValues) - Math.min(...allValues)).toFixed(1);
 
     csvRows.push([featureName, `${spread}%`, ...values].map(v => `"${v}"`).join(','));
@@ -162,7 +163,8 @@ export function exportCohortUserList(
   cohort: Cohort | StoredCohort,
   users: MasterUserRecord[] | EnhancedMasterUserRecord[]
 ): void {
-  const filteredUsers = applyFilters(users as EnhancedMasterUserRecord[], cohort.filterCriteria);
+  const filterCriteria = cohort.filterCriteria as FilterState;
+  const filteredUsers = applyFilters(users as EnhancedMasterUserRecord[], filterCriteria);
 
   const headers = [
     'Email',

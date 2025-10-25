@@ -31,9 +31,10 @@ function PowerUsersContent() {
     engagementScoreMax: '',
   });
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
-  const [showSaveCohortDialog, setShowSaveCohortDialog] = useState(false);
-  const [showComparisonBuilder, setShowComparisonBuilder] = useState(true);
+  const [, setShowSaveCohortDialog] = useState(false);
+  const [, setShowComparisonBuilder] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const filterRef = useRef<{ clearAll: () => void; openSaveDialog: () => void } | null>(null);
 
   // Keyboard shortcuts
