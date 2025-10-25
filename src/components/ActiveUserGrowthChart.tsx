@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo, memo, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -29,11 +29,12 @@ interface TooltipProps {
     dataKey: string;
     value: number;
     color: string;
+    name?: string;
   }>;
   label?: string;
 }
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
+const CustomTooltip = memo(({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
@@ -42,7 +43,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center justify-between min-w-[200px]">
               <span className="text-sm text-gray-700 capitalize">
-                {entry.dataKey.replace('_', ' ')}:
+                {(entry.name ?? entry.dataKey.replace('_', ' '))}:
               </span>
               <span className="text-sm font-medium text-gray-900">
                 {formatUserCount(entry.value)}
@@ -54,10 +55,22 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     );
   }
   return null;
-};
+});
 
-export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowthChartProps>(
-  ({ data, config, title = "Agent WAU, agent L4, power users", height = 400 }, ref) => {
+CustomTooltip.displayName = 'CustomTooltip';
+
+const ActiveUserGrowthChartComponent = forwardRef<HTMLDivElement, ActiveUserGrowthChartProps>(
+  ({ data, config, title = "Agent WAU, Daily User, power users", height = 400 }, ref) => {
+    // Create stable dot style objects that won't change on re-renders
+    const dotStyles = useMemo(() => ({
+      agent_wau: { fill: ACTIVE_USER_GROWTH_COLORS.agent_wau, r: 4 },
+      agent_l4: { fill: ACTIVE_USER_GROWTH_COLORS.agent_l4, r: 4 },
+      agent_power_user: { fill: ACTIVE_USER_GROWTH_COLORS.agent_power_user, r: 4 }
+    }), []);
+
+    // Create stable tooltip renderer
+    const renderTooltip = useCallback((props: TooltipProps) => <CustomTooltip {...props} />, []);
+
     if (data.length === 0) {
       return (
         <Card ref={ref}>
@@ -94,6 +107,7 @@ export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowth
                   angle={-45}
                   textAnchor="end"
                   height={80}
+                  allowDuplicatedCategory={false}
                 />
                 <YAxis 
                   tickFormatter={formatUserCount}
@@ -103,7 +117,7 @@ export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowth
                   label={{ value: 'Active Users', angle: -90, position: 'insideLeft' }}
                 />
                 
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={renderTooltip} />
                 
                 <Legend 
                   wrapperStyle={{ paddingTop: '20px' }}
@@ -116,8 +130,9 @@ export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowth
                     dataKey="agent_wau"
                     stroke={ACTIVE_USER_GROWTH_COLORS.agent_wau}
                     strokeWidth={2}
-                    dot={{ fill: ACTIVE_USER_GROWTH_COLORS.agent_wau, r: 4 }}
+                    dot={dotStyles.agent_wau}
                     name="Agent WAU"
+                    isAnimationActive={false}
                   />
                 )}
                 
@@ -127,8 +142,9 @@ export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowth
                     dataKey="agent_l4"
                     stroke={ACTIVE_USER_GROWTH_COLORS.agent_l4}
                     strokeWidth={2}
-                    dot={{ fill: ACTIVE_USER_GROWTH_COLORS.agent_l4, r: 4 }}
-                    name="Agent L4"
+                    dot={dotStyles.agent_l4}
+                    name="Daily User"
+                    isAnimationActive={false}
                   />
                 )}
                 
@@ -138,8 +154,9 @@ export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowth
                     dataKey="agent_power_user"
                     stroke={ACTIVE_USER_GROWTH_COLORS.agent_power_user}
                     strokeWidth={2}
-                    dot={{ fill: ACTIVE_USER_GROWTH_COLORS.agent_power_user, r: 4 }}
+                    dot={dotStyles.agent_power_user}
                     name="Agent Power User"
+                    isAnimationActive={false}
                   />
                 )}
               </LineChart>
@@ -151,7 +168,7 @@ export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowth
             <span>
               {data.length} week{data.length !== 1 ? 's' : ''} • 
               {' '}Avg WAU: {formatUserCount(data.reduce((sum, week) => sum + week.agent_wau, 0) / data.length)} • 
-              {' '}Avg L4: {formatUserCount(data.reduce((sum, week) => sum + week.agent_l4, 0) / data.length)} • 
+              {' '}Avg Daily User: {formatUserCount(data.reduce((sum, week) => sum + week.agent_l4, 0) / data.length)} • 
               {' '}Avg Power: {formatUserCount(data.reduce((sum, week) => sum + week.agent_power_user, 0) / data.length)}
             </span>
             <span>
@@ -164,5 +181,8 @@ export const ActiveUserGrowthChart = forwardRef<HTMLDivElement, ActiveUserGrowth
   }
 );
 
-ActiveUserGrowthChart.displayName = 'ActiveUserGrowthChart';
+ActiveUserGrowthChartComponent.displayName = 'ActiveUserGrowthChart';
+
+// Wrap component with React.memo to prevent unnecessary re-renders
+export const ActiveUserGrowthChart = memo(ActiveUserGrowthChartComponent);
 

@@ -74,7 +74,7 @@ export function ActiveUserGrowthControls({
                 onCheckedChange={() => handleLineToggle('agent_l4')}
               />
               <Label htmlFor="toggle-agent-l4" className="text-sm font-medium cursor-pointer">
-                Agent L4
+                Daily User
               </Label>
             </div>
             

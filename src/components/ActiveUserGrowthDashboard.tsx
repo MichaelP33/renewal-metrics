@@ -66,7 +66,7 @@ export function ActiveUserGrowthDashboard({
   const avgWAU = hasProcessedData 
     ? processedData.reduce((sum, week) => sum + week.agent_wau, 0) / processedData.length 
     : 0;
-  const avgL4 = hasProcessedData 
+  const avgDailyUser = hasProcessedData 
     ? processedData.reduce((sum, week) => sum + week.agent_l4, 0) / processedData.length 
     : 0;
   const avgPowerUser = hasProcessedData 
@@ -98,10 +98,10 @@ export function ActiveUserGrowthDashboard({
           <CardContent className="p-4 text-center">
             <Users className="h-8 w-8 text-orange-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-gray-900">
-              {hasProcessedData ? formatUserCount(avgL4) : '0'}
+              {hasProcessedData ? formatUserCount(avgDailyUser) : '0'}
             </div>
             <div className="text-sm text-gray-600">
-              Avg Agent L4
+              Avg Daily User
             </div>
           </CardContent>
         </Card>
@@ -143,7 +143,7 @@ export function ActiveUserGrowthDashboard({
         <ActiveUserGrowthChart
           data={processedData}
           config={config}
-          title="Agent WAU, agent L4, power users"
+          title="Agent WAU, Daily User, power users"
           height={400}
         />
       ) : (
