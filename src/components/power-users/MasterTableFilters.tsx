@@ -24,6 +24,8 @@ export interface FilterState {
   sessionsMax: string;
   requestsMin: string;
   requestsMax: string;
+  engagementScoreMin: string;
+  engagementScoreMax: string;
 }
 
 interface MasterTableFiltersProps {
@@ -48,6 +50,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
     sessionsMax: '',
     requestsMin: '',
     requestsMax: '',
+    engagementScoreMin: '',
+    engagementScoreMax: '',
   });
 
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -78,7 +82,7 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
     setFilters(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleQuickFilter = useCallback((filterType: 'anyPowerFeature' | 'top10Sessions' | 'top10Requests') => {
+  const handleQuickFilter = useCallback((filterType: 'anyPowerFeature' | 'top10Sessions' | 'top10Requests' | 'powerUsers' | 'activeUsers' | 'casualUsers' | 'atRiskUsers') => {
     if (filterType === 'anyPowerFeature') {
       setFilters(prev => ({
         ...prev,
@@ -98,6 +102,30 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
         ...prev,
         requestsMin: '100', // Adjust based on your data
       }));
+    } else if (filterType === 'powerUsers') {
+      setFilters(prev => ({
+        ...prev,
+        engagementScoreMin: '70',
+        engagementScoreMax: '100',
+      }));
+    } else if (filterType === 'activeUsers') {
+      setFilters(prev => ({
+        ...prev,
+        engagementScoreMin: '50',
+        engagementScoreMax: '69',
+      }));
+    } else if (filterType === 'casualUsers') {
+      setFilters(prev => ({
+        ...prev,
+        engagementScoreMin: '30',
+        engagementScoreMax: '49',
+      }));
+    } else if (filterType === 'atRiskUsers') {
+      setFilters(prev => ({
+        ...prev,
+        engagementScoreMin: '0',
+        engagementScoreMax: '29',
+      }));
     }
   }, []);
 
@@ -116,6 +144,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
       sessionsMax: '',
       requestsMin: '',
       requestsMax: '',
+      engagementScoreMin: '',
+      engagementScoreMax: '',
     });
   }, []);
 
@@ -131,7 +161,9 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
     filters.sessionsMin ||
     filters.sessionsMax ||
     filters.requestsMin ||
-    filters.requestsMax;
+    filters.requestsMax ||
+    filters.engagementScoreMin ||
+    filters.engagementScoreMax;
 
   return (
     <Card>
@@ -196,6 +228,45 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
               onClick={() => handleQuickFilter('top10Requests')}
             >
               Top 10 Requests
+            </Button>
+          </div>
+        </div>
+
+        {/* Engagement Score Quick Filters */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Engagement Segments</Label>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickFilter('powerUsers')}
+              className="bg-green-50 hover:bg-green-100 text-green-800 border-green-300"
+            >
+              Power Users (70+)
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickFilter('activeUsers')}
+              className="bg-blue-50 hover:bg-blue-100 text-blue-800 border-blue-300"
+            >
+              Active Users (50-69)
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickFilter('casualUsers')}
+              className="bg-orange-50 hover:bg-orange-100 text-orange-800 border-orange-300"
+            >
+              Casual Users (30-49)
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickFilter('atRiskUsers')}
+              className="bg-red-50 hover:bg-red-100 text-red-800 border-red-300"
+            >
+              At-Risk (&lt;30)
             </Button>
           </div>
         </div>
@@ -392,6 +463,35 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
                   placeholder="Max"
                   value={filters.requestsMax}
                   onChange={(e) => handleNumericChange('requestsMax', e.target.value)}
+                  className="text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="engagement-score-min" className="text-xs text-gray-600">
+                Engagement Score
+              </Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="engagement-score-min"
+                  type="number"
+                  placeholder="Min"
+                  min="0"
+                  max="100"
+                  value={filters.engagementScoreMin}
+                  onChange={(e) => handleNumericChange('engagementScoreMin', e.target.value)}
+                  className="text-sm"
+                />
+                <span className="text-gray-400">-</span>
+                <Input
+                  id="engagement-score-max"
+                  type="number"
+                  placeholder="Max"
+                  min="0"
+                  max="100"
+                  value={filters.engagementScoreMax}
+                  onChange={(e) => handleNumericChange('engagementScoreMax', e.target.value)}
                   className="text-sm"
                 />
               </div>

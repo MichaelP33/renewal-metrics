@@ -4,11 +4,9 @@ import type { MasterUserRecord, UserSegment } from '@/types/power-users';
  * Scoring weights for engagement calculation
  */
 const SCORING_WEIGHTS = {
-  sessions: 40,      // 0-40 points
-  requests: 25,      // 0-25 points
-  aiCodePct: 20,     // 0-20 points
-  powerFeatures: 10, // 0-10 points
-  tenure: 5,         // 0-5 points
+  sessions: 45,      // 0-45 points
+  requests: 35,      // 0-35 points
+  powerFeatures: 20, // 0-20 points
 } as const;
 
 /**
@@ -17,9 +15,6 @@ const SCORING_WEIGHTS = {
 const MAX_VALUES = {
   sessions: 1000,
   requests: 10000,
-  aiCodePct: 100,
-  powerFeatures: 5,  // 5 boolean features
-  tenure: 365,       // 1 year
 } as const;
 
 /**
@@ -35,44 +30,56 @@ const SEGMENT_THRESHOLDS = {
 /**
  * Calculates engagement score for a user based on multiple factors
  * 
+ * Simplified formula: Sessions (45) + Requests (35) + Power Features (20)
+ * 
  * @param user - Master user record
  * @returns Engagement score from 0-100
  */
 export function calculateEngagementScore(user: MasterUserRecord): number {
   let score = 0;
 
-  // Sessions score (0-40 points)
+  // Sessions score (0-45 points)
   const sessions = user.totalSessions ?? 0;
   const sessionsScore = Math.min((sessions / MAX_VALUES.sessions) * SCORING_WEIGHTS.sessions, SCORING_WEIGHTS.sessions);
   score += sessionsScore;
 
-  // Requests score (0-25 points)
+  // Requests score (0-35 points)
   const requests = user.totalAgentRequests ?? 0;
   const requestsScore = Math.min((requests / MAX_VALUES.requests) * SCORING_WEIGHTS.requests, SCORING_WEIGHTS.requests);
   score += requestsScore;
 
-  // AI Code % score (0-20 points)
-  const aiCodePct = user.pctAiCode ?? 0;
-  const aiCodeScore = (aiCodePct / MAX_VALUES.aiCodePct) * SCORING_WEIGHTS.aiCodePct;
-  score += aiCodeScore;
-
-  // Power features score (0-10 points)
-  let powerFeatureCount = 0;
-  if (user.isMcpUser) powerFeatureCount++;
-  if (user.isRuleCreator) powerFeatureCount++;
-  if (user.isRuleUser) powerFeatureCount++;
-  if (user.isCommandCreator) powerFeatureCount++;
-  if (user.isCommandUser) powerFeatureCount++;
-  const powerFeaturesScore = (powerFeatureCount / MAX_VALUES.powerFeatures) * SCORING_WEIGHTS.powerFeatures;
+  // Power features score (0-20 points)
+  // Simplified 3-category system:
+  // - MCP User: 4 points
+  // - Rules: Creator OR User = 4 points, both = 8 points
+  // - Commands: Creator OR User = 4 points, both = 8 points
+  let powerFeaturesScore = 0;
+  
+  // MCP user (4 points)
+  if (user.isMcpUser) powerFeaturesScore += 4;
+  
+  // Rules (4 points for creator OR user, 8 points for both)
+  const hasRuleCreator = user.isRuleCreator ?? false;
+  const hasRuleUser = user.isRuleUser ?? false;
+  if (hasRuleCreator && hasRuleUser) {
+    powerFeaturesScore += 8;
+  } else if (hasRuleCreator || hasRuleUser) {
+    powerFeaturesScore += 4;
+  }
+  
+  // Commands (4 points for creator OR user, 8 points for both)
+  const hasCommandCreator = user.isCommandCreator ?? false;
+  const hasCommandUser = user.isCommandUser ?? false;
+  if (hasCommandCreator && hasCommandUser) {
+    powerFeaturesScore += 8;
+  } else if (hasCommandCreator || hasCommandUser) {
+    powerFeaturesScore += 4;
+  }
+  
   score += powerFeaturesScore;
 
-  // Tenure score (0-5 points)
-  const membershipDays = user.membershipDays ?? 0;
-  const tenureScore = Math.min((membershipDays / MAX_VALUES.tenure) * SCORING_WEIGHTS.tenure, SCORING_WEIGHTS.tenure);
-  score += tenureScore;
-
-  // Clamp to 0-100
-  return Math.max(0, Math.min(100, score));
+  // Clamp to 0-100 and round to whole number
+  return Math.round(Math.max(0, Math.min(100, score)));
 }
 
 /**

@@ -111,7 +111,7 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
     isCommandUser: true,
     numProductsUsed: true,
     membershipDays: true,
-    engagementScore: false,
+    engagementScore: true,
     engagementPercentile: false,
     segment: false,
     isPowerUser: true,
@@ -188,6 +188,18 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       }
       if (filters.requestsMax && (row.totalAgentRequests ?? 0) > Number(filters.requestsMax)) {
         return false;
+      }
+
+      // Engagement score range filter
+      if (filters.engagementScoreMin && (row as EnhancedMasterUserRecord).engagementScore !== undefined) {
+        if ((row as EnhancedMasterUserRecord).engagementScore! < Number(filters.engagementScoreMin)) {
+          return false;
+        }
+      }
+      if (filters.engagementScoreMax && (row as EnhancedMasterUserRecord).engagementScore !== undefined) {
+        if ((row as EnhancedMasterUserRecord).engagementScore! > Number(filters.engagementScoreMax)) {
+          return false;
+        }
       }
 
       return true;
@@ -426,7 +438,7 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       if (columnVisibility.isCommandUser) values.push(row.isCommandUser ? 'Yes' : 'No');
       if (columnVisibility.numProductsUsed) values.push(String(row.numProductsUsed ?? ''));
       if (columnVisibility.membershipDays) values.push(String(row.membershipDays ?? ''));
-      if (columnVisibility.engagementScore) values.push(String((row as EnhancedMasterUserRecord).engagementScore?.toFixed(1) ?? ''));
+      if (columnVisibility.engagementScore) values.push(String((row as EnhancedMasterUserRecord).engagementScore ?? ''));
       if (columnVisibility.engagementPercentile) values.push(String((row as EnhancedMasterUserRecord).engagementPercentile ?? ''));
       if (columnVisibility.segment) values.push((row as EnhancedMasterUserRecord).segment || '');
       return values;
