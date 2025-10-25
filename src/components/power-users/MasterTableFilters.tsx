@@ -1,12 +1,16 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Search, Filter, X, Save } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { SaveCohortDialog } from './SaveCohortDialog';
+import { SavedCohortsPanel } from './SavedCohortsPanel';
+import { usePowerUsers } from '@/contexts/PowerUsersContext';
+import { applyFilters } from '@/lib/power-users/filter-utils';
 // import { Switch } from '@/components/ui/switch';
 // import { MasterUserRecord } from '@/types/power-users';
 
@@ -31,11 +35,13 @@ export interface FilterState {
 interface MasterTableFiltersProps {
   onFilterChange: (filters: FilterState) => void;
   searchInputRef?: React.RefObject<HTMLInputElement | null>;
+  onApplyCohortFilters?: (filters: FilterState) => void;
 }
 
 const DEBOUNCE_MS = 300;
 
-export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTableFiltersProps) {
+export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCohortFilters }: MasterTableFiltersProps) {
+  const { enhancedUsers, savedCohorts, createAndSaveCohort } = usePowerUsers();
   const [filters, setFilters] = useState<FilterState>({
     searchText: '',
     isMcpUser: null,
@@ -55,6 +61,28 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
   });
 
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  // Calculate filtered user count for save dialog
+  const filteredUserCount = useMemo(() => {
+    return applyFilters(enhancedUsers, filters).length;
+  }, [enhancedUsers, filters]);
+
+  // Get existing cohort names for validation
+  const existingCohortNames = useMemo(() => {
+    return savedCohorts.map(c => c.name);
+  }, [savedCohorts]);
+
+  const handleSaveCohort = useCallback((name: string) => {
+    createAndSaveCohort(name, filters);
+  }, [createAndSaveCohort, filters]);
+
+  const handleApplyCohortFilters = useCallback((cohortFilters: FilterState) => {
+    setFilters(cohortFilters);
+    if (onApplyCohortFilters) {
+      onApplyCohortFilters(cohortFilters);
+    }
+  }, [onApplyCohortFilters]);
 
   // Debounce search text
   useEffect(() => {
@@ -270,6 +298,21 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
             </Button>
           </div>
         </div>
+
+        {/* Save as Cohort Button */}
+        {hasActiveFilters && (
+          <div className="pt-2 border-t">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setShowSaveDialog(true)}
+              className="w-full bg-[#f54e00] hover:bg-[#e04800] text-white"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save as Cohort
+            </Button>
+          </div>
+        )}
 
         {/* Boolean Filters */}
         <div className="space-y-3">
@@ -556,7 +599,22 @@ export function MasterTableFilters({ onFilterChange, searchInputRef }: MasterTab
             </div>
           </div>
         </div>
+
+        {/* Saved Cohorts Panel */}
+        <div className="pt-4 border-t">
+          <SavedCohortsPanel onApplyFilters={handleApplyCohortFilters} />
+        </div>
       </CardContent>
+
+      {/* Save Cohort Dialog */}
+      <SaveCohortDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        onSave={handleSaveCohort}
+        currentFilters={filters}
+        userCount={filteredUserCount}
+        existingCohortNames={existingCohortNames}
+      />
     </Card>
   );
 }

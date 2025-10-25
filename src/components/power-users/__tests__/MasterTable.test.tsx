@@ -78,20 +78,22 @@ describe('MasterTable', () => {
   });
 
   it('displays filtered count', () => {
-    const filters = {
+    const filters: any = {
       searchText: 'user1',
       isMcpUser: null,
       isRuleCreator: null,
       isRuleUser: null,
       isCommandCreator: null,
       isCommandUser: null,
+      isPowerUserFilter: ['true', 'false', 'unmarked'],
       aiLinesMin: '',
       aiLinesMax: '',
       sessionsMin: '',
       sessionsMax: '',
       requestsMin: '',
       requestsMax: '',
-      isPowerUser: null,
+      engagementScoreMin: '',
+      engagementScoreMax: '',
     };
     render(<MasterTable rows={mockUsers} filters={filters} />);
     expect(screen.getByText(/1 of 2 users/)).toBeInTheDocument();
