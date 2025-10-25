@@ -20,11 +20,13 @@ interface PowerUsersVisualizationsProps {
 }
 
 export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps) {
-  const { selectedUserEmails, clearSelection, savedCohorts, selectedCohortIds } = usePowerUsers();
+  const { selectedUserEmails, clearSelection, savedCohorts, selectedCohortIds, getMultiCohortStats } = usePowerUsers();
   const isFiltered = selectedUserEmails.size > 0;
 
-  // Check if any users are labeled as power users or non-power users
-  const hasLabeledUsers = data.some(u => u.isPowerUser === true || u.isPowerUser === false);
+  // Get multi-cohort stats when cohorts are selected
+  const multiCohortStats = selectedCohortIds.length >= 2 
+    ? getMultiCohortStats(selectedCohortIds)
+    : null;
 
   return (
     <div className="space-y-8">
@@ -62,22 +64,9 @@ export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps
           <div className="space-y-4">
             <ComparisonBuilder />
             
-            {/* Comparison View or Placeholder */}
-            {selectedCohortIds.length >= 2 ? (
-              <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
-                <CardContent className="p-8 text-center">
-                  <Info className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Multi-Cohort Comparison Ready
-                  </h3>
-                  <p className="text-gray-600 mb-2">
-                    {selectedCohortIds.length} cohorts selected for comparison
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Phase 5 & 6: Advanced comparison visualizations will appear here
-                  </p>
-                </CardContent>
-              </Card>
+            {/* Comparison View */}
+            {multiCohortStats ? (
+              <PowerUserComparison stats={multiCohortStats} />
             ) : (
               <Card className="border-dashed">
                 <CardContent className="p-8 text-center">
@@ -95,13 +84,6 @@ export function PowerUsersVisualizations({ data }: PowerUsersVisualizationsProps
         </section>
       )}
 
-      {/* Power User Comparison */}
-      {hasLabeledUsers && (
-        <section>
-          <h2 className="text-lg font-semibold mb-4">Power User Comparison</h2>
-          <PowerUserComparison data={data} />
-        </section>
-      )}
 
       {/* User Segmentation */}
       <section>

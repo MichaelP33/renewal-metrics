@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
-import { ComparisonStats } from '@/lib/power-users/comparison-stats';
+import React, { useMemo } from 'react';
+import { MultiCohortStats } from '@/lib/power-users/multi-cohort-stats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { COHORT_COLOR_ARRAY } from '@/types';
 
 interface ComparisonChartsGridProps {
-  stats: ComparisonStats;
+  stats: MultiCohortStats;
 }
 
 /**
@@ -30,11 +31,8 @@ function formatTooltipValue(value: number): string {
 interface TooltipPayloadEntry {
   name: string;
   value: number;
-  payload: {
-    name: string;
-    'Power Users': number;
-    'Non-Power Users': number;
-  };
+  dataKey: string;
+  payload: Record<string, number | string>;
 }
 
 /**
@@ -68,11 +66,34 @@ function CustomTooltip({ active, payload }: TooltipProps) {
 }
 
 export function ComparisonChartsGrid({ stats }: ComparisonChartsGridProps) {
-  // Get top 6 metrics by ratio (highest differences)
-  const topMetrics = [...stats.metrics]
-    .filter(m => m.ratio > 0 && isFinite(m.ratio))
-    .sort((a, b) => b.ratio - a.ratio)
-    .slice(0, 6);
+  // Get top 6 metrics by spread (highest differences)
+  const topMetrics = useMemo(() => {
+    return [...stats.comparisonMetrics]
+      .filter(m => m.spread > 0 && isFinite(m.spread))
+      .sort((a, b) => b.spread - a.spread)
+      .slice(0, 6);
+  }, [stats.comparisonMetrics]);
+
+  // Generate bar charts dynamically for each cohort
+  const chartData = useMemo(() => {
+    return topMetrics.map(metric => {
+      const dataPoints = ['mean', 'median', 'p75'].map(name => {
+        const dataPoint: Record<string, string | number> = { name };
+        
+        // Add each cohort's value
+        stats.cohorts.forEach(({ cohort, metrics: cohortMetrics }) => {
+          const metricValue = cohortMetrics.metrics[metric.metricKey as keyof typeof cohortMetrics.metrics];
+          if (metricValue) {
+            dataPoint[cohort.name] = metricValue[name as keyof typeof metricValue] || 0;
+          }
+        });
+        
+        return dataPoint;
+      });
+      
+      return { metric, dataPoints };
+    });
+  }, [topMetrics, stats.cohorts]);
 
   if (topMetrics.length === 0) {
     return null;
@@ -80,49 +101,34 @@ export function ComparisonChartsGrid({ stats }: ComparisonChartsGridProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {topMetrics.map(metric => {
-        const chartData = [
-          {
-            name: 'Average',
-            'Power Users': metric.powerUsers.mean,
-            'Non-Power Users': metric.nonPowerUsers.mean,
-          },
-          {
-            name: 'Median',
-            'Power Users': metric.powerUsers.median,
-            'Non-Power Users': metric.nonPowerUsers.median,
-          },
-          {
-            name: 'P75',
-            'Power Users': metric.powerUsers.p75,
-            'Non-Power Users': metric.nonPowerUsers.p75,
-          },
-        ];
-
-        return (
-          <Card key={metric.metricKey}>
-            <CardHeader>
-              <CardTitle className="text-sm">{metric.metricName}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Bar dataKey="Power Users" fill="#f54e00" />
-                  <Bar dataKey="Non-Power Users" fill="#9ca3af" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        );
-      })}
+      {chartData.map(({ metric, dataPoints }) => (
+        <Card key={metric.metricKey}>
+          <CardHeader>
+            <CardTitle className="text-sm">{metric.metricName}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart
+                data={dataPoints}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                {stats.cohorts.map(({ cohort }, index) => (
+                  <Bar 
+                    key={cohort.id} 
+                    dataKey={cohort.name} 
+                    fill={COHORT_COLOR_ARRAY[index % COHORT_COLOR_ARRAY.length]} 
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
