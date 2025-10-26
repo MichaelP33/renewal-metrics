@@ -44,6 +44,15 @@ interface UploadState {
   validationStatus: 'idle' | 'validating' | 'valid' | 'invalid';
 }
 
+interface FileUploadSectionProps {
+  dataType: DataType;
+  state: UploadState;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  hasData: boolean;
+}
+
 export function TripleFileUpload({ 
   onModelCostsUpload, 
   onWAUUpload, 
@@ -286,9 +295,9 @@ export function TripleFileUpload({
   const getStatusIcon = (status: UploadState['validationStatus']) => {
     switch (status) {
       case 'validating':
-        return <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />;
+        return <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--cursor-orange)]" />;
       case 'valid':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-gray-700" />;
       case 'invalid':
         return <AlertCircle className="h-4 w-4 text-red-600" />;
       default:
@@ -315,19 +324,8 @@ export function TripleFileUpload({
     title, 
     description, 
     icon: Icon,
-    hasData,
-    borderColor,
-    iconColor 
-  }: {
-    dataType: DataType;
-    state: UploadState;
-    title: string;
-    description: string;
-    icon: React.ComponentType<{ className?: string }>;
-    hasData: boolean;
-    borderColor: string;
-    iconColor: string;
-  }) => {
+    hasData
+  }: FileUploadSectionProps) => {
     // Map data type to Hex URL
     const getHexUrl = () => {
       switch (dataType) {
@@ -376,10 +374,10 @@ export function TripleFileUpload({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Icon className={`h-5 w-5 ${iconColor}`} />
+            <Icon className="h-5 w-5 text-gray-600" />
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
             {hasData && (
-              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+              <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200">
                 Loaded
               </span>
             )}
@@ -392,9 +390,9 @@ export function TripleFileUpload({
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
           isDragOver === dataType
-            ? `${borderColor} bg-blue-50`
+            ? 'border-[var(--cursor-orange)] bg-orange-50'
             : state.validationStatus === 'valid'
-            ? 'border-green-300 bg-green-50'
+            ? 'border-gray-300 bg-gray-50'
             : state.validationStatus === 'invalid'
             ? 'border-red-300 bg-red-50'
             : 'border-gray-300 hover:border-gray-400'
@@ -434,7 +432,7 @@ export function TripleFileUpload({
             <div className="flex items-center justify-center space-x-2 text-sm">
               {getStatusIcon(state.validationStatus)}
               <span className={`${
-                state.validationStatus === 'valid' ? 'text-green-600' :
+                state.validationStatus === 'valid' ? 'text-gray-700' :
                 state.validationStatus === 'invalid' ? 'text-red-600' :
                 'text-gray-600'
               }`}>
@@ -463,7 +461,7 @@ export function TripleFileUpload({
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Upload className="h-5 w-5" />
-          <span>Data Upload</span>
+          <span>Data upload</span>
         </CardTitle>
       </CardHeader>
       
@@ -481,78 +479,64 @@ export function TripleFileUpload({
           <FileUploadSection
             dataType="MODEL_COSTS"
             state={modelCostsState}
-            title="Model Costs"
+            title="Model costs"
             description="Upload CSV with model usage costs and spending data"
             icon={DollarSign}
             hasData={hasModelCostsData}
-            borderColor="border-blue-400"
-            iconColor="text-blue-600"
           />
           
           <FileUploadSection
             dataType="WAU_ANALYTICS"
             state={wauState}
-            title="WAU Analytics"
+            title="WAU analytics"
             description="Upload CSV with weekly active user analytics data"
             icon={Users}
             hasData={hasWAUData}
-            borderColor="border-orange-400"
-            iconColor="text-orange-600"
           />
 
           <FileUploadSection
             dataType="AI_CODE_METRICS"
             state={aiCodeState}
-            title="AI Code Metrics"
+            title="AI code metrics"
             description="Upload CSV with user AI code generation statistics"
             icon={Code}
             hasData={hasAICodeData}
-            borderColor="border-orange-400"
-            iconColor="text-orange-600"
           />
 
           <FileUploadSection
             dataType="ACTIVE_USER_GROWTH"
             state={activeUserGrowthState}
-            title="Agent WAU Analytics"
+            title="Agent WAU analytics"
             description="Upload CSV with agent WAU, L4, and power user data"
             icon={TrendingUp}
             hasData={hasActiveUserGrowthData}
-            borderColor="border-orange-400"
-            iconColor="text-orange-600"
           />
 
           <FileUploadSection
             dataType="PERCENTILE_DATA"
             state={percentileState}
-            title="Percentile Distribution"
+            title="Percentile distribution"
             description="Upload CSV with percentile and interactions data"
             icon={BarChart3}
             hasData={hasPercentileData}
-            borderColor="border-orange-400"
-            iconColor="text-orange-600"
           />
 
           <FileUploadSection
             dataType="MCP_USAGE"
             state={mcpUsageState}
-            title="Weekly MCP Usage"
+            title="Weekly MCP usage"
             description="Upload CSV with weekly MCP usage data"
             icon={TrendingUp}
             hasData={hasMCPUsageData}
-            borderColor="border-orange-400"
-            iconColor="text-orange-600"
           />
 
           <FileUploadSection
             dataType="RULE_USAGE"
             state={ruleUsageState}
-            title="Weekly Rule Usage"
+            title="Weekly rule usage"
             description="Upload CSV with weekly rule usage data"
             icon={TrendingUp}
             hasData={hasRuleUsageData}
-            borderColor="border-orange-400"
-            iconColor="text-orange-600"
           />
         </div>
       </CardContent>

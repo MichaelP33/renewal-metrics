@@ -33,8 +33,8 @@ export default function Home() {
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Renewal Metrics Dashboard
+          <h1 className="text-4xl font-semibold text-gray-900 mb-3">
+            Renewal metrics dashboard
           </h1>
           <p className="text-xl text-gray-600">
             Track adoption, analyze costs, and monitor engagement across your organization
@@ -44,7 +44,7 @@ export default function Home() {
         {/* Section Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <OverviewSectionCard
-            title="General Adoption"
+            title="General adoption"
             description="Track overall product adoption, costs, and user engagement across your organization"
             icon={<TrendingUp className="h-8 w-8" />}
             href="/general-adoption"
@@ -54,7 +54,7 @@ export default function Home() {
           />
           
           <OverviewSectionCard
-            title="Team Trends"
+            title="Team trends"
             description="Detailed insights into feature adoption and usage patterns across different teams"
             icon={<Target className="h-8 w-8" />}
             href="/team-trends"
@@ -64,7 +64,7 @@ export default function Home() {
           />
           
           <OverviewSectionCard
-            title="Power Users"
+            title="Power users"
             description="Deep dive into power user behavior, AI code metrics, and advanced feature usage"
             icon={<Users className="h-8 w-8" />}
             href="/power-users"
@@ -76,7 +76,7 @@ export default function Home() {
 
         {/* Upload Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Upload Data</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Upload data</h2>
           <p className="text-gray-600 mb-6">
             Upload CSV files to analyze your metrics. You can upload from here or navigate to a specific section.
           </p>

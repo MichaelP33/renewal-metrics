@@ -13,47 +13,59 @@ export function Navigation() {
         <div className="flex items-center space-x-8">
           <Link
             href="/"
-            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
               pathname === '/'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'text-gray-900'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
+            {pathname === '/' && (
+              <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--cursor-orange)] rounded-r" />
+            )}
             <Home className="h-4 w-4" />
             <span>Overview</span>
           </Link>
           <Link
             href="/general-adoption"
-            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
               pathname === '/general-adoption'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'text-gray-900'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
+            {pathname === '/general-adoption' && (
+              <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--cursor-orange)] rounded-r" />
+            )}
             <TrendingUp className="h-4 w-4" />
-            <span>General Adoption</span>
+            <span>General adoption</span>
           </Link>
           <Link
             href="/team-trends"
-            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
               pathname === '/team-trends'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'text-gray-900'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
+            {pathname === '/team-trends' && (
+              <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--cursor-orange)] rounded-r" />
+            )}
             <Target className="h-4 w-4" />
-            <span>Team Trends</span>
+            <span>Team trends</span>
           </Link>
           <Link
             href="/power-users"
-            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
               pathname === '/power-users'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                ? 'text-gray-900'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
+            {pathname === '/power-users' && (
+              <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--cursor-orange)] rounded-r" />
+            )}
             <Users className="h-4 w-4" />
-            <span>Power Users</span>
+            <span>Power users</span>
           </Link>
         </div>
       </div>

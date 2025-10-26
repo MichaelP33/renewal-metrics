@@ -73,8 +73,8 @@ export default function TeamTrendsPage() {
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Team Adoption Trends
+          <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+            Team adoption trends
           </h1>
           <p className="text-gray-600">
             Detailed insights into feature adoption and usage patterns across different teams

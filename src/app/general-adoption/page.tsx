@@ -129,8 +129,8 @@ export default function GeneralAdoptionPage() {
       <div className="container mx-auto p-6" ref={dashboardRef}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            General Adoption Metrics
+          <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+            General adoption metrics
           </h1>
           <p className="text-gray-600">
             Track overall product adoption, costs, and user engagement across your organization
@@ -157,15 +157,15 @@ export default function GeneralAdoptionPage() {
                 onClick={() => setActiveTab('MODEL_COSTS')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'MODEL_COSTS'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--cursor-orange)] text-gray-900'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center space-x-2">
                   <DollarSign className="h-4 w-4" />
-                  <span>Model Costs</span>
+                  <span>Model costs</span>
                   {hasModelCostsData && (
-                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200">
                       Loaded
                     </span>
                   )}
@@ -175,15 +175,15 @@ export default function GeneralAdoptionPage() {
                 onClick={() => setActiveTab('WAU_ANALYTICS')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'WAU_ANALYTICS'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[var(--cursor-orange)] text-gray-900'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center space-x-2">
                   <Users className="h-4 w-4" />
-                  <span>WAU Analytics</span>
+                  <span>WAU analytics</span>
                   {hasWAUData && (
-                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200">
                       Loaded
                     </span>
                   )}
@@ -193,14 +193,14 @@ export default function GeneralAdoptionPage() {
                 onClick={() => setActiveTab('MAU_USAGE')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'MAU_USAGE'
-                    ? 'border-purple-500 text-purple-600'
+                    ? 'border-[var(--cursor-orange)] text-gray-900'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center space-x-2">
                   <TrendingUp className="h-4 w-4" />
-                  <span>MAU Usage</span>
-                  <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                  <span>MAU usage</span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200">
                     Interactive
                   </span>
                 </div>
