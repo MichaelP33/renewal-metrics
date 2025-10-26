@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Search, Filter, X, Save } from 'lucide-react';
+import { Search, Filter, X, Save, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SaveCohortDialog } from './SaveCohortDialog';
 import { SavedCohortsPanel } from './SavedCohortsPanel';
 import { CohortWorkflowGuide } from './CohortWorkflowGuide';
@@ -314,7 +315,42 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
 
         {/* Engagement Score Quick Filters */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Engagement Segments</Label>
+          <div className="flex items-center gap-1.5">
+            <Label className="text-sm font-medium">Engagement Segments</Label>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    type="button" 
+                    className="inline-flex items-center justify-center p-0.5 rounded hover:bg-gray-100 cursor-help"
+                    aria-label="Engagement score information"
+                  >
+                    <Info className="h-3.5 w-3.5 text-gray-400" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs" sideOffset={5}>
+                  <div className="space-y-3 text-sm text-gray-700">
+                    <div>
+                      <p className="font-medium text-gray-900 mb-1.5">Score: 0–100 points</p>
+                      <div className="space-y-1 text-xs">
+                        <div><span className="text-gray-500">Sessions:</span> 45 pts (max 1K sessions)</div>
+                        <div><span className="text-gray-500">Requests:</span> 35 pts (max 10K requests)</div>
+                        <div><span className="text-gray-500">Power features:</span> 20 pts (MCP, rules, commands)</div>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-gray-200">
+                      <div className="text-xs space-y-0.5">
+                        <div>Power users: 70+</div>
+                        <div>Active users: 50–69</div>
+                        <div>Casual users: 30–49</div>
+                        <div>At-risk: &lt;30</div>
+                      </div>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
@@ -564,9 +600,44 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="engagement-score-min" className="text-xs text-gray-600">
-                Engagement Score
-              </Label>
+              <div className="flex items-center gap-1">
+                <Label htmlFor="engagement-score-min" className="text-xs text-gray-600">
+                  Engagement Score
+                </Label>
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button 
+                        type="button" 
+                        className="inline-flex items-center justify-center p-0.5 rounded hover:bg-gray-100 cursor-help"
+                        aria-label="Engagement score information"
+                      >
+                        <Info className="h-3.5 w-3.5 text-gray-400" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs" sideOffset={5}>
+                      <div className="space-y-3 text-sm text-gray-700">
+                        <div>
+                          <p className="font-medium text-gray-900 mb-1.5">Score: 0–100 points</p>
+                          <div className="space-y-1 text-xs">
+                            <div><span className="text-gray-500">Sessions:</span> 45 pts (max 1K sessions)</div>
+                            <div><span className="text-gray-500">Requests:</span> 35 pts (max 10K requests)</div>
+                            <div><span className="text-gray-500">Power features:</span> 20 pts (MCP, rules, commands)</div>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-gray-200">
+                          <div className="text-xs space-y-0.5">
+                            <div>Power users: 70+</div>
+                            <div>Active users: 50–69</div>
+                            <div>Casual users: 30–49</div>
+                            <div>At-risk: &lt;30</div>
+                          </div>
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <div className="flex items-center space-x-2">
                 <Input
                   id="engagement-score-min"
