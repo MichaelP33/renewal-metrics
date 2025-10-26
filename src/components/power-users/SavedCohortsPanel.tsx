@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { ChevronDown, ChevronUp, Users, Download, Upload } from 'lucide-react';
+import { toast } from 'sonner';
 import { CohortBadge } from './CohortBadge';
 import { EditCohortDialog } from './EditCohortDialog';
 import { DeleteCohortDialog } from './DeleteCohortDialog';
@@ -21,7 +22,7 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
   const { savedCohorts, enhancedUsers, deleteCohort, updateCohort, createAndSaveCohort } = usePowerUsers();
   const [isExpanded, setIsExpanded] = useState(savedCohorts.length > 0);
   const [editingCohort, setEditingCohort] = useState<StoredCohort | null>(null);
-  const [deletingCohort, setDeletingCohort] = useState<StoredCohort | null>(null);
+  const [deletingCohort, setDeletingCohort] = useState<{ cohort: StoredCohort; userCount: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Calculate user counts for each cohort
@@ -52,14 +53,16 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
     setEditingCohort(cohort);
   };
 
-  const handleDelete = (cohort: StoredCohort) => {
-    setDeletingCohort(cohort);
+  const handleDelete = (cohort: StoredCohort, userCount: number) => {
+    setDeletingCohort({ cohort, userCount });
   };
 
   const handleConfirmDelete = () => {
     if (deletingCohort) {
-      deleteCohort(deletingCohort.id);
+      const cohortName = deletingCohort.cohort.name;
+      deleteCohort(deletingCohort.cohort.id);
       setDeletingCohort(null);
+      toast.success(`Cohort "${cohortName}" deleted successfully`);
     }
   };
 
@@ -67,11 +70,13 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
     if (editingCohort) {
       updateCohort(editingCohort.id, { name: newName });
       setEditingCohort(null);
+      toast.success(`Cohort renamed to "${newName}"`);
     }
   };
 
   const handleExportAll = () => {
     exportCohortDefinitions(savedCohorts);
+    toast.success('Cohort definitions exported');
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -90,13 +95,16 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
     const { cohorts, errors } = await importCohortDefinitions(file);
     
     if (errors.length > 0) {
-      alert(`Import errors:\n${errors.join('\n')}`);
+      toast.error(`Import errors: ${errors.join(', ')}`);
+      return;
     }
 
     // Import cohorts
     cohorts.forEach(cohort => {
       createAndSaveCohort(cohort.name, cohort.filterCriteria as FilterState);
     });
+
+    toast.success(`${cohorts.length} cohort${cohorts.length === 1 ? '' : 's'} imported successfully`);
 
     // Reset file input
     if (fileInputRef.current) {
@@ -144,6 +152,7 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
               title="Export cohort definitions"
             >
               <Download className="h-3 w-3" />
+              <span className="hidden md:inline ml-1.5">Export</span>
             </Button>
             <Button
               variant="ghost"
@@ -153,6 +162,7 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
               title="Import cohort definitions"
             >
               <Upload className="h-3 w-3" />
+              <span className="hidden md:inline ml-1.5">Import</span>
             </Button>
             <Input
               ref={fileInputRef}
@@ -182,7 +192,7 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
                 userCount={userCount}
                 onClick={() => handleCohortClick(cohort)}
                 onEdit={() => handleEdit(cohort)}
-                onDelete={() => handleDelete(cohort)}
+                onDelete={() => handleDelete(cohort, userCount)}
                 showActions
                 users={enhancedUsers}
               />
@@ -210,7 +220,8 @@ export function SavedCohortsPanel({ onApplyFilters }: SavedCohortsPanelProps) {
           isOpen={!!deletingCohort}
           onClose={() => setDeletingCohort(null)}
           onConfirm={handleConfirmDelete}
-          cohort={deletingCohort}
+          cohort={deletingCohort.cohort}
+          userCount={deletingCohort.userCount}
         />
       )}
     </div>

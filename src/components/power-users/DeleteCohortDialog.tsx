@@ -18,6 +18,7 @@ interface DeleteCohortDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   cohort: StoredCohort;
+  userCount: number;
 }
 
 export function DeleteCohortDialog({
@@ -25,6 +26,7 @@ export function DeleteCohortDialog({
   onClose,
   onConfirm,
   cohort,
+  userCount,
 }: DeleteCohortDialogProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -44,7 +46,7 @@ export function DeleteCohortDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="py-4 space-y-3">
           <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-md">
             <div
               className="w-4 h-4 rounded-full shrink-0"
@@ -56,6 +58,11 @@ export function DeleteCohortDialog({
                 Created {new Date(cohort.createdAt).toLocaleDateString()}
               </p>
             </div>
+          </div>
+          <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+            <p className="text-sm text-gray-700">
+              This cohort contains <span className="font-semibold">{userCount} {userCount === 1 ? 'user' : 'users'}</span>
+            </p>
           </div>
         </div>
 
