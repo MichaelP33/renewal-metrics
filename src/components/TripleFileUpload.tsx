@@ -443,7 +443,10 @@ export function TripleFileUpload({
           
           {state.validationStatus === 'valid' && (
             <Button
-              onClick={() => handleUpload(dataType)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUpload(dataType);
+              }}
               disabled={isLoading}
               className="w-full"
             >

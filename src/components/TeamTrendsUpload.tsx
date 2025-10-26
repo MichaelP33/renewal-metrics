@@ -336,7 +336,10 @@ export function TeamTrendsUpload({
             
             {state.validationStatus === 'valid' && (
               <Button
-                onClick={() => handleUpload(dataType)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUpload(dataType);
+                }}
                 disabled={isLoading}
                 className="w-full bg-orange-600 hover:bg-orange-700"
               >
