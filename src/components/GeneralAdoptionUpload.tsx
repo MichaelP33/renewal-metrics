@@ -233,7 +233,10 @@ export function GeneralAdoptionUpload({
             <div>
               <p className="text-sm font-medium text-gray-900">
                 Drop your CSV file here, or{' '}
-                <span className="text-blue-600 hover:text-blue-500 cursor-pointer underline">
+                <span 
+                  className="text-blue-600 hover:text-blue-500 cursor-pointer underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   browse
                 </span>
               </p>
@@ -284,7 +287,7 @@ export function GeneralAdoptionUpload({
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Upload className="h-5 w-5" />
-          <span>Upload Data</span>
+          <span>Upload Account Data</span>
         </CardTitle>
       </CardHeader>
       
@@ -303,7 +306,7 @@ export function GeneralAdoptionUpload({
             dataType="MODEL_COSTS"
             state={modelCostsState}
             title="Model Costs"
-            description="Upload CSV with model usage costs and spending data"
+            description="Upload account model costs and usage data"
             icon={DollarSign}
             hasData={hasModelCostsData}
             borderColor="border-blue-400"
@@ -315,7 +318,7 @@ export function GeneralAdoptionUpload({
             dataType="WAU_ANALYTICS"
             state={wauState}
             title="WAU Analytics"
-            description="Upload CSV with weekly active user analytics data"
+            description="Upload account WAU and engagement metrics"
             icon={Users}
             hasData={hasWAUData}
             borderColor="border-blue-400"

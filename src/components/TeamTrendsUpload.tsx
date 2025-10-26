@@ -300,7 +300,10 @@ export function TeamTrendsUpload({
             <div>
               <p className="text-sm font-medium text-gray-900">
                 Drop your CSV file here, or{' '}
-                <span className="text-orange-600 hover:text-orange-500 cursor-pointer underline">
+                <span 
+                  className="text-orange-600 hover:text-orange-500 cursor-pointer underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   browse
                 </span>
               </p>
@@ -351,7 +354,7 @@ export function TeamTrendsUpload({
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Upload className="h-5 w-5" />
-          <span>Upload Data</span>
+          <span>Upload Account Data</span>
         </CardTitle>
       </CardHeader>
       
@@ -370,7 +373,7 @@ export function TeamTrendsUpload({
             dataType="ACTIVE_USER_GROWTH"
             state={activeUserGrowthState}
             title="Agent WAU Analytics"
-            description="Upload CSV with agent WAU, L4, and power user data"
+            description="Upload account agent WAU, L4, and power user data"
             icon={TrendingUp}
             hasData={hasActiveUserGrowthData}
             borderColor="border-orange-400"
@@ -381,7 +384,7 @@ export function TeamTrendsUpload({
             dataType="PERCENTILE_DATA"
             state={percentileState}
             title="Percentile Distribution"
-            description="Upload CSV with percentile and interactions data"
+            description="Upload account percentile and interactions data"
             icon={BarChart3}
             hasData={hasPercentileData}
             borderColor="border-orange-400"
@@ -392,7 +395,7 @@ export function TeamTrendsUpload({
             dataType="MCP_USAGE"
             state={mcpUsageState}
             title="Weekly MCP Usage"
-            description="Upload CSV with weekly MCP usage data"
+            description="Upload account weekly MCP usage data"
             icon={TrendingUp}
             hasData={hasMCPUsageData}
             borderColor="border-orange-400"
@@ -403,7 +406,7 @@ export function TeamTrendsUpload({
             dataType="RULE_USAGE"
             state={ruleUsageState}
             title="Weekly Rule Usage"
-            description="Upload CSV with weekly rule usage data"
+            description="Upload account weekly rule usage data"
             icon={TrendingUp}
             hasData={hasRuleUsageData}
             borderColor="border-orange-400"

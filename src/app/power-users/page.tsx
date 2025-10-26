@@ -105,9 +105,9 @@ function PowerUsersContent() {
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Power Users Analytics</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Power User Analysis</h1>
           <p className="text-gray-600">
-            Upload and analyze user data across AI code metrics, power user features, and agent requests
+            Analyze power users within accounts across AI code metrics, advanced features, and agent requests
           </p>
           <p className="text-sm text-gray-500 mt-2">
             Tip: Press <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">/</kbd> to search, <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">?</kbd> for shortcuts
@@ -177,9 +177,9 @@ function PowerUsersContent() {
           ) : (
             <Card>
               <CardContent className="p-8 text-center">
-                <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Data Available</h3>
-                <p className="text-gray-600 mb-4">Upload data in the Upload Data tab to view the master table.</p>
+              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Data Available</h3>
+              <p className="text-gray-600 mb-4">Upload account data in the Upload Data tab to view the master table.</p>
               </CardContent>
             </Card>
           )
@@ -191,9 +191,9 @@ function PowerUsersContent() {
           ) : (
             <Card>
               <CardContent className="p-8 text-center">
-                <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Data Available</h3>
-                <p className="text-gray-600 mb-4">Upload data in the Upload Data tab to view visualizations.</p>
+              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Data Available</h3>
+              <p className="text-gray-600 mb-4">Upload account data in the Upload Data tab to view visualizations.</p>
               </CardContent>
             </Card>
           )

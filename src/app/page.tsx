@@ -2,7 +2,6 @@
 
 import { useDashboardData } from '@/contexts/DashboardDataContext';
 import { OverviewSectionCard } from '@/components/OverviewSectionCard';
-import { TripleFileUpload } from '@/components/TripleFileUpload';
 import { TrendingUp, Target, Users } from 'lucide-react';
 
 export default function Home() {
@@ -13,15 +12,6 @@ export default function Home() {
     hasPercentileData,
     hasMCPUsageData,
     hasRuleUsageData,
-    handleModelCostsUpload,
-    handleWAUUpload,
-    handleAICodeUpload,
-    handleActiveUserGrowthUpload,
-    handlePercentileUpload,
-    handleMCPUsageUpload,
-    handleRuleUsageUpload,
-    isLoading,
-    error
   } = useDashboardData();
 
   // Count loaded metrics for each section
@@ -34,18 +24,19 @@ export default function Home() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-semibold text-gray-900 mb-3">
-            Renewal metrics dashboard
+            Account Analytics Dashboard
           </h1>
-          <p className="text-xl text-gray-600">
-            Track adoption, analyze costs, and monitor engagement across your organization
+          <p className="text-lg text-gray-600 max-w-3xl">
+            Analyze account adoption, engagement patterns, and usage trends across accounts. 
+            Select a section below to upload account data and explore insights.
           </p>
         </div>
 
         {/* Section Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <OverviewSectionCard
             title="General adoption"
-            description="Track overall product adoption, costs, and user engagement across your organization"
+            description="Monitor account-level adoption metrics, usage costs, and engagement trends"
             icon={<TrendingUp className="h-8 w-8" />}
             href="/general-adoption"
             loadedCount={generalAdoptionLoaded}
@@ -55,7 +46,7 @@ export default function Home() {
           
           <OverviewSectionCard
             title="Team trends"
-            description="Detailed insights into feature adoption and usage patterns across different teams"
+            description="Analyze feature adoption patterns and usage trends within customer accounts"
             icon={<Target className="h-8 w-8" />}
             href="/team-trends"
             loadedCount={teamTrendsLoaded}
@@ -65,39 +56,12 @@ export default function Home() {
           
           <OverviewSectionCard
             title="Power users"
-            description="Deep dive into power user behavior, AI code metrics, and advanced feature usage"
+            description="Identify and analyze power users and advanced feature adoption within accounts"
             icon={<Users className="h-8 w-8" />}
             href="/power-users"
             loadedCount={0}
             totalCount={3}
             themeColor="green"
-          />
-        </div>
-
-        {/* Upload Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Upload data</h2>
-          <p className="text-gray-600 mb-6">
-            Upload CSV files to analyze your metrics. You can upload from here or navigate to a specific section.
-          </p>
-          
-          <TripleFileUpload
-            onModelCostsUpload={handleModelCostsUpload}
-            onWAUUpload={handleWAUUpload}
-            onAICodeUpload={handleAICodeUpload}
-            onActiveUserGrowthUpload={handleActiveUserGrowthUpload}
-            onPercentileUpload={handlePercentileUpload}
-            onMCPUsageUpload={handleMCPUsageUpload}
-            onRuleUsageUpload={handleRuleUsageUpload}
-            isLoading={isLoading}
-            error={error}
-            hasModelCostsData={hasModelCostsData}
-            hasWAUData={hasWAUData}
-            hasAICodeData={false}
-            hasActiveUserGrowthData={hasActiveUserGrowthData}
-            hasPercentileData={hasPercentileData}
-            hasMCPUsageData={hasMCPUsageData}
-            hasRuleUsageData={hasRuleUsageData}
           />
         </div>
       </div>

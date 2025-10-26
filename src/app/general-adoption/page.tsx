@@ -130,10 +130,10 @@ export default function GeneralAdoptionPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-gray-900 mb-2">
-            General adoption metrics
+            Account Adoption Overview
           </h1>
           <p className="text-gray-600">
-            Track overall product adoption, costs, and user engagement across your organization
+            Monitor usage patterns and costs across customer accounts
           </p>
         </div>
 
@@ -361,8 +361,8 @@ export default function GeneralAdoptionPage() {
               </h3>
               <p className="text-gray-600 mb-4">
                 {activeTab === 'MODEL_COSTS' 
-                  ? 'Upload a model costs CSV file to view cost analytics.'
-                  : 'Upload a WAU analytics CSV file to view user engagement analytics.'
+                  ? 'Upload account model costs data to view cost analytics.'
+                  : 'Upload account WAU analytics data to view user engagement analytics.'
                 }
               </p>
             </CardContent>

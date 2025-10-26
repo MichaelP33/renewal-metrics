@@ -26,6 +26,21 @@ export function OverviewSectionCard({
   // themeColor is intentionally unused
 }: OverviewSectionCardProps) {
   const isComplete = loadedCount === totalCount;
+  const hasNoData = loadedCount === 0;
+  const hasPartialData = loadedCount > 0 && !isComplete;
+
+  // Determine badge text (consistent neutral styling)
+  const getBadgeText = () => {
+    if (hasNoData) return 'Get started';
+    return `${loadedCount}/${totalCount} loaded`;
+  };
+
+  // Determine button text
+  const getButtonText = () => {
+    if (hasNoData) return 'Get started';
+    if (hasPartialData) return 'Continue setup';
+    return 'View metrics';
+  };
 
   return (
     <Card className="transition-all hover:shadow-sm">
@@ -37,7 +52,7 @@ export function OverviewSectionCard({
             </div>
           </div>
           <div className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
-            {loadedCount}/{totalCount} loaded
+            {getBadgeText()}
           </div>
         </div>
         
@@ -46,7 +61,7 @@ export function OverviewSectionCard({
         
         <Link href={href}>
           <Button className="w-full bg-gray-900 hover:bg-[var(--cursor-orange)] text-white transition-colors">
-            {isComplete ? 'View metrics' : 'View section'}
+            {getButtonText()}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>

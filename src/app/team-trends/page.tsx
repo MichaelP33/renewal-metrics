@@ -74,10 +74,10 @@ export default function TeamTrendsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-gray-900 mb-2">
-            Team adoption trends
+            Account Feature Adoption
           </h1>
           <p className="text-gray-600">
-            Detailed insights into feature adoption and usage patterns across different teams
+            Track feature usage and adoption trends within accounts
           </p>
         </div>
 
@@ -223,12 +223,12 @@ export default function TeamTrendsPage() {
               </h3>
               <p className="text-gray-600 mb-4">
                 {activeTab === 'ACTIVE_USER_GROWTH'
-                  ? 'Upload an active user growth CSV file to view agent WAU analytics.'
+                  ? 'Upload account active user growth data to view agent WAU analytics.'
                   : activeTab === 'PERCENTILE_DATA'
-                  ? 'Upload a percentile distribution CSV file to view percentile analytics.'
+                  ? 'Upload account percentile distribution data to view percentile analytics.'
                   : activeTab === 'MCP_USAGE'
-                  ? 'Upload a weekly MCP usage CSV file to view MCP usage analytics.'
-                  : 'Upload a weekly rule usage CSV file to view rule usage analytics.'
+                  ? 'Upload account weekly MCP usage data to view MCP usage analytics.'
+                  : 'Upload account weekly rule usage data to view rule usage analytics.'
                 }
               </p>
             </CardContent>

@@ -1,10 +1,10 @@
-# Usage Spend Analytics App
+# Account Analytics Dashboard
 
-Model cost analyzer and usage spend analytics dashboard for AI model consumption tracking.
+Account analytics dashboard for analyzing adoption, engagement, and usage patterns across accounts.
 
 ## Overview
 
-This application provides comprehensive analytics for AI model usage and costs, including:
+This application provides comprehensive analytics for analyzing customer account data, including:
 
 - **Model Cost Analysis**: Detailed breakdown of costs by AI model
 - **Usage Analytics**: Token usage and request patterns
@@ -38,13 +38,13 @@ This application provides comprehensive analytics for AI model usage and costs, 
 
 For detailed information about cohort features, see [COHORT_FEATURES.md](./COHORT_FEATURES.md).
 
-## Integration with Fieldsphere Portal
+## Purpose
 
-This app was previously integrated into the Fieldsphere portal as a microfrontend and now runs standalone:
-
-- **Previous Route**: `/usage-spend` (now runs on root `/`)
-- **Package Name**: `@usage-spend/app`
-- **Development URL**: `usage-spend.anyweb.dev`
+This dashboard is designed for the Cursor GTM team to:
+- Analyze customer account adoption and engagement
+- Track feature usage trends within accounts
+- Identify power users and advanced feature adoption
+- Monitor account health and renewal signals
 
 ## Development
 
