@@ -12,7 +12,8 @@ interface OverviewSectionCardProps {
   href: string;
   loadedCount: number;
   totalCount: number;
-  themeColor: 'blue' | 'orange' | 'green';
+  // Deprecated: kept for backwards compatibility; not used in the new design
+  themeColor?: 'blue' | 'orange' | 'green';
 }
 
 export function OverviewSectionCard({
@@ -22,7 +23,7 @@ export function OverviewSectionCard({
   href,
   loadedCount,
   totalCount,
-  themeColor
+  // themeColor is intentionally unused
 }: OverviewSectionCardProps) {
   const isComplete = loadedCount === totalCount;
 

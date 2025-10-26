@@ -20,6 +20,23 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  // Relax rules for test files to avoid build failures on non-production code
+  {
+    files: [
+      "**/__tests__/**/*.{ts,tsx,js,jsx}",
+      "**/*.test.{ts,tsx,js,jsx}",
+      "**/*.spec.{ts,tsx,js,jsx}",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;
