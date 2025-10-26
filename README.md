@@ -27,6 +27,17 @@ This application provides comprehensive analytics for AI model usage and costs, 
 - **Model Categorization**: Automatic categorization of AI models
 - **Cost Calculations**: Accurate cost breakdowns and totals
 
+### Cohort Comparison (NEW)
+- **Flexible User Segmentation**: Create named cohorts based on complex filter criteria
+- **Multi-Cohort Comparison**: Compare 2-6 cohorts side-by-side with comprehensive visualizations
+- **Engagement Scoring**: Automatic calculation of user engagement scores (0-100)
+- **Advanced Visualizations**: Radar charts, heatmaps, comparison tables, and bar charts
+- **Export/Import**: Save and share cohort definitions as JSON; export comparison data as CSV
+- **Keyboard Shortcuts**: Speed up workflow with intuitive shortcuts
+- **localStorage Persistence**: Cohorts saved locally for quick access
+
+For detailed information about cohort features, see [COHORT_FEATURES.md](./COHORT_FEATURES.md).
+
 ## Integration with Fieldsphere Portal
 
 This app was previously integrated into the Fieldsphere portal as a microfrontend and now runs standalone:
