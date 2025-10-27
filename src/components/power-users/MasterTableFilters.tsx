@@ -27,6 +27,8 @@ export interface FilterState {
   isPowerUserFilter: ('true' | 'false' | 'unmarked')[];
   aiLinesMin: string;
   aiLinesMax: string;
+  pctAiCodeMin: string;
+  pctAiCodeMax: string;
   sessionsMin: string;
   sessionsMax: string;
   requestsMin: string;
@@ -53,6 +55,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
     isPowerUserFilter: ['true', 'false', 'unmarked'],
     aiLinesMin: '',
     aiLinesMax: '',
+    pctAiCodeMin: '',
+    pctAiCodeMax: '',
     sessionsMin: '',
     sessionsMax: '',
     requestsMin: '',
@@ -69,6 +73,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
   const debouncedSearch = useDebounce(filters.searchText, 300);
   const debouncedAiLinesMin = useDebounce(filters.aiLinesMin, 300);
   const debouncedAiLinesMax = useDebounce(filters.aiLinesMax, 300);
+  const debouncedPctAiCodeMin = useDebounce(filters.pctAiCodeMin, 300);
+  const debouncedPctAiCodeMax = useDebounce(filters.pctAiCodeMax, 300);
   const debouncedSessionsMin = useDebounce(filters.sessionsMin, 300);
   const debouncedSessionsMax = useDebounce(filters.sessionsMax, 300);
   const debouncedRequestsMin = useDebounce(filters.requestsMin, 300);
@@ -83,6 +89,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
       searchText: debouncedSearch,
       aiLinesMin: debouncedAiLinesMin,
       aiLinesMax: debouncedAiLinesMax,
+      pctAiCodeMin: debouncedPctAiCodeMin,
+      pctAiCodeMax: debouncedPctAiCodeMax,
       sessionsMin: debouncedSessionsMin,
       sessionsMax: debouncedSessionsMax,
       requestsMin: debouncedRequestsMin,
@@ -97,6 +105,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
     debouncedSearch,
     debouncedAiLinesMin,
     debouncedAiLinesMax,
+    debouncedPctAiCodeMin,
+    debouncedPctAiCodeMax,
     debouncedSessionsMin,
     debouncedSessionsMax,
     debouncedRequestsMin,
@@ -128,6 +138,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
       searchText: debouncedSearch,
       aiLinesMin: debouncedAiLinesMin,
       aiLinesMax: debouncedAiLinesMax,
+      pctAiCodeMin: debouncedPctAiCodeMin,
+      pctAiCodeMax: debouncedPctAiCodeMax,
       sessionsMin: debouncedSessionsMin,
       sessionsMax: debouncedSessionsMax,
       requestsMin: debouncedRequestsMin,
@@ -139,6 +151,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
     debouncedSearch,
     debouncedAiLinesMin,
     debouncedAiLinesMax,
+    debouncedPctAiCodeMin,
+    debouncedPctAiCodeMax,
     debouncedSessionsMin,
     debouncedSessionsMax,
     debouncedRequestsMin,
@@ -219,6 +233,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
       isPowerUserFilter: ['true', 'false', 'unmarked'],
       aiLinesMin: '',
       aiLinesMax: '',
+      pctAiCodeMin: '',
+      pctAiCodeMax: '',
       sessionsMin: '',
       sessionsMax: '',
       requestsMin: '',
@@ -237,6 +253,8 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
     filters.isPowerUserFilter.length < 3 ||
     filters.aiLinesMin ||
     filters.aiLinesMax ||
+    filters.pctAiCodeMin ||
+    filters.pctAiCodeMax ||
     filters.sessionsMin ||
     filters.sessionsMax ||
     filters.requestsMin ||
@@ -544,6 +562,35 @@ export function MasterTableFilters({ onFilterChange, searchInputRef, onApplyCoho
                   placeholder="Max"
                   value={filters.aiLinesMax}
                   onChange={(e) => handleNumericChange('aiLinesMax', e.target.value)}
+                  className="text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="pct-ai-code-min" className="text-xs text-gray-600">
+                AI Code %
+              </Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="pct-ai-code-min"
+                  type="number"
+                  placeholder="Min"
+                  min="0"
+                  max="100"
+                  value={filters.pctAiCodeMin}
+                  onChange={(e) => handleNumericChange('pctAiCodeMin', e.target.value)}
+                  className="text-sm"
+                />
+                <span className="text-gray-400">-</span>
+                <Input
+                  id="pct-ai-code-max"
+                  type="number"
+                  placeholder="Max"
+                  min="0"
+                  max="100"
+                  value={filters.pctAiCodeMax}
+                  onChange={(e) => handleNumericChange('pctAiCodeMax', e.target.value)}
                   className="text-sm"
                 />
               </div>

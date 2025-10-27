@@ -177,6 +177,12 @@ export function MasterTable({ rows, filters }: MasterTableProps) {
       if (filters.aiLinesMax && (row.aiLinesChanged ?? 0) > Number(filters.aiLinesMax)) {
         return false;
       }
+      if (filters.pctAiCodeMin && (row.pctAiCode ?? 0) < Number(filters.pctAiCodeMin)) {
+        return false;
+      }
+      if (filters.pctAiCodeMax && (row.pctAiCode ?? 0) > Number(filters.pctAiCodeMax)) {
+        return false;
+      }
       if (filters.sessionsMin && (row.totalSessions ?? 0) < Number(filters.sessionsMin)) {
         return false;
       }

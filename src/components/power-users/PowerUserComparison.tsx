@@ -8,6 +8,7 @@ import { ComparisonMetricsTable } from './ComparisonMetricsTable';
 import { ComparisonChartsGrid } from './ComparisonChartsGrid';
 import { FeatureAdoptionHeatmap } from './FeatureAdoptionHeatmap';
 import { RadarChartComparison } from './RadarChartComparison';
+import { AICodePercentageComparison } from './AICodePercentageComparison';
 import { Download, Info, ChevronDown } from 'lucide-react';
 import { exportCSV } from '@/lib/export-utils';
 import { exportCohortComparison } from '@/lib/power-users/cohort-export-utils';
@@ -170,6 +171,9 @@ export function PowerUserComparison({ stats }: PowerUserComparisonProps) {
 
       {/* Metrics Comparison Table */}
       <ComparisonMetricsTable stats={stats} />
+
+      {/* AI Code Percentage Comparison */}
+      <AICodePercentageComparison stats={stats} />
 
       {/* Visual Comparisons */}
       <ComparisonChartsGrid stats={stats} />
