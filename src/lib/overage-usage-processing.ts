@@ -1,4 +1,4 @@
-import { OverageUsageData, OverageUsageConfig, ForecastMethod, OverageUsageMonthData } from '@/types';
+import { OverageUsageData, OverageUsageConfig, OverageUsageMonthData } from '@/types';
 
 /**
  * Calculates linear trend forecast using least squares regression
@@ -77,7 +77,7 @@ export function calculateGrowthRateForecast(
   const sortedData = [...data].sort((a, b) => a.month.localeCompare(b.month));
   
   // Calculate average month-over-month growth rate
-  let growthRates: number[] = [];
+  const growthRates: number[] = [];
   for (let i = 1; i < sortedData.length; i++) {
     const prevSpend = sortedData[i - 1].spend;
     if (prevSpend > 0) {

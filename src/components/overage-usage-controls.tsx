@@ -224,7 +224,7 @@ export function OverageUsageControls({
         setGrowthRateInput((safeConfig.customGrowthRate * 100).toFixed(1));
       }
     }
-  }, [safeConfig.forecastMethod, isGrowthRateFocused]);
+  }, [safeConfig.forecastMethod, safeConfig.customGrowthRate, isGrowthRateFocused]);
 
   // Handle growth rate input change - update local state only
   const handleGrowthRateChange = (value: string) => {
@@ -316,7 +316,7 @@ export function OverageUsageControls({
           </div>
 
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {sortedData.map((entry, index) => {
+            {sortedData.map((entry) => {
               const originalIndex = safeData.findIndex(d => d.month === entry.month);
               return (
                 <div key={`${entry.month}-${originalIndex}`} className="flex gap-2 items-start">
@@ -366,7 +366,7 @@ export function OverageUsageControls({
             {sortedData.length === 0 && (
               <div className="text-center py-8 text-gray-500">
                 <p>No months added yet.</p>
-                <p className="text-sm mt-2">Click "Bulk Add 12 Months" or "Add Month" to get started.</p>
+                <p className="text-sm mt-2">Click &quot;Bulk Add 12 Months&quot; or &quot;Add Month&quot; to get started.</p>
               </div>
             )}
           </div>

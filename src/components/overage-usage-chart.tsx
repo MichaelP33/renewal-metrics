@@ -1,7 +1,7 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Legend, Tooltip, LabelList } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Legend, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign } from 'lucide-react';
 import { OverageUsageData, OverageUsageConfig } from '@/types';
@@ -23,40 +23,23 @@ interface ChartDataPoint {
   isForecast: boolean;
 }
 
-interface CustomLabelProps {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: ChartDataPoint }>;
+}
+
+interface BarProps {
+  payload: ChartDataPoint;
   x?: number;
   y?: number;
   width?: number;
   height?: number;
   value?: number;
-  payload?: ChartDataPoint;
 }
 
-const CustomLabel = (props: CustomLabelProps) => {
-  const { x, y, width, height, value, payload } = props;
-  if (!x || !y || !width || value === undefined || !payload) return null;
-  
-  // Only hide labels for truly zero values, but show them for very small amounts
-  if (value === 0) return null;
-  
-  // Position label above the bar
-  const labelY = y - 8;
-  const labelX = x + width / 2;
-  
-  return (
-    <text
-      x={labelX}
-      y={labelY}
-      fill={payload.isForecast ? OVERAGE_USAGE_COLORS.forecastStroke : '#333'}
-      textAnchor="middle"
-      fontSize={12}
-      fontWeight={600}
-      style={{ pointerEvents: 'none' }}
-    >
-      {formatCurrency(value)}
-    </text>
-  );
-};
+interface LegendFormatterEntry {
+  payload?: ChartDataPoint;
+}
 
 export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartProps>(
   ({ data, config, title = "Overage Usage Spend", height = 400 }, ref) => {
@@ -94,7 +77,7 @@ export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartPro
     const chartData: ChartDataPoint[] = [...actualData, ...forecastData];
 
     // Custom tooltip
-    const CustomTooltip = ({ active, payload }: any) => {
+    const CustomTooltip = ({ active, payload }: TooltipProps) => {
       if (active && payload && payload.length) {
         const data = payload[0].payload as ChartDataPoint;
         return (
@@ -111,8 +94,12 @@ export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartPro
     };
 
     // Custom bar component for forecast bars with dashed stroke and labels
-    const CustomBar = (props: any) => {
+    const CustomBar = (props: BarProps) => {
       const { payload, x, y, width, height, value } = props;
+      
+      if (!x || !y || !width || !height || value === undefined) {
+        return null;
+      }
       
       if (payload.isForecast) {
         return (
@@ -217,7 +204,7 @@ export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartPro
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend 
-                  formatter={(value, entry: any) => {
+                  formatter={(value, entry: LegendFormatterEntry) => {
                     if (entry.payload?.isForecast) {
                       return 'Forecasted';
                     }
