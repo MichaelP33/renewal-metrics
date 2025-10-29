@@ -7,14 +7,16 @@ import { ActiveUserGrowthDashboard } from '@/components/ActiveUserGrowthDashboar
 import { PercentileDashboard } from '@/components/PercentileDashboard';
 import { MCPUsageDashboard } from '@/components/mcp-usage-dashboard';
 import { RuleUsageDashboard } from '@/components/rule-usage-dashboard';
+import { OverageUsageDashboard } from '@/components/overage-usage-dashboard';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, BarChart3, AlertCircle } from 'lucide-react';
+import { TrendingUp, BarChart3, AlertCircle, DollarSign } from 'lucide-react';
 import { processPercentileData } from '@/lib/percentile-data-processing';
 import { 
   ActiveUserGrowthConfig, 
   PercentileConfig, 
   MCPUsageConfig, 
-  RuleUsageConfig 
+  RuleUsageConfig,
+  OverageUsageConfig
 } from '@/types';
 
 export default function TeamTrendsPage() {
@@ -23,23 +25,28 @@ export default function TeamTrendsPage() {
     percentileRawData,
     mcpUsageRawData,
     ruleUsageRawData,
+    overageUsageData,
     activeUserGrowthConfig,
     percentileConfig,
     mcpUsageConfig,
     ruleUsageConfig,
+    overageUsageConfig,
     setActiveUserGrowthConfig,
     setPercentileConfig,
     setMCPUsageConfig,
     setRuleUsageConfig,
+    setOverageUsageData,
+    setOverageUsageConfig,
     handleActiveUserGrowthUpload,
     handlePercentileUpload,
     handleMCPUsageUpload,
     handleRuleUsageUpload,
     isLoading,
-    error
+    error,
+    hasOverageUsageData
   } = useDashboardData();
 
-  const [activeTab, setActiveTab] = useState<'ACTIVE_USER_GROWTH' | 'PERCENTILE_DATA' | 'MCP_USAGE' | 'RULE_USAGE'>('ACTIVE_USER_GROWTH');
+  const [activeTab, setActiveTab] = useState<'ACTIVE_USER_GROWTH' | 'PERCENTILE_DATA' | 'MCP_USAGE' | 'RULE_USAGE' | 'OVERAGE_USAGE'>('ACTIVE_USER_GROWTH');
 
   const handleActiveUserGrowthConfigChange = (config: ActiveUserGrowthConfig) => {
     setActiveUserGrowthConfig(config);
@@ -55,6 +62,15 @@ export default function TeamTrendsPage() {
 
   const handleRuleUsageConfigChange = (config: RuleUsageConfig) => {
     setRuleUsageConfig(config);
+  };
+
+  const handleOverageUsageDataChange = (data: OverageUsageData) => {
+    console.log('[TeamTrendsPage] handleOverageUsageDataChange called with:', data);
+    setOverageUsageData(data);
+  };
+
+  const handleOverageUsageConfigChange = (config: OverageUsageConfig) => {
+    setOverageUsageConfig(config);
   };
 
   const hasActiveUserGrowthData = activeUserGrowthRawData.length > 0;
@@ -173,6 +189,24 @@ export default function TeamTrendsPage() {
                   )}
                 </div>
               </button>
+              <button
+                onClick={() => setActiveTab('OVERAGE_USAGE')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'OVERAGE_USAGE'
+                    ? 'border-orange-500 text-orange-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <DollarSign className="h-4 w-4" />
+                  <span>Overage Usage</span>
+                  {hasOverageUsageData && (
+                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      Loaded
+                    </span>
+                  )}
+                </div>
+              </button>
             </nav>
           </div>
         </div>
@@ -210,6 +244,15 @@ export default function TeamTrendsPage() {
           />
         )}
 
+        {activeTab === 'OVERAGE_USAGE' && (
+          <OverageUsageDashboard
+            data={overageUsageData}
+            config={overageUsageConfig}
+            onDataChange={handleOverageUsageDataChange}
+            onConfigChange={handleOverageUsageConfigChange}
+          />
+        )}
+
         {/* Show message if no data for active tab */}
         {((activeTab === 'ACTIVE_USER_GROWTH' && !hasActiveUserGrowthData) ||
           (activeTab === 'PERCENTILE_DATA' && !hasPercentileData) ||
@@ -228,7 +271,9 @@ export default function TeamTrendsPage() {
                   ? 'Upload account percentile distribution data to view percentile analytics.'
                   : activeTab === 'MCP_USAGE'
                   ? 'Upload account weekly MCP usage data to view MCP usage analytics.'
-                  : 'Upload account weekly rule usage data to view rule usage analytics.'
+                  : activeTab === 'RULE_USAGE'
+                  ? 'Upload account weekly rule usage data to view rule usage analytics.'
+                  : 'Enter monthly overage usage spend data to view analytics and forecasts.'
                 }
               </p>
             </CardContent>

@@ -90,7 +90,7 @@ export interface DateRange {
 }
 
 export type TimePeriod = 'MoM' | 'QoQ';
-export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE' | 'AI_CODE_METRICS' | 'ACTIVE_USER_GROWTH' | 'PERCENTILE_DATA' | 'MCP_USAGE' | 'RULE_USAGE';
+export type DataType = 'MODEL_COSTS' | 'WAU_ANALYTICS' | 'MAU_USAGE' | 'AI_CODE_METRICS' | 'ACTIVE_USER_GROWTH' | 'PERCENTILE_DATA' | 'MCP_USAGE' | 'RULE_USAGE' | 'OVERAGE_USAGE';
 export type WAUViewType = 'MoM' | 'WoW';
 
 export interface ChartConfig {
@@ -216,6 +216,23 @@ export interface RuleUsageConfig {
   visibleLines: Set<'rule_usage_wau' | 'agent_l4'>;
 }
 
+export interface OverageUsageMonthData {
+  month: string; // YYYY-MM format
+  spend: number; // Dollar amount
+}
+
+export type OverageUsageData = OverageUsageMonthData[];
+
+export type ForecastMethod = 'linear' | 'growth_rate';
+
+export interface OverageUsageConfig {
+  showLabels: boolean;
+  showForecast: boolean;
+  forecastMonths: number; // 1-12
+  forecastMethod: ForecastMethod;
+  customGrowthRate: number | null; // Percentage as decimal (-0.5 to 2.0), null uses calculated rate
+}
+
 export interface UserNameData {
   first_name: string;
   last_name: string;
@@ -283,6 +300,13 @@ export const MCP_USAGE_COLORS = {
 export const RULE_USAGE_COLORS = {
   rule_usage_wau: '#f54e00',  // Primary brand orange
   agent_l4: '#D4A27F'         // Tan/beige (consistent secondary)
+};
+
+// Overage Usage colors
+export const OVERAGE_USAGE_COLORS = {
+  actual: '#f54e00',          // Primary brand orange for actual spend
+  forecast: '#ff8844',        // Lighter orange for forecasted spend
+  forecastStroke: '#f54e00'    // Stroke color for forecast bars
 };
 
 // Cohort colors for multi-cohort comparison

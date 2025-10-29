@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import {
   RawDataRow,
   WAURawDataRow,
@@ -20,6 +20,8 @@ import {
   WAUChartConfig,
   MAUUsageData,
   MAUUsageConfig,
+  OverageUsageData,
+  OverageUsageConfig,
   CATEGORY_ORDER
 } from '@/types';
 import {
@@ -71,6 +73,8 @@ interface DashboardDataContextType {
   percentileConfig: PercentileConfig;
   mcpUsageConfig: MCPUsageConfig;
   ruleUsageConfig: RuleUsageConfig;
+  overageUsageData: OverageUsageData;
+  overageUsageConfig: OverageUsageConfig;
   
   // Loading and error states
   isLoading: boolean;
@@ -97,6 +101,8 @@ interface DashboardDataContextType {
   setPercentileConfig: React.Dispatch<React.SetStateAction<PercentileConfig>>;
   setMCPUsageConfig: React.Dispatch<React.SetStateAction<MCPUsageConfig>>;
   setRuleUsageConfig: React.Dispatch<React.SetStateAction<RuleUsageConfig>>;
+  setOverageUsageData: React.Dispatch<React.SetStateAction<OverageUsageData>>;
+  setOverageUsageConfig: React.Dispatch<React.SetStateAction<OverageUsageConfig>>;
   
   // Computed values
   hasModelCostsData: boolean;
@@ -106,6 +112,7 @@ interface DashboardDataContextType {
   hasPercentileData: boolean;
   hasMCPUsageData: boolean;
   hasRuleUsageData: boolean;
+  hasOverageUsageData: boolean;
 }
 
 const DashboardDataContext = createContext<DashboardDataContextType | undefined>(undefined);
@@ -192,6 +199,81 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
     dateRange: null,
     visibleLines: new Set(['rule_usage_wau', 'agent_l4'])
   });
+
+  // Overage Usage state with localStorage persistence
+  const STORAGE_KEY_DATA = 'overageUsageData';
+  const STORAGE_KEY_CONFIG = 'overageUsageConfig';
+
+  const [overageUsageData, setOverageUsageDataState] = useState<OverageUsageData>([]);
+  const [overageUsageConfig, setOverageUsageConfigState] = useState<OverageUsageConfig>({
+    showLabels: true,
+    showForecast: false,
+    forecastMonths: 3,
+    forecastMethod: 'linear',
+    customGrowthRate: null
+  });
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedData = localStorage.getItem(STORAGE_KEY_DATA);
+      if (storedData) {
+        const parsed = JSON.parse(storedData) as OverageUsageData;
+        setOverageUsageDataState(parsed);
+      }
+
+      const storedConfig = localStorage.getItem(STORAGE_KEY_CONFIG);
+      if (storedConfig) {
+        const parsed = JSON.parse(storedConfig) as OverageUsageConfig;
+        setOverageUsageConfigState(parsed);
+      }
+    } catch (error) {
+      console.error('Failed to load overage usage data from localStorage:', error);
+    }
+  }, []);
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(overageUsageData));
+    } catch (error) {
+      console.error('Failed to save overage usage data to localStorage:', error);
+    }
+  }, [overageUsageData]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(overageUsageConfig));
+    } catch (error) {
+      console.error('Failed to save overage usage config to localStorage:', error);
+    }
+  }, [overageUsageConfig]);
+
+  // Wrapper setters that update both state and localStorage
+  const setOverageUsageData = useCallback((data: OverageUsageData | ((prev: OverageUsageData) => OverageUsageData)) => {
+    console.log('[DashboardDataContext] setOverageUsageData called with:', data);
+    if (typeof data === 'function') {
+      setOverageUsageDataState((prev) => {
+        const newData = data(prev);
+        console.log('[DashboardDataContext] setOverageUsageData (function) - prev:', prev, 'new:', newData);
+        return newData;
+      });
+    } else {
+      console.log('[DashboardDataContext] setOverageUsageData (direct) - setting:', data);
+      setOverageUsageDataState(data);
+    }
+  }, []);
+
+  const setOverageUsageConfig = useCallback((config: OverageUsageConfig | ((prev: OverageUsageConfig) => OverageUsageConfig)) => {
+    if (typeof config === 'function') {
+      setOverageUsageConfigState((prev) => {
+        const newConfig = config(prev);
+        return newConfig;
+      });
+    } else {
+      setOverageUsageConfigState(config);
+    }
+  }, []);
 
   // Upload handlers
   const handleModelCostsUpload = useCallback(async (file: File, content: string) => {
@@ -350,6 +432,7 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
   const hasPercentileData = percentileRawData.length > 0;
   const hasMCPUsageData = mcpUsageRawData.length > 0;
   const hasRuleUsageData = ruleUsageRawData.length > 0;
+  const hasOverageUsageData = overageUsageData.length > 0;
 
   const value = useMemo(() => ({
     rawData,
@@ -370,6 +453,8 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
     percentileConfig,
     mcpUsageConfig,
     ruleUsageConfig,
+    overageUsageData,
+    overageUsageConfig,
     isLoading,
     error,
     handleModelCostsUpload,
@@ -390,13 +475,16 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
     setPercentileConfig,
     setMCPUsageConfig,
     setRuleUsageConfig,
+    setOverageUsageData,
+    setOverageUsageConfig,
     hasModelCostsData,
     hasWAUData,
     hasAICodeData,
     hasActiveUserGrowthData,
     hasPercentileData,
     hasMCPUsageData,
-    hasRuleUsageData
+    hasRuleUsageData,
+    hasOverageUsageData
   }), [
     rawData,
     wauRawData,
@@ -416,6 +504,8 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
     percentileConfig,
     mcpUsageConfig,
     ruleUsageConfig,
+    overageUsageData,
+    overageUsageConfig,
     isLoading,
     error,
     handleModelCostsUpload,
@@ -431,7 +521,8 @@ export function DashboardDataProvider({ children }: { children: React.ReactNode 
     hasActiveUserGrowthData,
     hasPercentileData,
     hasMCPUsageData,
-    hasRuleUsageData
+    hasRuleUsageData,
+    hasOverageUsageData
   ]);
 
   return (
