@@ -37,9 +37,6 @@ interface BarProps {
   value?: number;
 }
 
-interface LegendFormatterEntry {
-  payload?: ChartDataPoint;
-}
 
 export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartProps>(
   ({ data, config, title = "Overage Usage Spend", height = 400 }, ref) => {
@@ -204,12 +201,8 @@ export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartPro
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend 
-                  formatter={(value, entry: LegendFormatterEntry) => {
-                    if (entry.payload?.isForecast) {
-                      return 'Forecasted';
-                    }
-                    return 'Actual';
-                  }}
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  iconType="rect"
                 />
                 <Bar 
                   dataKey="spend" 
