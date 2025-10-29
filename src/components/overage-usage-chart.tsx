@@ -29,7 +29,7 @@ interface TooltipProps {
 }
 
 interface BarProps {
-  payload: ChartDataPoint;
+  payload?: ChartDataPoint;
   x?: number;
   y?: number;
   width?: number;
@@ -94,7 +94,7 @@ export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartPro
     const CustomBar = (props: BarProps) => {
       const { payload, x, y, width, height, value } = props;
       
-      if (!x || !y || !width || !height || value === undefined) {
+      if (!x || !y || !width || !height || value === undefined || !payload) {
         return null;
       }
       
