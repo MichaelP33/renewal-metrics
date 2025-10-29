@@ -207,7 +207,7 @@ export const OverageUsageChart = forwardRef<HTMLDivElement, OverageUsageChartPro
                 <Bar 
                   dataKey="spend" 
                   name="Spend"
-                  shape={CustomBar}
+                  shape={<CustomBar />}
                   isAnimationActive={false}
                 >
                   {chartData.map((entry, index) => (
