@@ -16,7 +16,8 @@ import {
   PercentileConfig, 
   MCPUsageConfig, 
   RuleUsageConfig,
-  OverageUsageConfig
+  OverageUsageConfig,
+  OverageUsageData
 } from '@/types';
 
 export default function TeamTrendsPage() {
