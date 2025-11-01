@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { usePowerUsers } from '@/contexts/PowerUsersContext';
 import { DataSourceLink } from '../DataSourceLink';
-import { TAM_MISSION_CONTROL_HEX_URL } from '@/lib/data-source-links';
+import { TAM_MISSION_CONTROL_HEX_URL, AI_CODE_METRICS_HEX_URL } from '@/lib/data-source-links';
 
 interface FileUploadState {
   file: File | null;
@@ -89,6 +89,9 @@ export function PowerUsersUpload() {
               </span>
             )}
           </div>
+          {kind === 'ai' && (
+            <DataSourceLink href={AI_CODE_METRICS_HEX_URL} />
+          )}
           {(kind === 'features' || kind === 'agent') && (
             <DataSourceLink href={TAM_MISSION_CONTROL_HEX_URL} />
           )}
