@@ -8,8 +8,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-  Cell
+  ResponsiveContainer
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3 } from 'lucide-react';
@@ -89,6 +88,9 @@ const CustomDataLabel = (props: DataLabelProps) => {
     return null; // Do not show labels for small values or undefined positions
   }
   
+  // Format as full number with comma separators, no abbreviations
+  const formattedValue = Math.round(value).toLocaleString();
+  
   return (
     <text
       x={x + width / 2}
@@ -97,9 +99,9 @@ const CustomDataLabel = (props: DataLabelProps) => {
       textAnchor="middle"
       dominantBaseline="middle"
       fontSize="11"
-      fontWeight="500"
+      fontWeight="700"
     >
-      {formatUserCount(value)}
+      {formattedValue}
     </text>
   );
 };
@@ -159,13 +161,8 @@ export const WAUMoMChart = forwardRef<HTMLDivElement, WAUMoMChartProps>(
                   stroke={WAU_COLORS.primary}
                   strokeWidth={0}
                   radius={[2, 2, 0, 0]}
-                >
-                  {config.showDataLabels && (
-                    <Cell>
-                      <CustomDataLabel />
-                    </Cell>
-                  )}
-                </Bar>
+                  label={config.showDataLabels ? <CustomDataLabel /> : false}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
